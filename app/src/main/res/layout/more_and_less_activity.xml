@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginLeft="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/time"
+            android:textSize="25dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btn_big_power_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="开始分析"
+                android:onClick="bigPower"/>
+            <TextView
+                android:id="@+id/tv_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0%"/>
+            <ProgressBar
+                android:visibility="gone"
+                android:id="@+id/loading"
+                android:layout_gravity="center_vertical"
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_after"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="符合放量追涨："/>
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/tv_more_less"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="放量后缩量："/>
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/tv_wait"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="符合缩量埋伏："/>
+
+        <TextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/tv_horizontal_plate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="平盘震荡："/>
+    </LinearLayout>
+</ScrollView>
