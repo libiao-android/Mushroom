@@ -381,8 +381,8 @@ class SharesRecordActivity : AppCompatActivity() {
                     zongShiZhi = values[13].trim().toDouble()
                 } else {
                     if(yesterdayPrice > 0) {
-                        val s = String.format("%.4f",(nowPrice - yesterdayPrice)  / yesterdayPrice)
-                        range = s.toDouble() * 100
+                        val s = String.format("%.2f",(nowPrice - yesterdayPrice)  / yesterdayPrice * 100)
+                        range = s.toDouble()
                     }
                 }
             }
