@@ -1,10 +1,8 @@
 package com.libiao.mushroom
 
+import android.app.DatePickerDialog
 import android.content.Context
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Looper
+import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.libiao.mushroom.mode.*
+import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import java.io.BufferedReader
 import java.io.File
@@ -47,7 +46,6 @@ class SharesAnalysisActivity : AppCompatActivity() {
 
     private var time = "2021-4-30"
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.more_and_less_activity)
@@ -71,7 +69,39 @@ class SharesAnalysisActivity : AppCompatActivity() {
 
         timeTv?.text = "日期：$time"
 
+        chooseDate()
         initData()
+    }
+
+    private fun chooseDate() {
+        val f = File(file, "sz000001")
+        var lines : List<String>? = null
+        if(f.exists()) {
+            val stream = FileInputStream(f)
+            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+            lines = reader.readLines()
+        }
+        timeTv?.setOnClickListener {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+                val dialog = DatePickerDialog(this)
+                dialog.setOnDateSetListener { view, year, month, dayOfMonth ->
+                    i(TAG, "$year, $month, $dayOfMonth")
+                    timeTv?.text = "日期：$year-${month + 1}-$dayOfMonth"
+
+                    Constant.PRE = 0
+                    lines?.forEachIndexed{ index, s ->
+                        if(s.startsWith("$year-${month + 1}-$dayOfMonth")) {
+                            Constant.PRE = lines.size - index - 1
+                            i(TAG, "pre: ${Constant.PRE}")
+                            return@setOnDateSetListener
+                        }
+                    }
+
+
+                }
+                dialog.show()
+            }
+        }
     }
 
     private fun initData() {
@@ -133,6 +163,10 @@ class SharesAnalysisActivity : AppCompatActivity() {
     }
 
     fun startAnalysis(view: View) {
+        mModeList.forEach {
+            it.clear()
+        }
+        mAdapter?.notifyDataSetChanged()
         start()
         //test()
         loadingPb?.visibility = View.VISIBLE
@@ -140,7 +174,7 @@ class SharesAnalysisActivity : AppCompatActivity() {
     }
 
     private fun test() {
-        analysis("sz300767")
+        analysis("sz000799")
     }
 
     class SharesInfoAdater(val context: Context) : RecyclerView.Adapter<SharesInfoHolder>() {

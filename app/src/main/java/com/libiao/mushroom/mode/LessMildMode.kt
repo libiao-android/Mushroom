@@ -1,13 +1,14 @@
 package com.libiao.mushroom.mode
 
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
 class LessMildMode : BaseMode() {
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = size - 3
+        mDeviationValue = size - 3 - Constant.PRE
         if(mDeviationValue >= 0) {
             val today = shares[mDeviationValue + 2]
             val pre1 = shares[mDeviationValue + 1]
@@ -19,9 +20,13 @@ class LessMildMode : BaseMode() {
                     val b = today.totalPrice / pre1.totalPrice
                     if(a < 0.8 && a > 0.7) {
                         if(b < 0.8 && b > 0.7) {
-                            if(today.zongShiZhi > 30 && today.zongShiZhi > 100) {
+                            if(today.zongShiZhi > 100) {
                                 i(TAG, "两天缩量：${today.brieflyInfo()}, ${today.range}, ${pre1.range}")
-                                mFitModeList.add(Pair(today.totalPrice, today))
+                                if(mDeviationValue + 3 < size) {
+                                    val post = shares[mDeviationValue + 3]
+                                    today.postRange = post.range
+                                }
+                                mFitModeList.add(Pair(a + b, today))
                             }
                         }
                     }

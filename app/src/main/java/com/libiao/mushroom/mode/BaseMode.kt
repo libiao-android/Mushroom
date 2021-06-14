@@ -26,7 +26,12 @@ abstract class BaseMode {
         val sb = StringBuilder("")
 
         for(i in 0 until size) {
-            sb.append("${mFitModeList[i].second?.code}, ${mFitModeList[i].second?.name} \n")
+            sb.append("${mFitModeList[i].second?.code}" +
+                    ",  ${mFitModeList[i].second?.name}" +
+                    ",  ${String.format("%.4f",mFitModeList[i].first)}" +
+                    ",  ${mFitModeList[i].second?.postRange}" +
+                    ",  ${mFitModeList[i].second?.zongShiZhi}" +
+                    " \n")
         }
 
         return sb.toString()

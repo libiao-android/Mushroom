@@ -1,6 +1,8 @@
 package com.libiao.mushroom.mode
 
+import com.libiao.mushroom.SharesAnalysisActivity
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import kotlin.math.abs
 import kotlin.math.max
@@ -10,12 +12,14 @@ class HorizontalPlateMode : BaseMode() {
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = size - 4
-        if(mDeviationValue >  0) {
+        //i(TAG, "$size")
+        mDeviationValue = size - 5 - Constant.PRE
+        if(mDeviationValue >= 0) {
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
             val four = shares[mDeviationValue + 3]
+            val five = shares[mDeviationValue + 4]
 
 
             var middleOne = (one.beginPrice + one.nowPrice) / 2
@@ -26,37 +30,49 @@ class HorizontalPlateMode : BaseMode() {
 
             var middleFour = (four.beginPrice + four.nowPrice) / 2
 
-            if(four.nowPrice > 30) {
-                middleOne = String.format("%.1f",middleOne).toDouble()
-                middletwo = String.format("%.1f",middletwo).toDouble()
-                middleThree = String.format("%.1f",middleThree).toDouble()
-                middleFour = String.format("%.1f",middleFour).toDouble()
-            }
+            var middleFive = (five.beginPrice + five.nowPrice) / 2
+
             var totalPriceMin = min(one.totalPrice, two.totalPrice)
             totalPriceMin = min(totalPriceMin, three.totalPrice)
             totalPriceMin = min(totalPriceMin, four.totalPrice)
+            totalPriceMin = min(totalPriceMin, five.totalPrice)
             //val incremental = (middleOne < middletwo && middletwo < middleThree) || (middletwo < middleThree && middleThree < middleFour)
             val incremental = false
-            val decreasing = (middleOne > middletwo && middletwo > middleThree) || (middletwo > middleThree && middleThree > middleFour)
+            //val decreasing = (middleOne > middletwo && middletwo > middleThree) || (middletwo > middleThree && middleThree > middleFour)
 
-            if(totalPriceMin > 100000000 && four.nowPrice > 10 && !incremental && !decreasing) {
+            if(totalPriceMin > 100000000) {
 
                 var middleMax = max(middleOne, middletwo)
                 middleMax = max(middleMax, middleThree)
                 middleMax = max(middleMax, middleFour)
+                middleMax = max(middleMax, middleFive)
 
                 var middleMin = min(middleOne, middletwo)
                 middleMin = min(middleMin, middleThree)
                 middleMin = min(middleMin, middleFour)
+                middleMin = min(middleMin, middleFive)
 
-                if((middleMax - middleMin) / middleMin < 0.05) {
-                    if(abs(one.range) < 1 && abs(two.range) < 1 && abs(three.range) < 1 && abs(four.range) < 1) {
-                        i(TAG, "震荡模式：${shares.last().brieflyInfo()}")
-                        mFitModeList.add(Pair(four.zongShiZhi, four))
+                val a = (middleMax - middleMin) / middleMin
+
+                //i(TAG, "${one.brieflyInfo()}, $middleMin, $middleMax, $a")
+
+                if(a < getValue(five.nowPrice)) {
+                    i(TAG, "震荡模式：$a, ${one.brieflyInfo()}, ${five.nowPrice}")
+                    if(mDeviationValue + 5 < size) {
+                        val six = shares[mDeviationValue + 5]
+                        five.postRange = six.range
                     }
+                    mFitModeList.add(Pair(a, five))
                 }
             }
         }
+    }
+
+    private fun getValue(nowPrice: Double): Double {
+        if(nowPrice > 150) return 0.0099
+        if(nowPrice > 100) return 0.005
+        if(nowPrice > 50) return 0.004
+        return 0.002
     }
 
     override fun des(): String {

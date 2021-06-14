@@ -1,13 +1,14 @@
 package com.libiao.mushroom.mode
 
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
 class MoreMildMode : BaseMode() {
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = size - 3
+        mDeviationValue = size - 3 - Constant.PRE
         if(mDeviationValue >  0) {
 
             val zero = shares[mDeviationValue - 1]
@@ -41,6 +42,10 @@ class MoreMildMode : BaseMode() {
                         val c = three.totalCount / maxCount.toDouble()
                         //Log.i(Constant.TAG, "${three.totalCount}, $maxCount")
                         i(TAG, "$a, $b, $c, ${three.brieflyInfo()}")
+                        if(mDeviationValue + 3 < size) {
+                            val post = shares[mDeviationValue + 3]
+                            three.postRange = post.range
+                        }
                         mFitModeList.add(Pair(a + b, three))
                     }
 

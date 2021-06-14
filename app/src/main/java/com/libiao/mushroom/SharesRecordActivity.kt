@@ -360,6 +360,8 @@ class SharesRecordActivity : AppCompatActivity() {
         var liuTongShiZhi: Double = 0.00 //流通市值
         var zongShiZhi: Double = 0.00 //总市值
 
+        var postRange = 0.00
+
         constructor(){}
         constructor(info: String){
             val values = info.split(",")
