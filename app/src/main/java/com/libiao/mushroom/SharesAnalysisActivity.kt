@@ -106,10 +106,15 @@ class SharesAnalysisActivity : AppCompatActivity() {
 
     private fun initData() {
         mModeList.add(LeaderMode())
-        mModeList.add(MoreShizixingMode())
-        mModeList.add(MoreMildMode())
-        mModeList.add(HorizontalPlateMode())
-        mModeList.add(LessMildMode())
+//        mModeList.add(MoreShizixingMode())
+//        mModeList.add(MoreMildMode())
+//        mModeList.add(HorizontalPlateMode())
+//        mModeList.add(LessMildMode())
+        mModeList.add(MoreMoreMode1())
+        mModeList.add(MoreMoreMode2())
+        mModeList.add(MoreMoreMode3())
+        mModeList.add(MoreMoreMode4())
+        mModeList.add(MoreMoreMode5())
     }
 
     private fun start() {

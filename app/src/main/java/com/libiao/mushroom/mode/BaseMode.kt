@@ -43,12 +43,12 @@ abstract class BaseMode {
 
     fun more(firstDay: SharesRecordActivity.ShareInfo, secondDay: SharesRecordActivity.ShareInfo): Boolean {
 
-        if(secondDay.range > 5) { //当天涨幅大于5%
+        if(secondDay.range > 5 && firstDay.range < 9) { //当天涨幅大于5%
             var multiple = 0.00
             if(firstDay.totalPrice > 0) {
                 multiple = secondDay.totalPrice / firstDay.totalPrice
             }
-            if(firstDay.totalPrice > 50000000 && multiple > 2.5 && multiple < 4) {
+            if(secondDay.totalPrice > 150000000 && multiple > 2.5) {
                 //Log.i("libiao", "放量：${today.toFile()}, multiple: $multiple")
                 return true
             }
@@ -64,5 +64,9 @@ abstract class BaseMode {
     fun getRange(begin: Double, end: Double): Double {
         val s = String.format("%.4f",(end - begin)  / begin * 100)
         return s.toDouble()
+    }
+
+    fun isChuang(code: String?): Boolean {
+        return code?.startsWith("sz300") ?: false
     }
 }
