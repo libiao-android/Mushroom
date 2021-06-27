@@ -8,6 +8,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <Button
+            android:enabled="false"
             android:id="@+id/btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -26,5 +27,11 @@
             android:layout_height="20dp"/>
 
     </LinearLayout>
+    <Button
+        android:enabled="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="history"
+        android:text="补充历史数据"/>
 
 </LinearLayout>

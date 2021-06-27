@@ -18,7 +18,7 @@ abstract class BaseMode {
     abstract fun des(): String
 
 
-    fun content(): String {
+    open fun content(): String {
         val size = mFitModeList.size
         i(TAG, "mFitModeList: $size")
         mFitModeList.sortByDescending { it.first }
@@ -43,12 +43,20 @@ abstract class BaseMode {
 
     fun more(firstDay: SharesRecordActivity.ShareInfo, secondDay: SharesRecordActivity.ShareInfo): Boolean {
 
-        if(secondDay.range > 5 && firstDay.range < 9) { //当天涨幅大于5%
+        if(secondDay.range > 5) { //当天涨幅大于5%
             var multiple = 0.00
             if(firstDay.totalPrice > 0) {
                 multiple = secondDay.totalPrice / firstDay.totalPrice
             }
-            if(secondDay.totalPrice > 150000000 && multiple > 2.5) {
+            var m = 3.5
+            if(firstDay.totalPrice > 500000000) {
+                m = 2.0
+            } else if(firstDay.totalPrice > 250000000) {
+                m = 2.5
+            } else if(firstDay.totalPrice > 100000000) {
+                m = 3.0
+            }
+            if(multiple > m) {
                 //Log.i("libiao", "放量：${today.toFile()}, multiple: $multiple")
                 return true
             }
@@ -58,7 +66,8 @@ abstract class BaseMode {
 
     fun isShiZiXing(begin: Double, end: Double): Boolean {
         //return false
-        return abs(begin - end) / min(begin, end) < 0.0019
+        if(abs(begin - end) <= 0.01) return true
+        return abs(begin - end) / min(begin, end) < 0.0025
     }
 
     fun getRange(begin: Double, end: Double): Double {

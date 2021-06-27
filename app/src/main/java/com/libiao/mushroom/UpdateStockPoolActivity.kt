@@ -10,19 +10,28 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.libiao.mushroom.utils.CodeUtil
+import com.libiao.mushroom.utils.Constant
+import com.libiao.mushroom.utils.FileUtil
+import com.libiao.mushroom.utils.LogUtil.i
 import okhttp3.*
-import java.io.File
-import java.io.FileWriter
-import java.io.IOException
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.*
 import java.lang.Exception
 import java.lang.StringBuilder
+import java.nio.charset.Charset
 
 class UpdateStockPoolActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "UpdateStockPoolActivity"
+    }
 
     private val mHandler = Handler()
     private val client = OkHttpClient()
 
     private val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")
+    private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
     private var stockPoolFile: File? = null
 
     private var latelyTime: String? = null
@@ -47,6 +56,20 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         if (!file.exists()) {
             file.mkdir()
         }
+        if (!fileNew.exists()) {
+            fileNew.mkdir()
+        }
+
+        val file1 = File(fileNew, "sh601528")
+        if(!file1.exists()) {
+            file1.createNewFile()
+        }
+
+        val file2 = File(fileNew, "sz301004")
+        if(!file2.exists()) {
+            file2.createNewFile()
+        }
+
 
         progressTv = findViewById(R.id.tv_progress)
 
@@ -63,7 +86,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
         startTime = System.currentTimeMillis()
 
-        stockPoolFile = File(file, "stock_pool")
+        stockPoolFile = File(fileNew, "stock_pool")
         stockPoolFile?.also {
             it.delete()
             it.createNewFile()
@@ -102,7 +125,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             Log.i("libiao", "进度：90%")
             mHandler.post { progressTv?.text = "90%, $count" }
             //创业板股票 sz300
-            for(i in 1 .. 999) {
+            for(i in 1 .. 1500) {
                 val code = CodeUtil.getCyCode(i)
                 //Log.i("libiao", code)
                 queryInfo(code)
@@ -126,6 +149,8 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                 loadingPb?.visibility = View.GONE
                 btn?.isEnabled = true
             }
+
+            i(TAG, "${set.size}, ${set.toString()}")
 
         }.start()
 
@@ -164,8 +189,10 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         })
     }
 
+    val set = HashSet<String>()
     private fun parseSharesInfo(response: String?) {
         response?.also {
+
             val leftRight = it.split("=")
             if (leftRight.size < 2) return
             val info = leftRight[0].split("_")
@@ -173,11 +200,21 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             val params = leftRight[1].split(",")
             val name = params[0].substring(1)
             val time = params[30]
+            val statusP = params[32]
+            val status = statusP.substring(0, 2)
+            set.add(status)
+            //i(TAG, "status: $status")
+//            if(status == "-3" || status == "-2" || status == "03") {
+//                i(TAG, "$it")
+//            }
+//            if(status.trim().isEmpty()) {
+//                i(TAG, "$it")
+//            }
             //Log.i("libiao", "code: $code, name: $name, price: $price")
             if(code == "sz000001") {
                 latelyTime = time
             }
-            if(time == latelyTime) {
+            if(time == latelyTime && status != "-3" && status != "-2" && status != "03") {
                 sb.append("$code, $name\n")
                 count++
                 if(count % 400 == 0) {
@@ -186,7 +223,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                     writeFileAppend(infos)
                 }
             } else {
-                //Log.i("libiao", " 抛弃 code: $code, time: $time")
+                i(TAG, " 抛弃 code: $code, time: $time, status: $status")
             }
         }
     }
@@ -208,6 +245,173 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+
+
+    private var isHistoryDoing = false
+    fun history(v: View) {
+        i(TAG, "isHistoryDoing: $isHistoryDoing")
+        if(isHistoryDoing) return
+        isHistoryDoing = true
+        Thread{
+
+            val stream = FileInputStream(File(fileNew, "stock_pool"))
+            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+            var str: String?
+            str = reader.readLine()
+            var count = 0
+            while (str != null) {
+                count++
+                if(count % 100 == 0) {
+                    i(TAG, "str: $str, $count")
+                }
+                val a = str.split(",")
+                getHistoryData(a[0].trim(), a[1].trim())
+                str = reader.readLine()
+                Thread.sleep(200)
+            }
+            isHistoryDoing = false
+            i(TAG, "history end")
+        }.start()
+
+        //getHistoryData("sz300999", "瑞玛工业")
+    }
+
+    private fun getHistoryData(code: String, name: String) {
+        //i(TAG, "getHistoryData: $code, $name")
+        //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
+        val request = Request.Builder()
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20200101&end=20210624")
+            .build()
+
+        val call = client.newCall(request)
+
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call?, e: IOException?) {
+                i(TAG, "onFailure: ${e}")
+            }
+
+            override fun onResponse(call: Call?, response: Response?) {
+                val value = response?.body()?.string()
+                //Log.i("libiao", "response: ${value}")
+                try {
+                    if (value != null && value.length > 50) {
+                        parseHistoryInfo(value, code, name)
+                    } else {
+                        i(TAG, "getHistoryData exception value: ${value}, $code, $name")
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    i(TAG, "getHistoryData exception: ${e.message}, $code, $name")
+                }
+            }
+        })
+    }
+
+    private fun parseHistoryInfo(value: String, code: String, name: String) {
+        val array_5 = arrayOfNulls<Double>(5)
+        val array_10 = arrayOfNulls<Double>(10)
+        val array_20 = arrayOfNulls<Double>(20)
+        val json = JSONArray(value)[0] as JSONObject
+        val array = json.getJSONArray("hq")
+        //i(TAG, "array: ${array.length()}")
+        var index = 0
+        var yesToday = 0.00
+        val sharesInfoSb = StringBuilder()
+        for( i in array.length()-1 downTo 0) {
+            //i(TAG, "${array[i]}")
+            val info = array[i] as JSONArray
+            //val strs = info[0].toString().split(",")
+            val time = info[0].toString()
+            val beginPrice = info[1].toString().toDouble()
+            val nowPrice = info[2].toString().toDouble()
+            val range = info[4].toString()
+            val rangeD = range.substring(0, range.length - 1).toDouble()
+            val minPrice = info[5].toString().toDouble()
+            val maxPrice = info[6].toString().toDouble()
+            val totalCount = info[7].toString().toInt()
+            val totalPrice = info[8].toString().toDouble() * 10000
+            val huanShouLv = info[9].toString()
+            //i(TAG, "huanShouLv: $huanShouLv")
+            val huanShouLvD = safeToDouble(huanShouLv.substring(0, huanShouLv.length - 1))
+//            i(TAG, "time: $time")
+//            i(TAG, "beginPrice: $beginPrice")
+//            i(TAG, "nowPrice: $nowPrice")
+//            i(TAG, "rangeD: $rangeD")
+//            i(TAG, "minPrice: $minPrice")
+//            i(TAG, "maxPrice: $maxPrice")
+//            i(TAG, "totalCount: $totalCount")
+//            i(TAG, "totalPrice: $totalPrice")
+//            i(TAG, "huanShouLvD: $huanShouLvD")
+
+            //String.format("%.2f",(nowPrice - yesterdayPrice)  / yesterdayPrice * 100)
+
+            val shareInfo = SharesRecordActivity.ShareInfo()
+            shareInfo.time = time
+            shareInfo.code = code
+            shareInfo.name = name
+            shareInfo.yesterdayPrice = yesToday
+            shareInfo.beginPrice = beginPrice
+            shareInfo.nowPrice = nowPrice
+            shareInfo.range = rangeD
+            shareInfo.minPrice = minPrice
+            shareInfo.maxPrice = maxPrice
+            shareInfo.totalCount = totalCount
+            shareInfo.totalPrice = totalPrice
+            shareInfo.huanShouLv = huanShouLvD
+            if(yesToday != 0.00) {
+                val rangeBegin = String.format("%.2f", (beginPrice - yesToday) / yesToday * 100)
+                val rangeMin = String.format("%.2f", (minPrice - yesToday) / yesToday * 100)
+                val rangeMax = String.format("%.2f", (maxPrice - yesToday) / yesToday * 100)
+                shareInfo.rangeBegin = rangeBegin.toDouble()
+                shareInfo.rangeMin = rangeMin.toDouble()
+                shareInfo.rangeMax = rangeMax.toDouble()
+            }
+            array_5[index % 5] = nowPrice
+            array_10[index % 10] = nowPrice
+            array_20[index % 20] = nowPrice
+            if(index >= 4) {
+                val str_5 = String.format("%.2f", array_5.sumByDouble { it ?: 0.00 } / 5)
+                shareInfo.line_5 = str_5.toDouble()
+            }
+            if(index >= 9) {
+                val str_10 = String.format("%.2f", array_10.sumByDouble { it ?: 0.00 } / 10)
+                shareInfo.line_10 = str_10.toDouble()
+            }
+            if(index >= 19) {
+                val str_20 = String.format("%.2f", array_20.sumByDouble { it ?: 0.00 } / 20)
+                shareInfo.line_20 = str_20.toDouble()
+            }
+            //i(TAG, shareInfo.toFile())
+            sharesInfoSb.append("${shareInfo.toFile()}\n")
+            yesToday = nowPrice
+            index++
+
+            if(index % 20 == 0) {
+                writeToFile(code, sharesInfoSb.toString())
+                sharesInfoSb.clear()
+            }
+        }
+        writeToFile(code, sharesInfoSb.toString())
+    }
+
+    private fun safeToDouble(substring: String): Double {
+        try {
+            return substring.toDouble()
+        }catch (e: Exception) {
+
+        }
+        return 0.00
+    }
+
+    private fun writeToFile(code: String, info: String) {
+        //i(TAG, "$info")
+        val file = File(fileNew, code)
+        if(!file.exists()) {
+            file.createNewFile()
+        }
+        FileUtil.writeFileAppend(file, info)
     }
 }
 

@@ -42,7 +42,7 @@ class SharesAnalysisActivity : AppCompatActivity() {
     private var loadingPb: ProgressBar? = null
     private var bigPowerBtn: Button? = null
 
-    private val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")
+    private val file = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
 
     private var time = "2021-4-30"
 
@@ -106,15 +106,20 @@ class SharesAnalysisActivity : AppCompatActivity() {
 
     private fun initData() {
         mModeList.add(LeaderMode())
+
 //        mModeList.add(MoreShizixingMode())
 //        mModeList.add(MoreMildMode())
 //        mModeList.add(HorizontalPlateMode())
 //        mModeList.add(LessMildMode())
+
         mModeList.add(MoreMoreMode1())
         mModeList.add(MoreMoreMode2())
         mModeList.add(MoreMoreMode3())
         mModeList.add(MoreMoreMode4())
         mModeList.add(MoreMoreMode5())
+
+        mModeList.add(UpLine5Mode())
+        mModeList.add(UpLine10Mode())
     }
 
     private fun start() {

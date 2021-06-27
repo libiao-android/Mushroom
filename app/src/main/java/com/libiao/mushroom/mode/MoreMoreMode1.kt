@@ -3,14 +3,13 @@ package com.libiao.mushroom.mode
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
-import kotlin.math.abs
-import kotlin.math.min
 
 class MoreMoreMode1 : BaseMode() {
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - 3 - Constant.PRE
+
         if(mDeviationValue >  0) {
 
             val zero = shares[mDeviationValue - 1]
@@ -21,23 +20,40 @@ class MoreMoreMode1 : BaseMode() {
             if(more(zero, one)) {
                 if(two.totalPrice > one.totalPrice * 1) { // 连续两天放量
                     if(two.nowPrice > (one.beginPrice + one.nowPrice)/2
-                        && three.nowPrice > (one.beginPrice + one.nowPrice)/2
+                        && three.nowPrice > (one.beginPrice + one.nowPrice) * 0.51
                         && two.maxPrice > one.nowPrice ) { //放量后价格不能低于放量前
 
                         if (two.beginPrice > two.nowPrice && three.beginPrice > three.nowPrice) { //连续两天收阴线
                             if (three.totalPrice > zero.totalPrice * 2 && three.totalPrice > 130000000 && three.totalPrice > one.totalPrice * 0.7) { //连续收阴量能不能太低
                                 if (three.totalPrice > zero.totalPrice * 3 || three.totalPrice * 2 > two.totalPrice) {
-                                    i(
-                                        TAG,
-                                        "${three.brieflyInfo()}, ${one.range}, ${two.range}, ${three.range}"
-                                    )
+                                    if(three.nowPrice > one.nowPrice) { //高位
+                                        if(three.totalPrice < (one.totalPrice + two.totalPrice)/2) { //缩量
+                                            if(three.maxPrice > two.maxPrice) { //创新高
+                                                return
+                                            }
+                                        }
+                                    }
+
+                                    if(three.maxPrice < two.nowPrice) { //跳空低开低走
+                                        return
+                                    }
+
+                                    val shangYinXianTwo = two.maxPrice - two.beginPrice > (two.beginPrice - two.nowPrice) * 2
+                                    val shangYinXianThree = three.maxPrice - three.beginPrice > (three.beginPrice - three.nowPrice) * 2
+                                    if(shangYinXianTwo && shangYinXianThree) {
+                                        val m = three.beginPrice - three.nowPrice > (three.nowPrice - three.minPrice)
+                                        if(m) { return }
+                                    }
+                                    i(TAG, "${three.brieflyInfo()}")
+
+
                                     if(mDeviationValue + 3 < size) {
                                         val post = shares[mDeviationValue + 3]
                                         three.postRange = post.range
                                     }
                                     mFitModeList.add(
                                         Pair(
-                                            one.range + two.range + three.range,
+                                            three.range,
                                             three
                                         )
                                     )
@@ -52,6 +68,7 @@ class MoreMoreMode1 : BaseMode() {
 
             }
         }
+
     }
 
     override fun des(): String {

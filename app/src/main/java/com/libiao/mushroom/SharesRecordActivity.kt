@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.libiao.mushroom.utils.Constant
+import com.libiao.mushroom.utils.LogUtil.i
 import okhttp3.*
 import java.io.*
 import java.lang.Exception
@@ -21,10 +22,14 @@ import java.util.*
 
 class SharesRecordActivity : AppCompatActivity() {
 
+    companion object {
+        private const val TAG = "SharesRecordActivity"
+    }
+
     private val mHandler = Handler()
     private val client = OkHttpClient()
 
-    private val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")
+    private val file = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
 
     private var progressTv: TextView? = null
 
@@ -56,7 +61,7 @@ class SharesRecordActivity : AppCompatActivity() {
         btn?.isEnabled = false
         loadingPb?.visibility = View.VISIBLE
         Thread {
-            Log.i("libiao_A", "开始查询")
+            i(TAG, "开始查询")
             val stream = FileInputStream(File(file, "stock_pool"))
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
             var str: String?
@@ -72,12 +77,14 @@ class SharesRecordActivity : AppCompatActivity() {
                 queryInfo(str.split(",")[0])
                 str = reader.readLine()
             }
+            reader.close()
+            stream.close()
             mHandler.post{
                 progressTv?.text = "$100%, $count"
                 loadingPb?.visibility = View.GONE
                 btn?.isEnabled = true
             }
-            Log.i("libiao_A", "结束查询")
+            i(TAG, "结束查询")
         }.start()
 
     }
@@ -114,6 +121,8 @@ class SharesRecordActivity : AppCompatActivity() {
             //Log.i("libiao_A", "$lines")
             val lastLine = lines.last()
             Log.i("libiao_A", "lastLine: $lastLine")
+            reader.close()
+            stream.close()
             val info = ShareInfo(lastLine)
             if(info.time != time) return false
         }
@@ -138,9 +147,8 @@ class SharesRecordActivity : AppCompatActivity() {
     }
 
     private fun queryInfo(code: String) {
-        //networkRequestForSina(code)
         networkRequestForQt(code)
-        Thread.sleep(100)
+        Thread.sleep(200)
     }
 
     private fun networkRequestForQt(code: String) {
@@ -169,35 +177,6 @@ class SharesRecordActivity : AppCompatActivity() {
         })
     }
 
-    private fun networkRequestForSina(code: String) {
-
-        val request = Request.Builder()
-            .url("https://hq.sinajs.cn/list=$code")
-            .build()
-
-        val call = client.newCall(request)
-
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call?, e: IOException?) {
-                Log.i("libiao_A", "onFailure: ${e}")
-            }
-
-            override fun onResponse(call: Call?, response: Response?) {
-                val value = response?.body()?.string()
-                //Log.i("libiao_A", "response: ${value}")
-                try {
-                    if (value != null && value.length > 50) {
-                        parseSharesInfoForSina(value)
-                    } else {
-                        Log.i("libiao_A", "exception value: $value")
-                    }
-                } catch (e: Exception) {
-                    Log.i("libiao_A", "parseSharesInfo exception: ${e.message}")
-                }
-            }
-        })
-    }
-
     private fun parseSharesInfoForQt(code: String, response: String?) {
         val values = response?.split("~")
         values?.also {
@@ -218,10 +197,24 @@ class SharesRecordActivity : AppCompatActivity() {
                 info.liuTongShiZhi = it[44].toDouble()
                 info.zongShiZhi = it[45].toDouble()
 
+                val rangeBegin = String.format("%.2f", (info.beginPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
+                val rangeMin = String.format("%.2f", (info.minPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
+                val rangeMax = String.format("%.2f", (info.maxPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
+                info.rangeBegin = rangeBegin.toDouble()
+                info.rangeMin = rangeMin.toDouble()
+                info.rangeMax = rangeMax.toDouble()
+
                 //Log.i(Constant.TAG, info.toString())
 
                 val file = File(file, code)
                 if(file.exists()) {
+                    val stream = FileInputStream(file)
+                    val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+                    val lines = reader.readLines()
+                    supplyAvgLines(info, lines)
+                    reader.close()
+                    stream.close()
+                    //i(TAG, info.toFile())
                     writeFileAppend(file, info.toFile())
                 } else {
                     Log.i("libiao_A", "file not exist: $info")
@@ -233,41 +226,69 @@ class SharesRecordActivity : AppCompatActivity() {
         }
     }
 
-    private fun parseSharesInfoForSina(response: String?) {
-        response?.also {
-            val leftRight = it.split("=")
-            if (leftRight.size < 2) return
-            val info = leftRight[0].split("_")
-            val code = info[info.size - 1]
-            val params = leftRight[1].split(",")
-            val name = params[0].substring(1)
-            val beginPrice = params[1].toDouble()
-            val yesterdayPrice = params[2].toDouble()
-            val price = params[3].toDouble()
-            val maxPrice = params[4].toDouble()
-            val minPrice = params[5].toDouble()
-            val totalCount = params[8].toInt()
-            val totalPrice = params[9].toDouble()
-            val time = params[30]
-            //Log.i("libiao_A", "code: $code, name: $name, price: $price")
+    private fun supplyAvgLines(info: ShareInfo, lines: List<String>) {
+        when {
+            lines.size >= 19 -> {
+                val avg_lines = lines.subList(lines.size - 19, lines.size)
+                val shares = ArrayList<ShareInfo>()
+                for(line in avg_lines) {
+                    shares.add(ShareInfo(line))
+                }
+                var sum_20 = info.nowPrice
+                var sum_10 = info.nowPrice
+                var sum_5 = info.nowPrice
+                shares.forEachIndexed { index, shareInfo ->
+                    sum_20 += shareInfo.nowPrice
+                    if(index >= 10) {
+                        sum_10 += shareInfo.nowPrice
+                    }
+                    if(index >= 15) {
+                        sum_5 += shareInfo.nowPrice
+                    }
+                }
+                val str_20 = String.format("%.2f", sum_20 / 20)
+                info.line_20 = str_20.toDouble()
 
-            val sharesInfo = ShareInfo()
-            sharesInfo.name = name
-            sharesInfo.code = code
-            sharesInfo.beginPrice = beginPrice
-            sharesInfo.yesterdayPrice = yesterdayPrice
-            sharesInfo.nowPrice = price
-            sharesInfo.maxPrice = maxPrice
-            sharesInfo.minPrice = minPrice
-            sharesInfo.totalCount = totalCount
-            sharesInfo.totalPrice = totalPrice
-            sharesInfo.time = this.time
-            //Log.i("libiao_A", sharesInfo.toString())
-            val file = File(file, code)
-            if(file.exists()) {
-                writeFileAppend(file, sharesInfo.toFile())
-            } else {
-                Log.i("libiao_A", "file not exist: $sharesInfo")
+                val str_10 = String.format("%.2f", sum_10 / 10)
+                info.line_10 = str_10.toDouble()
+
+                val str_5 = String.format("%.2f", sum_5 / 5)
+                info.line_5 = str_5.toDouble()
+
+            }
+            lines.size >= 9 -> {
+                val avg_lines = lines.subList(lines.size - 9, lines.size)
+                val shares = ArrayList<ShareInfo>()
+                for(line in avg_lines) {
+                    shares.add(ShareInfo(line))
+                }
+                var sum_10 = info.nowPrice
+                var sum_5 = info.nowPrice
+                shares.forEachIndexed { index, shareInfo ->
+                    sum_10 += shareInfo.nowPrice
+                    if(index >= 5) {
+                        sum_5 += shareInfo.nowPrice
+                    }
+                }
+
+                val str_10 = String.format("%.2f", sum_10 / 10)
+                info.line_10 = str_10.toDouble()
+
+                val str_5 = String.format("%.2f", sum_5 / 5)
+                info.line_5 = str_5.toDouble()
+            }
+            lines.size >= 4 -> {
+                val avg_lines = lines.subList(lines.size - 4, lines.size)
+                val shares = ArrayList<ShareInfo>()
+                for(line in avg_lines) {
+                    shares.add(ShareInfo(line))
+                }
+                var sum_5 = info.nowPrice
+                shares.forEachIndexed { index, shareInfo ->
+                    sum_5 += shareInfo.nowPrice
+                }
+                val str_5 = String.format("%.2f", sum_5 / 5)
+                info.line_5 = str_5.toDouble()
             }
         }
     }
@@ -350,43 +371,49 @@ class SharesRecordActivity : AppCompatActivity() {
         var nowPrice: Double = 0.00  //当前价格
         var maxPrice: Double = 0.00  //最高价格
         var minPrice: Double = 0.00  //最低价格
-        var totalCount: Int = 0 //总手数
-        var totalPrice: Double = 0.00 //总金额
+        var totalCount: Int = 0 //总成交手数，单位手
+        var totalPrice: Double = 0.00 //总成交金额，单位元
         var time: String? = null //日期
 
-        var range: Double = 0.00 //涨跌幅
+        var range: Double = 0.00 //涨跌幅，单位%
 
-        var huanShouLv: Double = 0.00 //换手率
-        var liuTongShiZhi: Double = 0.00 //流通市值
-        var zongShiZhi: Double = 0.00 //总市值
+        var huanShouLv: Double = 0.00 //换手率，单位%
+        var liuTongShiZhi: Double = 0.00 //流通市值，单位亿
+        var zongShiZhi: Double = 0.00 //总市值，单位亿
+
+        var line_5: Double = 0.00 //10日线
+        var line_10: Double = 0.00 //10日线
+        var line_20: Double = 0.00 //10日线
+        var rangeBegin: Double = 0.00 //开盘涨跌幅，单位%
+        var rangeMax: Double = 0.00 //最大涨幅，单位%
+        var rangeMin: Double = 0.00 //最大跌幅，单位%
 
         var postRange = 0.00
 
         constructor(){}
         constructor(info: String){
             val values = info.split(",")
-            if(values.size >= 10) {
+            if(values.size >= 20) {
                 time = values[0].trim()
                 name = values[1].trim()
                 code = values[2].trim()
-                beginPrice = values[3].trim().toDouble()
-                yesterdayPrice = values[4].trim().toDouble()
+                yesterdayPrice = values[3].trim().toDouble()
+                beginPrice = values[4].trim().toDouble()
                 nowPrice = values[5].trim().toDouble()
                 maxPrice = values[6].trim().toDouble()
                 minPrice = values[7].trim().toDouble()
-                totalCount = values[8].trim().toInt()
-                totalPrice = values[9].trim().toDouble()
-                if(values.size == 14) {
-                    range = values[10].trim().toDouble()
-                    huanShouLv = values[11].trim().toDouble()
-                    liuTongShiZhi = values[12].trim().toDouble()
-                    zongShiZhi = values[13].trim().toDouble()
-                } else {
-                    if(yesterdayPrice > 0) {
-                        val s = String.format("%.2f",(nowPrice - yesterdayPrice)  / yesterdayPrice * 100)
-                        range = s.toDouble()
-                    }
-                }
+                range = values[8].trim().toDouble()
+                rangeBegin = values[9].trim().toDouble()
+                rangeMax = values[10].trim().toDouble()
+                rangeMin = values[11].trim().toDouble()
+                line_5 = values[12].trim().toDouble()
+                line_10 = values[13].trim().toDouble()
+                line_20 = values[14].trim().toDouble()
+                totalCount = values[15].trim().toInt()
+                totalPrice = values[16].trim().toDouble()
+                huanShouLv = values[17].trim().toDouble()
+                liuTongShiZhi = values[18].trim().toDouble()
+                zongShiZhi = values[19].trim().toDouble()
             }
         }
 
@@ -397,11 +424,15 @@ class SharesRecordActivity : AppCompatActivity() {
         }
 
         fun toFile(): String {
-            return "$time, $name, $code, $beginPrice, $yesterdayPrice, $nowPrice, $maxPrice, $minPrice, $totalCount, $totalPrice, $range, $huanShouLv, $liuTongShiZhi, $zongShiZhi"
+            return "$time, $name, $code, $yesterdayPrice, $beginPrice, $nowPrice, $maxPrice, $minPrice, $range, $rangeBegin, $rangeMax, $rangeMin, $line_5, $line_10, $line_20, $totalCount, $totalPrice, $huanShouLv, $liuTongShiZhi, $zongShiZhi"
         }
 
         fun brieflyInfo(): String {
             return "$time, $name, $code, $zongShiZhi"
+        }
+
+        fun followUp(): String {
+            return "($rangeBegin, $range, $rangeMin, $rangeMax)"
         }
     }
 }
