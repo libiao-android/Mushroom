@@ -22,6 +22,7 @@ class MoreMoreMode1 : BaseMode {
             val three = shares[mDeviationValue + 2]
 
             if(more(zero, one)) {
+                if(one.totalPrice < 200000000) return
                 if(two.totalPrice > one.totalPrice * 1) { // 连续两天放量
                     if(two.nowPrice > (one.beginPrice + one.nowPrice)/2
                         && three.nowPrice > (one.beginPrice + one.nowPrice) * 0.51
