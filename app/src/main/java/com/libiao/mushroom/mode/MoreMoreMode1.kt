@@ -4,12 +4,16 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
-class MoreMoreMode1 : BaseMode() {
+class MoreMoreMode1 : BaseMode {
 
-    override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
+    constructor(): super() {
+    }
+    constructor(showTime: Boolean): super(showTime) {
+    }
+
+    override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = size - 3 - Constant.PRE
-
+        mDeviationValue = day - 3
         if(mDeviationValue >  0) {
 
             val zero = shares[mDeviationValue - 1]
@@ -50,6 +54,11 @@ class MoreMoreMode1 : BaseMode() {
                                     if(mDeviationValue + 3 < size) {
                                         val post = shares[mDeviationValue + 3]
                                         three.postRange = post.range
+                                        three.post1 = "${post.range}/${post.rangeBegin}/${post.rangeMin}/${post.rangeMax}"
+                                    }
+                                    if(mDeviationValue + 4 < size) {
+                                        val post = shares[mDeviationValue + 4]
+                                        three.post2 = "${post.range}/${post.rangeBegin}/${post.rangeMin}/${post.rangeMax}"
                                     }
                                     mFitModeList.add(
                                         Pair(
@@ -68,6 +77,13 @@ class MoreMoreMode1 : BaseMode() {
 
             }
         }
+    }
+
+    override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
+        val size = shares.size
+        mDeviationValue = size - Constant.PRE
+
+        analysis(mDeviationValue, shares)
 
     }
 

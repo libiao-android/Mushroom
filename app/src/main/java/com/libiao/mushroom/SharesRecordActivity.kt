@@ -30,6 +30,7 @@ class SharesRecordActivity : AppCompatActivity() {
     private val client = OkHttpClient()
 
     private val file = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
+    private val file_2021 = File(file, "2021")
 
     private var progressTv: TextView? = null
 
@@ -113,7 +114,7 @@ class SharesRecordActivity : AppCompatActivity() {
         Log.i("libiao_A", "time: $time")
         this.time = time
 
-        val f = File(file, "sz000001")
+        val f = File(file_2021, "sz000001")
         if(f.exists()) {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
@@ -148,7 +149,7 @@ class SharesRecordActivity : AppCompatActivity() {
 
     private fun queryInfo(code: String) {
         networkRequestForQt(code)
-        Thread.sleep(200)
+        Thread.sleep(80)
     }
 
     private fun networkRequestForQt(code: String) {
@@ -206,7 +207,7 @@ class SharesRecordActivity : AppCompatActivity() {
 
                 //Log.i(Constant.TAG, info.toString())
 
-                val file = File(file, code)
+                val file = File(file_2021, code)
                 if(file.exists()) {
                     val stream = FileInputStream(file)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
@@ -313,7 +314,7 @@ class SharesRecordActivity : AppCompatActivity() {
     }
 
     private fun deleteFileLastLine(code: String) {
-        val f = File(file, code)
+        val f = File(file_2021, code)
         if(f.exists()) {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
@@ -389,6 +390,8 @@ class SharesRecordActivity : AppCompatActivity() {
         var rangeMin: Double = 0.00 //最大跌幅，单位%
 
         var postRange = 0.00
+        var post1 = ""
+        var post2 = ""
 
         constructor(){}
         constructor(info: String){

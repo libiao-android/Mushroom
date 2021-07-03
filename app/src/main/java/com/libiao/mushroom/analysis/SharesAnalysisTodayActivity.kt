@@ -1,4 +1,4 @@
-package com.libiao.mushroom
+package com.libiao.mushroom.analysis
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -12,6 +12,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.libiao.mushroom.R
+import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mode.*
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
@@ -25,10 +27,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class SharesAnalysisActivity : AppCompatActivity() {
+class SharesAnalysisTodayActivity : AppCompatActivity() {
 
     companion object {
-        private const val TAG = "SharesAnalysisActivity"
+        private const val TAG = "SharesAnalysisTodayActivity"
     }
 
     private var mRecyclerView: RecyclerView? = null
@@ -43,13 +45,16 @@ class SharesAnalysisActivity : AppCompatActivity() {
     private var bigPowerBtn: Button? = null
 
     private val file = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
+    private val file_2021 = File(file, "2021")
 
     private var time = "2021-4-30"
+
+    private val allData: ArrayList<ArrayList<SharesRecordActivity.ShareInfo>> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.more_and_less_activity)
-        title = "股票分析"
+        title = "2021"
 
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")// HH:mm:ss
         time = simpleDateFormat.format(Date())
@@ -74,7 +79,7 @@ class SharesAnalysisActivity : AppCompatActivity() {
     }
 
     private fun chooseDate() {
-        val f = File(file, "sz000001")
+        val f = File(file_2021, "sz000001")
         var lines : List<String>? = null
         if(f.exists()) {
             val stream = FileInputStream(f)
@@ -121,8 +126,9 @@ class SharesAnalysisActivity : AppCompatActivity() {
         mModeList.add(UpLine5Mode())
         mModeList.add(UpLine10Mode())
     }
-
+    var done = 0
     private fun start() {
+        done = 0
         Thread {
             i(TAG, "开始查询")
 
@@ -130,33 +136,115 @@ class SharesAnalysisActivity : AppCompatActivity() {
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
             var str: String?
             str = reader.readLine()
+            val codeList = ArrayList<String>()
             var count = 0
             while (str != null) {
-                count++
-                if(count % 100 == 0) {
-                    val p = (count / 4000F * 100).toInt()
-                    mHandler.post { progressTv?.text = "$p%, $count" }
-                }
                 //Log.i("libiao", "str: $str, $count")
                 //queryInfo(str.split(",")[0])
-
-                analysis(str.split(",")[0])
+                codeList.add(str.split(",")[0])
 
                 str = reader.readLine()
             }
 
-            i(TAG, "结束查询")
-            mHandler.post{
-                progressTv?.text = "$100%, $count"
-                loadingPb?.visibility = View.GONE
-                bigPowerBtn?.isEnabled = true
-                mAdapter?.setData(mModeList)
-            }
+            val size = codeList.size
+            val avg = size / 4
+            i(TAG, "avg: $avg")
+
+            Thread{
+                val data = ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>()
+                for(i in 0 until avg) {
+
+                    count++
+                    if(count % 10 == 0 && count < 601) {
+                        val p = (count / 650F * 100).toInt()
+                        mHandler.post { progressTv?.text = "$p%, ${count * 4}" }
+                    }
+
+                    analysis(codeList[i], data)
+                }
+                mHandler.post {
+                    allData.addAll(data)
+                    progressTv?.text = "$100%, $size, ${++done}"
+                    loadingPb?.visibility = View.GONE
+                    findOutFitMode()
+                }
+            }.start()
+
+            Thread{
+                val data = ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>()
+                for(i in avg until avg * 2) {
+                    analysis(codeList[i], data)
+                }
+                mHandler.post {
+                    allData.addAll(data)
+                    progressTv?.text = "$100%, $size, ${++done}"
+                    loadingPb?.visibility = View.GONE
+                    findOutFitMode()
+                }
+            }.start()
+            Thread{
+                val data = ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>()
+                for(i in avg * 2 until avg * 3) {
+                    analysis(codeList[i], data)
+                }
+                mHandler.post {
+                    allData.addAll(data)
+                }
+                mHandler.post{
+                    progressTv?.text = "$100%, $size, ${++done}"
+                    loadingPb?.visibility = View.GONE
+                    findOutFitMode()
+                }
+            }.start()
+
+            Thread{
+                val data = ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>()
+                for(i in avg * 3 until codeList.size) {
+                    analysis(codeList[i], data)
+                }
+                mHandler.post {
+                    allData.addAll(data)
+                }
+                mHandler.post{
+                    progressTv?.text = "$100%, $size, ${++done}"
+                    loadingPb?.visibility = View.GONE
+                    findOutFitMode()
+
+                }
+            }.start()
+
         }.start()
     }
 
+    private fun findOutFitMode() {
+        if(done == 4) {
+            i(TAG, "结束查询: ${allData.size}")
+            allData.forEach {shares ->
+                mModeList.forEach {
+                    it.analysis(shares)
+                }
+            }
+            mAdapter?.setData(mModeList)
+        }
+    }
+
+    private fun analysis(code: String, dataList: ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>) {
+        val f = File(file_2021, code)
+        if(f.exists()) {
+            val stream = FileInputStream(f)
+            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+            val lines = reader.readLines()
+            //Log.i("libiao", "$lines")
+            val shares = ArrayList<SharesRecordActivity.ShareInfo>()
+            for(line in lines) {
+                shares.add(SharesRecordActivity.ShareInfo(line))
+            }
+            dataList.add(shares)
+        }
+    }
+
     private fun analysis(code: String) {
-        val f = File(file, code)
+        val f = File(file_2021, code)
         if(f.exists()) {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
@@ -197,7 +285,12 @@ class SharesAnalysisActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SharesInfoHolder {
-            return SharesInfoHolder(LayoutInflater.from(context).inflate(R.layout.shares_info_item, null))
+            return SharesInfoHolder(
+                LayoutInflater.from(context).inflate(
+                    R.layout.shares_info_item,
+                    null
+                )
+            )
         }
 
         override fun getItemCount(): Int {

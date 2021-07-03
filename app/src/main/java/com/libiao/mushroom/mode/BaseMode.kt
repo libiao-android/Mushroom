@@ -13,25 +13,54 @@ abstract class BaseMode {
     var mDeviationValue = 0
     val mFitModeList = ArrayList<Pair<Double, SharesRecordActivity.ShareInfo?>>()
 
+    var showTime = false
+
+    constructor() {
+
+    }
+
+    constructor(showTime: Boolean) {
+        this.showTime = showTime
+    }
+
 
     abstract fun analysis(shares : ArrayList<SharesRecordActivity.ShareInfo>)
     abstract fun des(): String
 
 
+    open fun analysis(day: Int, shares : ArrayList<SharesRecordActivity.ShareInfo>) {
+
+    }
+
     open fun content(): String {
         val size = mFitModeList.size
         i(TAG, "mFitModeList: $size")
-        mFitModeList.sortByDescending { it.first }
+        if(showTime) {
+            mFitModeList.sortBy { it.second?.time }
+        } else {
+            mFitModeList.sortByDescending { it.first }
+        }
+
 
         val sb = StringBuilder("")
 
         for(i in 0 until size) {
-            sb.append("${mFitModeList[i].second?.code}" +
-                    ",  ${mFitModeList[i].second?.name}" +
-                    ",  ${String.format("%.4f",mFitModeList[i].first)}" +
-                    ",  ${mFitModeList[i].second?.postRange}" +
-                    ",  ${mFitModeList[i].second?.zongShiZhi}" +
-                    " \n")
+            if(showTime) {
+                sb.append("${mFitModeList[i].second?.time}" +
+                        ",  ${mFitModeList[i].second?.code}" +
+                        ",  ${mFitModeList[i].second?.name}" +
+                        ",  \n${mFitModeList[i].second?.post1}" +
+                        ",  ${mFitModeList[i].second?.post2}" +
+                        " \n\n")
+            } else {
+                sb.append("${mFitModeList[i].second?.code}" +
+                        ",  ${mFitModeList[i].second?.name}" +
+                        ",  ${String.format("%.4f",mFitModeList[i].first)}" +
+                        ",  ${mFitModeList[i].second?.postRange}" +
+                        ",  ${mFitModeList[i].second?.zongShiZhi}" +
+                        " \n")
+            }
+
         }
 
         return sb.toString()

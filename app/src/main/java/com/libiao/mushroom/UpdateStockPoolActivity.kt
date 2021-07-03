@@ -32,6 +32,9 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
     private val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")
     private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
+    private val fileNew_2019 = File(fileNew, "2019")
+    private val fileNew_2020 = File(fileNew, "2020")
+    private val fileNew_2021 = File(fileNew, "2021")
     private var stockPoolFile: File? = null
 
     private var latelyTime: String? = null
@@ -59,16 +62,26 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         if (!fileNew.exists()) {
             fileNew.mkdir()
         }
-
-        val file1 = File(fileNew, "sh601528")
-        if(!file1.exists()) {
-            file1.createNewFile()
+        if (!fileNew_2019.exists()) {
+            fileNew_2019.mkdir()
+        }
+        if (!fileNew_2020.exists()) {
+            fileNew_2020.mkdir()
         }
 
-        val file2 = File(fileNew, "sz301004")
-        if(!file2.exists()) {
-            file2.createNewFile()
+        if (!fileNew_2021.exists()) {
+            fileNew_2021.mkdir()
         }
+
+//        val file1 = File(fileNew, "sh601528")
+//        if(!file1.exists()) {
+//            file1.createNewFile()
+//        }
+//
+//        val file2 = File(fileNew, "sz301004")
+//        if(!file2.exists()) {
+//            file2.createNewFile()
+//        }
 
 
         progressTv = findViewById(R.id.tv_progress)
@@ -282,7 +295,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20200101&end=20210624")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20190101&end=20200101")
             .build()
 
         val call = client.newCall(request)
@@ -407,7 +420,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
     private fun writeToFile(code: String, info: String) {
         //i(TAG, "$info")
-        val file = File(fileNew, code)
+        val file = File(fileNew_2019, code)
         if(!file.exists()) {
             file.createNewFile()
         }

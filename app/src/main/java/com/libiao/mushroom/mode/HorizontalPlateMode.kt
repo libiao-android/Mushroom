@@ -1,10 +1,8 @@
 package com.libiao.mushroom.mode
 
-import com.libiao.mushroom.SharesAnalysisActivity
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 

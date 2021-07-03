@@ -18,7 +18,7 @@ class LeaderMode : BaseMode() {
             val three = shares[mDeviationValue + 2]
             val four = shares[mDeviationValue + 3]
             val range = one.range + two.range + three.range + four.range
-            if(range >= 39) {
+            if(range >= 39 && size > 10) {
                 i(TAG, "$range, ${four.brieflyInfo()}")
                 if(mDeviationValue + 4 < size) {
                     val post = shares[mDeviationValue + 4]
