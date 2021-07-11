@@ -70,7 +70,7 @@ abstract class BaseMode {
         mFitModeList.clear()
     }
 
-    fun more(firstDay: SharesRecordActivity.ShareInfo, secondDay: SharesRecordActivity.ShareInfo): Boolean {
+    open fun more(firstDay: SharesRecordActivity.ShareInfo, secondDay: SharesRecordActivity.ShareInfo): Boolean {
 
         if(secondDay.range > 5) { //当天涨幅大于5%
             var multiple = 0.00

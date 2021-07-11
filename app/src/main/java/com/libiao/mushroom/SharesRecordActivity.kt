@@ -1,8 +1,6 @@
 package com.libiao.mushroom
 
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
+import android.os.*
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -364,7 +362,39 @@ class SharesRecordActivity : AppCompatActivity() {
         }.start()
     }
 
-    class ShareInfo {
+    class ShareInfo : Parcelable {
+        override fun writeToParcel(dest: Parcel?, flags: Int) {
+            //i(TAG, "writeToParcel")
+            dest?.writeString(name)
+            dest?.writeString(code)
+            dest?.writeDouble(beginPrice)
+            dest?.writeDouble(yesterdayPrice)
+            dest?.writeDouble(nowPrice)
+            dest?.writeDouble(maxPrice)
+            dest?.writeDouble(minPrice)
+            dest?.writeInt(totalCount)
+            dest?.writeDouble(totalPrice)
+            dest?.writeString(time)
+            dest?.writeDouble(range)
+            dest?.writeDouble(huanShouLv)
+            dest?.writeDouble(liuTongShiZhi)
+            dest?.writeDouble(zongShiZhi)
+            dest?.writeDouble(line_5)
+            dest?.writeDouble(line_10)
+            dest?.writeDouble(line_20)
+            dest?.writeDouble(rangeBegin)
+            dest?.writeDouble(rangeMax)
+            dest?.writeDouble(rangeMin)
+            dest?.writeDouble(postRange)
+            dest?.writeString(post1)
+            dest?.writeString(post2)
+        }
+
+        override fun describeContents(): Int {
+            //i(TAG, "describeContents")
+            return 0
+        }
+
         var name: String? = null //股票名称
         var code: String? = null //股票代码
         var beginPrice: Double = 0.00 //开盘价
@@ -392,6 +422,32 @@ class SharesRecordActivity : AppCompatActivity() {
         var postRange = 0.00
         var post1 = ""
         var post2 = ""
+
+        constructor(parcel: Parcel) : this() {
+            name = parcel.readString()
+            code = parcel.readString()
+            beginPrice = parcel.readDouble()
+            yesterdayPrice = parcel.readDouble()
+            nowPrice = parcel.readDouble()
+            maxPrice = parcel.readDouble()
+            minPrice = parcel.readDouble()
+            totalCount = parcel.readInt()
+            totalPrice = parcel.readDouble()
+            time = parcel.readString()
+            range = parcel.readDouble()
+            huanShouLv = parcel.readDouble()
+            liuTongShiZhi = parcel.readDouble()
+            zongShiZhi = parcel.readDouble()
+            line_5 = parcel.readDouble()
+            line_10 = parcel.readDouble()
+            line_20 = parcel.readDouble()
+            rangeBegin = parcel.readDouble()
+            rangeMax = parcel.readDouble()
+            rangeMin = parcel.readDouble()
+            postRange = parcel.readDouble()
+            post1 = parcel.readString() ?: ""
+            post2 = parcel.readString() ?: ""
+        }
 
         constructor(){}
         constructor(info: String){
@@ -436,6 +492,16 @@ class SharesRecordActivity : AppCompatActivity() {
 
         fun followUp(): String {
             return "($rangeBegin, $range, $rangeMin, $rangeMax)"
+        }
+
+        companion object CREATOR : Parcelable.Creator<ShareInfo> {
+            override fun createFromParcel(parcel: Parcel): ShareInfo {
+                return ShareInfo(parcel)
+            }
+
+            override fun newArray(size: Int): Array<ShareInfo?> {
+                return arrayOfNulls(size)
+            }
         }
     }
 }

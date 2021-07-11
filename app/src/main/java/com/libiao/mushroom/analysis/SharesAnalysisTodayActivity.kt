@@ -2,6 +2,7 @@ package com.libiao.mushroom.analysis
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
@@ -43,6 +44,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     private var progressTv: TextView? = null
     private var loadingPb: ProgressBar? = null
     private var bigPowerBtn: Button? = null
+    private var oneDayTime: TextView? = null
 
     private val file = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
     private val file_2021 = File(file, "2021")
@@ -71,6 +73,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         progressTv = findViewById(R.id.tv_progress)
         loadingPb = findViewById(R.id.loading)
         bigPowerBtn = findViewById(R.id.btn_start_analysis)
+        oneDayTime = findViewById(R.id.tv_before_one_day_time)
 
         timeTv?.text = "日期：$time"
 
@@ -95,14 +98,19 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
                     Constant.PRE = 0
                     lines?.forEachIndexed{ index, s ->
-                        if(s.startsWith("$year-${month + 1}-$dayOfMonth")) {
-                            Constant.PRE = lines.size - index - 1
-                            i(TAG, "pre: ${Constant.PRE}")
-                            return@setOnDateSetListener
+                        val values = s.split(",")[0].split("-")
+                        if(values.size > 2) {
+                            val y = values[0].toInt()
+                            val m = values[1].toInt()
+                            val d = values[2].toInt()
+                            i(TAG, "y: $y, m: $m, d:$d")
+                            if(year == y && m == month+1 && d == dayOfMonth) {
+                                Constant.PRE = lines.size - index - 1
+                                i(TAG, "pre: ${Constant.PRE}")
+                                return@setOnDateSetListener
+                            }
                         }
                     }
-
-
                 }
                 dialog.show()
             }
@@ -118,12 +126,12 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 //        mModeList.add(LessMildMode())
 
         mModeList.add(MoreMoreMode1())
-        mModeList.add(MoreMoreMode2())
-        mModeList.add(MoreMoreMode3())
+//        mModeList.add(MoreMoreMode2())
+//        mModeList.add(MoreMoreMode3())
         mModeList.add(MoreMoreMode4())
-        mModeList.add(MoreMoreMode5())
+      //  mModeList.add(MoreMoreMode5())
 
-        mModeList.add(UpLine5Mode())
+//        mModeList.add(UpLine5Mode())
         mModeList.add(UpLine10Mode())
     }
     var done = 0
@@ -225,6 +233,16 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
                 }
             }
             mAdapter?.setData(mModeList)
+            bigPowerBtn?.isEnabled = true
+
+            var time = ""
+            mModeList.forEach {
+                if(it.mFitModeList.size > 0) {
+                    time = it.mFitModeList[0].second?.time ?: ""
+                    return@forEach
+                }
+            }
+            oneDayTime?.text = time
         }
     }
 
@@ -260,11 +278,39 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         }
     }
 
+    fun beforeOneDay(v: View) {
+        if(allData.size == 0) return
+        Constant.PRE++
+        mModeList.forEach {
+            it.clear()
+        }
+        mAdapter?.notifyDataSetChanged()
+        findOutFitMode()
+    }
+
+    fun afterOneDay(v: View) {
+        if(allData.size == 0) return
+        Constant.PRE--
+        if(Constant.PRE < 0) {
+            Constant.PRE = 0
+            return
+        }
+        mModeList.forEach {
+            it.clear()
+        }
+        mAdapter?.notifyDataSetChanged()
+        findOutFitMode()
+    }
+
     fun startAnalysis(view: View) {
         mModeList.forEach {
             it.clear()
         }
         mAdapter?.notifyDataSetChanged()
+        if(allData.size > 0) {
+            findOutFitMode()
+            return
+        }
         start()
         //test()
         loadingPb?.visibility = View.VISIBLE
@@ -285,7 +331,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SharesInfoHolder {
-            return SharesInfoHolder(
+            return SharesInfoHolder(context,
                 LayoutInflater.from(context).inflate(
                     R.layout.shares_info_item,
                     null
@@ -302,20 +348,38 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         }
     }
 
-    class SharesInfoHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class SharesInfoHolder(context: Context, view: View) : RecyclerView.ViewHolder(view) {
 
         private var mTitleTv: TextView? = null
         private var mContentTv: TextView? = null
+        private var mData: ArrayList<SharesRecordActivity.ShareInfo> = ArrayList()
 
         init {
             mTitleTv = view.findViewById(R.id.title)
             mContentTv = view.findViewById(R.id.content)
+            mContentTv?.setOnClickListener {
+                val intent = Intent(context, SharesRealTimeInfoActivity::class.java)
+                //i(TAG, "$mData")
+                intent.putParcelableArrayListExtra("data", mData)
+                context.startActivity(intent)
+            }
         }
 
         fun bindData(info: BaseMode) {
+            mData.clear()
+            info.mFitModeList.forEach {
+                it.second?.also {shareInfo ->
+                    mData.add(shareInfo)
+                }
+            }
             mTitleTv?.text = info.des()
             mContentTv?.text = info.content()
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Constant.PRE = 0
     }
 }

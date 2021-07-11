@@ -83,9 +83,7 @@ class MoreMoreMode1 : BaseMode {
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
-
         analysis(mDeviationValue, shares)
-
     }
 
     override fun des(): String {
