@@ -123,16 +123,21 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 //        mModeList.add(MoreShizixingMode())
 //        mModeList.add(MoreMildMode())
 //        mModeList.add(HorizontalPlateMode())
-//        mModeList.add(LessMildMode())
 
-        mModeList.add(MoreMoreMode1())
+        mModeList.add(CloseToLine10Mode())
+        mModeList.add(CloseToLine20Mode())
+
+       // mModeList.add(MoreMoreMode1())
 //        mModeList.add(MoreMoreMode2())
 //        mModeList.add(MoreMoreMode3())
-        mModeList.add(MoreMoreMode4())
-      //  mModeList.add(MoreMoreMode5())
+       // mModeList.add(MoreMoreMode4())
+
+//        mModeList.add(MoreMoreMode5())
 
 //        mModeList.add(UpLine5Mode())
-        mModeList.add(UpLine10Mode())
+       // mModeList.add(UpLine10Mode())
+
+        mModeList.add(LessMildMode())
     }
     var done = 0
     private fun start() {

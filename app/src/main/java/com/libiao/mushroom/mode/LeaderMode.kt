@@ -1,11 +1,8 @@
 package com.libiao.mushroom.mode
 
-import android.util.Log
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
-import kotlin.math.abs
-import kotlin.math.min
 
 class LeaderMode : BaseMode() {
 
@@ -17,7 +14,13 @@ class LeaderMode : BaseMode() {
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
             val four = shares[mDeviationValue + 3]
-            val range = one.range + two.range + three.range + four.range
+            var range = one.range + two.range + three.range + four.range
+            if(four.code?.startsWith("sz300") == true) {
+                val r = three.range + four.range
+                if(r > range) {
+                    range = r
+                }
+            }
             if(range >= 39 && size > 10) {
                 i(TAG, "$range, ${four.brieflyInfo()}")
                 if(mDeviationValue + 4 < size) {
