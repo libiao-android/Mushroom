@@ -127,6 +127,9 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(CloseToLine10Mode())
         mModeList.add(CloseToLine20Mode())
 
+        mModeList.add(StrongStockMode())
+        //mModeList.add(Difference2FitMode())
+
        // mModeList.add(MoreMoreMode1())
 //        mModeList.add(MoreMoreMode2())
 //        mModeList.add(MoreMoreMode3())
@@ -137,7 +140,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 //        mModeList.add(UpLine5Mode())
        // mModeList.add(UpLine10Mode())
 
-        mModeList.add(LessMildMode())
+        //mModeList.add(LessMildMode())
     }
     var done = 0
     private fun start() {

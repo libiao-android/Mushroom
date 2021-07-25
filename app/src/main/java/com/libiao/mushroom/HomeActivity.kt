@@ -76,6 +76,11 @@ class HomeActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    fun myPool(v: View) {
+        val intent = Intent(this, MyPoolActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun supplyInfo() {
         val time = "2021-5-27-4"
         val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")

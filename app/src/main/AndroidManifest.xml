@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SharesRecordActivity"/>
+        <activity android:name=".MyPoolActivity"/>
         <activity android:name=".analysis.SharesAnalysisTodayActivity"/>
         <activity android:name=".UpdateStockPoolActivity"/>
         <activity android:name=".analysis.SharesAnalysisHistoryActivity"/>
