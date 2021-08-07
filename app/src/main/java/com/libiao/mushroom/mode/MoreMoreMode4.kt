@@ -3,8 +3,6 @@ package com.libiao.mushroom.mode
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
-import kotlin.math.abs
-import kotlin.math.min
 
 class MoreMoreMode4 : BaseMode {
 
@@ -43,12 +41,6 @@ class MoreMoreMode4 : BaseMode {
                 beiShu = 3.5
             }
 
-//            var avgZeroPrice = if(fuYi.totalPrice > zero.totalPrice) {
-//                (fuYi.totalPrice + zero.totalPrice) / 2
-//            } else {
-//                zero.totalPrice
-//            }
-
             val avgZeroPrice = zero.totalPrice
             if(one.totalPrice > avgZeroPrice * (beiShu - 0.5) && avgMorePrice > avgZeroPrice * beiShu) {
                 if(one.range > 0 && two.range > 0) {
@@ -72,7 +64,7 @@ class MoreMoreMode4 : BaseMode {
                             if(twoFit) {
                                 val a = avgMorePrice / avgZeroPrice
                                 val zengLiang = (avgMorePrice - avgZeroPrice) / 100000000
-                                if(zengLiang > 5) {
+                                if(zengLiang > 15) {
 
                                     i(TAG, "$mDeviationValue, $size")
                                     if(mDeviationValue + 4 <= size) {
@@ -92,26 +84,6 @@ class MoreMoreMode4 : BaseMode {
                     }
                 }
             }
-
-
-//            if(more(zero, one)) {
-//                if(two.totalPrice > one.totalPrice * 1) { // 连续两天放量
-//                    if(two.nowPrice > (one.beginPrice + one.nowPrice)/2
-//                        && three.nowPrice > (one.beginPrice + one.nowPrice)/2
-//                        && two.maxPrice > one.nowPrice ) { //放量后价格不能低于放量前
-//                        if(three.totalPrice > two.totalPrice && four.totalPrice > three.totalPrice) { //连续三天放量
-//                            i(TAG, "${three.brieflyInfo()}, ${one.range}, ${two.range}, ${three.range}, ${four.range}")
-//                            if(mDeviationValue + 4 < size) {
-//                                val post = shares[mDeviationValue + 4]
-//                                four.postRange = post.range
-//                            }
-//                            mFitModeList.add(Pair(one.range + two.range + three.range + four.range, four))
-//                        }
-//
-//                    }
-//
-//                }
-//            }
         }
     }
 

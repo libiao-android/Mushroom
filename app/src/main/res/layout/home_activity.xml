@@ -19,13 +19,13 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="股票分析"
-        android:onClick="analysis"/>
+        android:text="我的股票池"
+        android:onClick="myPool"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="我的股票池"
-        android:onClick="myPool"/>
+        android:text="股票分析"
+        android:onClick="analysis"/>
 
 </LinearLayout>
