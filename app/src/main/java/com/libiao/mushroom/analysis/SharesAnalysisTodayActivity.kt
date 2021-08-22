@@ -118,31 +118,39 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     }
 
     private fun initData() {
-        mModeList.add(LeaderMode())
+
 
 //        mModeList.add(MoreShizixingMode())
 //        mModeList.add(MoreMildMode())
 //        mModeList.add(HorizontalPlateMode())
 
         //mModeList.add(CloseToLine10Mode())
-        //mModeList.add(CloseToLine20Mode())
+//        mModeList.add(CloseToLine20Mode())
 
 
-        mModeList.add(Difference2FitMode())
-        mModeList.add(StrongStockMode())
-        //mModeList.add(ShangYinXian2FitMode())
+//        mModeList.add(ShangYinXian2FitMode())
 
-       // mModeList.add(MoreMoreMode1())
+//        mModeList.add(MoreMoreMode1())
 //        mModeList.add(MoreMoreMode2())
 //        mModeList.add(MoreMoreMode3())
-        mModeList.add(MoreMoreMode4())
 
 //        mModeList.add(MoreMoreMode5())
 
 //        mModeList.add(UpLine5Mode())
-       // mModeList.add(UpLine10Mode())
+//        mModeList.add(UpLine10Mode())
 
-        //mModeList.add(LessMildMode())
+//        mModeList.add(LessMildMode())
+
+
+        //mModeList.add(DuanCengMode())
+
+
+        mModeList.add(LeaderMode())
+        //mModeList.add(Difference2FitMode())
+        mModeList.add(StrongStockMode())
+        mModeList.add(StrongStockMode2())
+        mModeList.add(MoreMoreMode4())
+        mModeList.add(ChuangYeBanTouJiMode())
     }
     var done = 0
     private fun start() {

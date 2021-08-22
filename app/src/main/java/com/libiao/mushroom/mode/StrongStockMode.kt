@@ -87,7 +87,7 @@ class StrongStockMode() : BaseMode() {
 
                 if(day10.beginPrice > day1.beginPrice && min > 0) {
                     val range = (max - min) / min * 100
-                    if(range > 50) {
+                    if(range > 45) {
                         if(!poolList.contains(day10.code)) {
                             LogUtil.i(TAG, "${day10.brieflyInfo()}, ${range}")
                             day10.code?.also {

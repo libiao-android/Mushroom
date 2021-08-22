@@ -107,4 +107,14 @@ abstract class BaseMode {
     fun isChuang(code: String?): Boolean {
         return code?.startsWith("sz300") ?: false
     }
+
+    fun zhangTing(info: SharesRecordActivity.ShareInfo): Boolean {
+        var maxRange = 1.1
+        if(info.code?.startsWith("sz300") == true) {
+            maxRange = 1.2
+        }
+        var zhangTingPrice = info.yesterdayPrice * maxRange
+        zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
+        return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice
+    }
 }
