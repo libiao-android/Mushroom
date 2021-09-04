@@ -9,12 +9,12 @@ import java.nio.charset.Charset
 import kotlin.math.max
 import kotlin.math.min
 
-class StrongStockMode() : BaseMode() {
+class StrongStock50Mode() : BaseMode() {
     private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
     private val poolList = java.util.ArrayList<String>()
     private var poolFile: File? = null
     init {
-        poolFile = File(fileNew, "my_pool")
+        poolFile = File(fileNew, "my_50_pool")
         if(poolFile?.exists() == false) {
             poolFile?.createNewFile()
         } else {
@@ -87,7 +87,7 @@ class StrongStockMode() : BaseMode() {
 
                 if(day10.beginPrice > day1.beginPrice && min > 0) {
                     val range = (max - min) / min * 100
-                    if(range > 45) {
+                    if(range > 50) {
                         if(!poolList.contains(day10.code)) {
                             LogUtil.i(TAG, "${day10.brieflyInfo()}, ${range}")
                             day10.code?.also {
@@ -123,6 +123,6 @@ class StrongStockMode() : BaseMode() {
     }
 
     override fun des(): String {
-        return "新增强势股"
+        return "50"
     }
 }

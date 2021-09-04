@@ -21,6 +21,8 @@
         </activity>
         <activity android:name=".SharesRecordActivity"/>
         <activity android:name=".MyPoolActivity"/>
+        <activity android:name=".MyPool20Activity"/>
+        <activity android:name=".MyPool50Activity"/>
         <activity android:name=".analysis.SharesAnalysisTodayActivity"/>
         <activity android:name=".UpdateStockPoolActivity"/>
         <activity android:name=".analysis.SharesAnalysisHistoryActivity"/>

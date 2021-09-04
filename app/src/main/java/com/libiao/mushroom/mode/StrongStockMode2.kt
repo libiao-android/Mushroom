@@ -21,7 +21,7 @@ class StrongStockMode2 : BaseMode() {
             }
 
             if(zhangTing(zero)) {
-                if(one.range < 5 || (one.range < 9 && two.beginPrice < two.nowPrice)) {
+                if(one.range < 5 || (!zhangTing(one) && two.beginPrice < two.nowPrice)) {
                     if(one.minPrice > zero.nowPrice * biLi && two.minPrice > zero.nowPrice * biLi) {
                         i(TAG, "${two.brieflyInfo()}")
                         mFitModeList.add(Pair(two.range, two))
