@@ -130,7 +130,7 @@ class SharesAnalysisHistoryActivity : AppCompatActivity() {
 //        mModeList.add(MoreShizixingMode())
 //        mModeList.add(MoreMildMode())
 //        mModeList.add(HorizontalPlateMode())
-//        mModeList.add(LessMildMode())
+//        mModeList.add(Chuang20Mode())
 
         mModeList.add(MoreMoreMode1(true))
 //        mModeList.add(MoreMoreMode2())

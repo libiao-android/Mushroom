@@ -139,11 +139,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 //        mModeList.add(UpLine5Mode())
 //        mModeList.add(UpLine10Mode())
 
-//        mModeList.add(LessMildMode())
-
 
         //mModeList.add(DuanCengMode())
-        //mModeList.add(Difference2FitMode())
         //mModeList.add(StrongStockMode2())
         //mModeList.add(ChuangYeBanTouJiMode())
 
@@ -152,6 +149,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(Strong20Mode())
         mModeList.add(StrongStock50Mode())
         mModeList.add(MoreMoreMode4())
+        mModeList.add(Chuang20Mode())
+        mModeList.add(Difference2FitMode())
 
     }
     var done = 0

@@ -49,20 +49,24 @@ class Strong20Mode : BaseMode() {
             val r2 = four.range + two.range + three.range > 20
             val r3 = four.range + five.range + three.range > 20
             var m = 0.00
+            var max = 0.00
             if(r1) {
                 m = (three.nowPrice + one.beginPrice) / 2
+                max = three.nowPrice
             }
             if(r2) {
                 m = (four.nowPrice + two.beginPrice) / 2
+                max = four.nowPrice
             }
             if(r3) {
                 m = (five.nowPrice + three.beginPrice) / 2
+                max = five.nowPrice
             }
 
 
             if (r1 || r2 || r3) {
 
-                if(six.minPrice > six.line_10 && seven.minPrice > seven.line_10 && eight.minPrice > eight.line_10 && eight.nowPrice < eight.line_5) {
+                if(six.minPrice > six.line_10 && seven.minPrice > seven.line_10 && eight.minPrice > eight.line_10 && eight.nowPrice < max) {
 
                     if(eight.nowPrice > m) {
 
