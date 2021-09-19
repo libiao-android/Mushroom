@@ -64,7 +64,7 @@ class MoreMoreMode4 : BaseMode {
                             if(twoFit) {
                                 val a = avgMorePrice / avgZeroPrice
                                 val zengLiang = (avgMorePrice - avgZeroPrice) / 100000000
-                                if(zengLiang > 15) {
+                                if(zengLiang > 30) {
 
                                     i(TAG, "$mDeviationValue, $size")
                                     if(mDeviationValue + 4 <= size) {

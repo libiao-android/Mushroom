@@ -13,70 +13,66 @@ class MoreMoreMode1 : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 3
+        mDeviationValue = day - 13
         if(mDeviationValue >  0) {
 
-            val zero = shares[mDeviationValue - 1]
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
+            val four = shares[mDeviationValue + 3]
+            val five = shares[mDeviationValue + 4]
+            val six = shares[mDeviationValue + 5]
+            val seven = shares[mDeviationValue + 6]
+            val eight = shares[mDeviationValue + 7]
+            val nine = shares[mDeviationValue + 8]
+            val ten = shares[mDeviationValue + 9]
 
-            if(more(zero, one)) {
-                if(one.totalPrice < 200000000) return
-                if(two.totalPrice > one.totalPrice * 1) { // 连续两天放量
-                    if(two.nowPrice > (one.beginPrice + one.nowPrice)/2
-                        && three.nowPrice > (one.beginPrice + one.nowPrice) * 0.51
-                        && two.maxPrice > one.nowPrice ) { //放量后价格不能低于放量前
-
-                        if (two.beginPrice > two.nowPrice && three.beginPrice > three.nowPrice) { //连续两天收阴线
-                            if (three.totalPrice > zero.totalPrice * 2 && three.totalPrice > 130000000 && three.totalPrice > one.totalPrice * 0.7) { //连续收阴量能不能太低
-                                if (three.totalPrice > zero.totalPrice * 3 || three.totalPrice * 2 > two.totalPrice) {
-                                    if(three.nowPrice > one.nowPrice) { //高位
-                                        if(three.totalPrice < (one.totalPrice + two.totalPrice)/2) { //缩量
-                                            if(three.maxPrice > two.maxPrice) { //创新高
-                                                return
-                                            }
-                                        }
-                                    }
-
-                                    if(three.maxPrice < two.nowPrice) { //跳空低开低走
-                                        return
-                                    }
-
-                                    val shangYinXianTwo = two.maxPrice - two.beginPrice > (two.beginPrice - two.nowPrice) * 2
-                                    val shangYinXianThree = three.maxPrice - three.beginPrice > (three.beginPrice - three.nowPrice) * 2
-                                    if(shangYinXianTwo && shangYinXianThree) {
-                                        val m = three.beginPrice - three.nowPrice > (three.nowPrice - three.minPrice)
-                                        if(m) { return }
-                                    }
-                                    i(TAG, "${three.brieflyInfo()}")
+            var maxT = one.totalPrice
+            if(two.totalPrice > maxT) maxT = two.totalPrice
+            if(three.totalPrice > maxT) maxT = three.totalPrice
+            if(four.totalPrice > maxT) maxT = four.totalPrice
+            if(five.totalPrice > maxT) maxT = five.totalPrice
+            if(six.totalPrice > maxT) maxT = six.totalPrice
+            if(seven.totalPrice > maxT) maxT = seven.totalPrice
+            if(eight.totalPrice > maxT) maxT = eight.totalPrice
+            if(nine.totalPrice > maxT) maxT = nine.totalPrice
+            if(ten.totalPrice > maxT) maxT = ten.totalPrice
 
 
-                                    if(mDeviationValue + 3 < size) {
-                                        val post = shares[mDeviationValue + 3]
-                                        three.postRange = post.range
-                                        three.post1 = "${post.range}/${post.rangeBegin}/${post.rangeMin}/${post.rangeMax}"
-                                    }
-                                    if(mDeviationValue + 4 < size) {
-                                        val post = shares[mDeviationValue + 4]
-                                        three.post2 = "${post.range}/${post.rangeBegin}/${post.rangeMin}/${post.rangeMax}"
-                                    }
-                                    mFitModeList.add(
-                                        Pair(
-                                            three.range,
-                                            three
-                                        )
-                                    )
-                                }
-                            }
+            val ten1 = shares[mDeviationValue + 10]
+            val ten2 = shares[mDeviationValue + 11]
+            val ten3 = shares[mDeviationValue + 12]
 
-                        }
+            var preAvg = (one.totalPrice + two.totalPrice + three.totalPrice
+                    + four.totalPrice + five.totalPrice + six.totalPrice + seven.totalPrice
+                    + eight.totalPrice + nine.totalPrice + ten.totalPrice) / 10
 
-                    }
+            preAvg = maxT
+
+            val moreAvg = preAvg * 3
+
+
+
+            if(ten1.totalPrice > moreAvg && ten2.totalPrice > moreAvg && ten3.totalPrice > moreAvg) {
+
+                var max = ten1.totalPrice
+                if(ten2.totalPrice > max) max = ten2.totalPrice
+                if(ten3.totalPrice > max) max = ten3.totalPrice
+
+                var min = ten1.totalPrice
+                if(ten2.totalPrice < min) min = ten2.totalPrice
+                if(ten3.totalPrice < min) min = ten3.totalPrice
+
+                if(max < min * 2) {
 
                 }
 
+                if(ten3.nowPrice > ten1.nowPrice) {
+                    i(TAG, "${ten3.brieflyInfo()}, $preAvg")
+                    mFitModeList.add(Pair(ten3.range, ten3))
+                }
             }
+
         }
     }
 
@@ -87,6 +83,6 @@ class MoreMoreMode1 : BaseMode {
     }
 
     override fun des(): String {
-        return "放量后连续两天收阴"
+        return "放量"
     }
 }

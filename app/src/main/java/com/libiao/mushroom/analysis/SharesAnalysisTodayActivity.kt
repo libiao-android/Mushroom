@@ -130,8 +130,6 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
 //        mModeList.add(ShangYinXian2FitMode())
 
-//        mModeList.add(MoreMoreMode1())
-//        mModeList.add(MoreMoreMode2())
 //        mModeList.add(MoreMoreMode3())
 
 //        mModeList.add(MoreMoreMode5())
@@ -141,16 +139,19 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
 
         //mModeList.add(DuanCengMode())
-        //mModeList.add(StrongStockMode2())
+
         //mModeList.add(ChuangYeBanTouJiMode())
+        //        mModeList.add(StrongStock10Mode())
+        //mModeList.add(Chuang20Mode())
 
         mModeList.add(LeaderMode())
-        mModeList.add(StrongStock10Mode())
+        mModeList.add(StrongStockMode2())
         mModeList.add(Strong20Mode())
         mModeList.add(StrongStock50Mode())
-        mModeList.add(MoreMoreMode4())
-        mModeList.add(Chuang20Mode())
         mModeList.add(Difference2FitMode())
+        mModeList.add(MoreMoreMode1())
+        mModeList.add(MoreMoreMode4())
+        mModeList.add(YiZiBanMode())
 
     }
     var done = 0

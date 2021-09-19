@@ -15,9 +15,9 @@ class StrongStockMode2 : BaseMode() {
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
 
-            var biLi = 0.99
+            var biLi = 0.985
             if(isChuang(zero.code)) {
-                biLi = 0.98
+                biLi = 0.975
             }
 
             if(zhangTing(zero)) {

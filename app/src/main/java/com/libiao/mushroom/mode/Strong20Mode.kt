@@ -45,9 +45,9 @@ class Strong20Mode : BaseMode() {
             val seven = shares[mDeviationValue + 6]
             val eight = shares[mDeviationValue + 7]
 
-            val r1 = one.range + two.range + three.range > 20
-            val r2 = four.range + two.range + three.range > 20
-            val r3 = four.range + five.range + three.range > 20
+            val r1 = one.range + two.range + three.range > 16
+            val r2 = four.range + two.range + three.range > 16
+            val r3 = four.range + five.range + three.range > 16
             var m = 0.00
             var max = 0.00
             if(r1) {
