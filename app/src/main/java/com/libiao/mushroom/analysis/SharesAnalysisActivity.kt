@@ -5,6 +5,7 @@ import android.os.*
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.libiao.mushroom.R
+import java.io.File
 
 
 class SharesAnalysisActivity : AppCompatActivity() {
@@ -40,5 +41,12 @@ class SharesAnalysisActivity : AppCompatActivity() {
     fun today(v: View) {
         val intent = Intent(this, SharesAnalysisTodayActivity::class.java)
         startActivity(intent)
+    }
+
+    fun deleteCache(v: View) {
+        val myPoolFile20 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/my_20_pool")
+        val myPoolFile50 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/my_50_pool")
+        myPoolFile20.delete()
+        myPoolFile50.delete()
     }
 }

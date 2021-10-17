@@ -30,7 +30,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
     private val mHandler = Handler()
     private val client = OkHttpClient()
 
-    private val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")
+    //private val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")
     private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
     private val fileNew_2019 = File(fileNew, "2019")
     private val fileNew_2020 = File(fileNew, "2020")
@@ -56,9 +56,9 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
 
-        if (!file.exists()) {
+        /*if (!file.exists()) {
             file.mkdir()
-        }
+        }*/
         if (!fileNew.exists()) {
             fileNew.mkdir()
         }
@@ -190,13 +190,15 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             override fun onResponse(call: Call?, response: Response?) {
                 val value = response?.body()?.string()
                 //Log.i("libiao", "response: ${value}")
-                try {
-                    if (value != null && value.length > 50) {
-                        parseSharesInfo(value)
+                mHandler.post {
+                    try {
+                        if (value != null && value.length > 50) {
+                            parseSharesInfo(value)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Log.i("libiao", "parseSharesInfo exception: ${e.message}")
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Log.i("libiao", "parseSharesInfo exception: ${e.message}")
                 }
             }
         })
@@ -295,7 +297,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20190101&end=20200101")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20210927&end=20210930")
             .build()
 
         val call = client.newCall(request)
@@ -420,7 +422,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
     private fun writeToFile(code: String, info: String) {
         //i(TAG, "$info")
-        val file = File(fileNew_2019, code)
+        val file = File(fileNew_2021, code)
         if(!file.exists()) {
             file.createNewFile()
         }

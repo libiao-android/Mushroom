@@ -36,6 +36,7 @@ class Strong20Mode : BaseMode() {
         if(mDeviationValue >=  0) {
 
             val one = shares[mDeviationValue + 0]
+            if(!isChuang(one.code)) return
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
 
@@ -66,7 +67,7 @@ class Strong20Mode : BaseMode() {
 
             if (r1 || r2 || r3) {
 
-                if(six.minPrice > six.line_10 && seven.minPrice > seven.line_10 && eight.minPrice > eight.line_10 && eight.nowPrice < max) {
+                if(six.minPrice > six.line_10 && seven.minPrice > seven.line_10 && eight.minPrice > eight.line_10 && eight.nowPrice < max * 1.1) {
 
                     if(eight.nowPrice > m) {
 
@@ -75,8 +76,8 @@ class Strong20Mode : BaseMode() {
                                 poolList.add(it)
                                 writeFileAppend(it)
                             }
-                            i(TAG, "${six.brieflyInfo()}, $m")
-                            mFitModeList.add(Pair(six.range, six))
+                            i(TAG, "${eight.brieflyInfo()}, $m")
+                            mFitModeList.add(Pair(eight.range, eight))
 
                         }
                     }

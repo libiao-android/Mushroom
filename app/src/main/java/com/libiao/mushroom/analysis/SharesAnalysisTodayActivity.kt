@@ -142,16 +142,19 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
         //mModeList.add(ChuangYeBanTouJiMode())
         //        mModeList.add(StrongStock10Mode())
-        //mModeList.add(Chuang20Mode())
+        //mModeList.add(StrongStockMode2())
+
 
         mModeList.add(LeaderMode())
-        mModeList.add(StrongStockMode2())
+        mModeList.add(Chuang20Mode())
         mModeList.add(Strong20Mode())
         mModeList.add(StrongStock50Mode())
         mModeList.add(Difference2FitMode())
         mModeList.add(MoreMoreMode1())
         mModeList.add(MoreMoreMode4())
         mModeList.add(YiZiBanMode())
+
+
 
     }
     var done = 0

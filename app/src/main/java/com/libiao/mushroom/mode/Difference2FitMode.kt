@@ -18,7 +18,7 @@ class Difference2FitMode : BaseMode() {
 
             if(zhangTing(zero)) {
                 if(one.beginPrice > one.nowPrice) {
-                    if(two.nowPrice > one.maxPrice) {
+                    if(zhangTing(two)) {
                         i(TAG, "${two.brieflyInfo()}")
                         mFitModeList.add(Pair(two.rangeBegin, two))
                     }
