@@ -13,16 +13,13 @@ class ChuangYeBanTouJiMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 3
+        mDeviationValue = day - 1
         if(mDeviationValue >=  0) {
             val one = shares[mDeviationValue + 0]
-            val two = shares[mDeviationValue + 1]
-            val three = shares[mDeviationValue + 2]
-            if (!zhangTing(one) && zhangTing(two) && isChuang(one.code)) {
-                if (three.totalPrice > two.totalPrice && three.nowPrice > two.minPrice && three.nowPrice < two.nowPrice) {
-                    i(TAG, "${three.brieflyInfo()}")
-                    mFitModeList.add(Pair(three.range, three))
-                }
+
+            if (one.range > 15) {
+                i(TAG, "${one.brieflyInfo()}")
+                mFitModeList.add(Pair(one.range, one))
             }
         }
     }
