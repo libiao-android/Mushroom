@@ -1,5 +1,6 @@
 package com.libiao.mushroom.mode
 
+import android.content.Context
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.LogUtil.i
 import java.lang.StringBuilder
@@ -15,8 +16,9 @@ abstract class BaseMode {
 
     var showTime = false
 
-    constructor() {
 
+
+    constructor() {
     }
 
     constructor(showTime: Boolean) {
@@ -116,5 +118,10 @@ abstract class BaseMode {
         var zhangTingPrice = info.yesterdayPrice * maxRange
         zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
         return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice
+    }
+
+    open fun shouldAnalysis(context: Context): Boolean {
+        val sharedPreferences = context.getSharedPreferences("mode", Context.MODE_PRIVATE) //私有数据
+        return sharedPreferences.getBoolean(TAG, false)
     }
 }

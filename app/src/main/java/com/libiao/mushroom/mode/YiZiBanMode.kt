@@ -8,6 +8,10 @@ import kotlin.math.min
 
 class YiZiBanMode : BaseMode() {
 
+    companion object {
+        const val KEY = "YiZiBanMode"
+    }
+
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - 1 - Constant.PRE

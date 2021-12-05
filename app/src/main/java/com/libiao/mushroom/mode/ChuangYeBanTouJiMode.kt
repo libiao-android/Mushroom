@@ -6,6 +6,10 @@ import com.libiao.mushroom.utils.LogUtil.i
 
 class ChuangYeBanTouJiMode : BaseMode {
 
+    companion object {
+        const val KEY = "ChuangYeBanTouJiMode"
+    }
+
     constructor(): super() {
     }
     constructor(showTime: Boolean): super(showTime) {

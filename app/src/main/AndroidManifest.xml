@@ -28,6 +28,7 @@
         <activity android:name=".analysis.SharesAnalysisHistoryActivity"/>
         <activity android:name=".analysis.SharesAnalysisActivity"/>
         <activity android:name=".analysis.SharesRealTimeInfoActivity"/>
+        <activity android:name=".setting.SettingActivity"/>
     </application>
 
 </manifest>

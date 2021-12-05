@@ -6,6 +6,10 @@ import com.libiao.mushroom.utils.LogUtil.i
 
 class StrongStock10Mode : BaseMode() {
 
+    companion object {
+        const val KEY = "StrongStock10Mode"
+    }
+
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - 1 - Constant.PRE

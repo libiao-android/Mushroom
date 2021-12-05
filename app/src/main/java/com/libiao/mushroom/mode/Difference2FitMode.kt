@@ -6,6 +6,10 @@ import com.libiao.mushroom.utils.LogUtil.i
 
 class Difference2FitMode : BaseMode() {
 
+    companion object {
+        const val KEY = "Difference2FitMode"
+    }
+
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - 2 - Constant.PRE

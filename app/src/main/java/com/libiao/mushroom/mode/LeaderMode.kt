@@ -6,6 +6,10 @@ import com.libiao.mushroom.utils.LogUtil.i
 
 class LeaderMode : BaseMode() {
 
+    companion object {
+        const val KEY = "LeaderMode"
+    }
+
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - 4 - Constant.PRE

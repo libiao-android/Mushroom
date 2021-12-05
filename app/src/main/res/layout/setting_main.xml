@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
+    android:layout_marginLeft="20dp">
+
+    <Button
+        android:id="@+id/btn_delete_cache"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="删除缓存"/>
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="模式选择"/>
+    <CheckBox
+        android:id="@+id/cb_long_tou"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="龙头"/>
+    <CheckBox
+        android:id="@+id/cb_50"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="50模式"/>
+    <CheckBox
+        android:id="@+id/cb_20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="20模式"/>
+    <CheckBox
+        android:id="@+id/cb_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="10模式"/>
+    <CheckBox
+        android:id="@+id/cb_yi_zi_ban"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="一字板"/>
+    <CheckBox
+        android:id="@+id/cb_fang_liang_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="放量3天"/>
+
+    <CheckBox
+        android:id="@+id/cb_fen_qi_to_yi_zhi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="分歧转一致"/>
+
+    <CheckBox
+        android:id="@+id/cb_chuang_ye_ban"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="创业板涨停"/>
+
+</LinearLayout>

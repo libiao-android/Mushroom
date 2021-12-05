@@ -4,7 +4,11 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
-class MoreMoreMode1 : BaseMode {
+class MoreMore3Mode : BaseMode {
+
+    companion object {
+        const val KEY = "MoreMore3Mode"
+    }
 
     constructor(): super() {
     }

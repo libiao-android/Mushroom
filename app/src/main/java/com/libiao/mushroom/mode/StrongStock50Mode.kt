@@ -10,6 +10,11 @@ import kotlin.math.max
 import kotlin.math.min
 
 class StrongStock50Mode() : BaseMode() {
+
+    companion object {
+        const val KEY = "StrongStock50Mode"
+    }
+
     private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
     private val poolList = java.util.ArrayList<String>()
     private var poolFile: File? = null

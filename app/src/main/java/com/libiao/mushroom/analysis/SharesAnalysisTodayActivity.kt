@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mode.*
+import com.libiao.mushroom.setting.SettingActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import java.io.BufferedReader
@@ -40,6 +42,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
     private val mHandler = Handler(Looper.getMainLooper())
 
+    private var settingIv: ImageView? = null
     private var timeTv: TextView? = null
     private var progressTv: TextView? = null
     private var loadingPb: ProgressBar? = null
@@ -64,6 +67,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         i(TAG, "t: $time")
 
         timeTv = findViewById(R.id.time)
+        settingIv = findViewById(R.id.iv_setting)
 
         mRecyclerView = findViewById(R.id.recycler_view)
         mRecyclerView?.layoutManager = LinearLayoutManager(this)
@@ -76,6 +80,10 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         oneDayTime = findViewById(R.id.tv_before_one_day_time)
 
         timeTv?.text = "日期：$time"
+
+        settingIv?.setOnClickListener {
+            startActivity(Intent(this, SettingActivity::class.java))
+        }
 
         chooseDate()
         initData()
@@ -143,19 +151,26 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         //mModeList.add(ChuangYeBanTouJiMode())
         //        mModeList.add(StrongStock10Mode())
         //mModeList.add(StrongStockMode2())
+        //mModeList.add(MoreMoreMode4())
 
 
         mModeList.add(LeaderMode())
-        mModeList.add(Chuang20Mode())
-        mModeList.add(Strong20Mode())
         mModeList.add(StrongStock50Mode())
-        mModeList.add(Difference2FitMode())
-        mModeList.add(MoreMoreMode1())
-        mModeList.add(MoreMoreMode4())
+        mModeList.add(Strong20Mode())
+        mModeList.add(StrongStock10Mode())
         mModeList.add(YiZiBanMode())
+        mModeList.add(MoreMore3Mode())
+        mModeList.add(Difference2FitMode())
+        mModeList.add(ChuangYeBanTouJiMode())
 
 
-
+        val tempList = ArrayList<BaseMode>()
+        mModeList.forEach {
+            if(it.shouldAnalysis(this)) {
+                tempList.add(it)
+            }
+        }
+        mModeList = tempList
     }
     var done = 0
     private fun start() {
@@ -390,6 +405,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
         fun bindData(info: BaseMode) {
             mData.clear()
+            itemView.visibility = View.VISIBLE
             info.mFitModeList.forEach {
                 it.second?.also {shareInfo ->
                     mData.add(shareInfo)
@@ -398,7 +414,6 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
             mTitleTv?.text = info.des()
             mContentTv?.text = info.content()
         }
-
     }
 
     override fun onDestroy() {
