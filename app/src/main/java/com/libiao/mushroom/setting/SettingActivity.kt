@@ -77,6 +77,12 @@ class SettingActivity : AppCompatActivity() {
                 editor?.putBoolean(ChuangYeBanTouJiMode.KEY, isChecked)
                 editor?.commit()//提交修改
             }
+
+            cb_up_10.isChecked = it.getBoolean(UpLine10Mode.KEY, false)
+            cb_up_10.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(UpLine10Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
         }
 
         btn_delete_cache.setOnClickListener {

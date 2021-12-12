@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mode.*
 import com.libiao.mushroom.setting.SettingActivity
 import com.libiao.mushroom.utils.Constant
@@ -162,6 +163,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(MoreMore3Mode())
         mModeList.add(Difference2FitMode())
         mModeList.add(ChuangYeBanTouJiMode())
+        mModeList.add(UpLine10Mode())
 
 
         val tempList = ArrayList<BaseMode>()
@@ -389,18 +391,23 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     class SharesInfoHolder(context: Context, view: View) : RecyclerView.ViewHolder(view) {
 
         private var mTitleTv: TextView? = null
-        private var mContentTv: TextView? = null
         private var mData: ArrayList<SharesRecordActivity.ShareInfo> = ArrayList()
+        private var mRv: RecyclerView? =  null
+        private var adapter: ShareItemAdater? = null
 
         init {
             mTitleTv = view.findViewById(R.id.title)
-            mContentTv = view.findViewById(R.id.content)
-            mContentTv?.setOnClickListener {
+            mTitleTv?.setOnClickListener {
                 val intent = Intent(context, SharesRealTimeInfoActivity::class.java)
                 //i(TAG, "$mData")
                 intent.putParcelableArrayListExtra("data", mData)
                 context.startActivity(intent)
             }
+            mRv = view.findViewById(R.id.rv)
+            mRv?.layoutManager = LinearLayoutManager(context)
+            adapter = ShareItemAdater(context)
+            mRv?.adapter = adapter
+
         }
 
         fun bindData(info: BaseMode) {
@@ -412,12 +419,64 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
                 }
             }
             mTitleTv?.text = info.des()
-            mContentTv?.text = info.content()
+            //mContentTv?.text = info.content()
+            adapter?.setData(mData)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Constant.PRE = 0
+    }
+
+
+
+    class ShareItemHolder(context: Context, view: View) : RecyclerView.ViewHolder(view) {
+
+        private var mItemContentTv: TextView? = null
+        private var itemInfo: SharesRecordActivity.ShareInfo? = null
+
+        init {
+            mItemContentTv = view.findViewById(R.id.item_content)
+            mItemContentTv?.setOnClickListener {
+                val intent = Intent(context, KLineActivity::class.java)
+                intent.putExtra("code", itemInfo?.code)
+                intent.putExtra("info", "${itemInfo?.time}  ${itemInfo?.code}  ${itemInfo?.name}")
+                context.startActivity(intent)
+            }
+
+        }
+
+        fun bindData(info: SharesRecordActivity.ShareInfo) {
+            itemInfo = info
+            mItemContentTv?.text = info.simpleInfo()
+        }
+    }
+
+    class ShareItemAdater(val context: Context) : RecyclerView.Adapter<ShareItemHolder>() {
+
+        private var mData: ArrayList<SharesRecordActivity.ShareInfo> = ArrayList()
+
+        fun setData(data: ArrayList<SharesRecordActivity.ShareInfo>) {
+            mData = data
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShareItemHolder {
+            return ShareItemHolder(context,
+                LayoutInflater.from(context).inflate(
+                    R.layout.share_item,
+                    null
+                )
+            )
+        }
+
+        override fun getItemCount(): Int {
+            return mData.size
+        }
+
+        override fun onBindViewHolder(holder: ShareItemHolder, position: Int) {
+            holder.bindData(mData.get(position))
+        }
     }
 }

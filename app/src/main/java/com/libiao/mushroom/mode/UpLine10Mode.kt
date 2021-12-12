@@ -9,9 +9,13 @@ import kotlin.math.min
 
 class UpLine10Mode : BaseMode() {
 
+    companion object {
+        const val KEY = "UpLine10Mode"
+    }
+
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = size - 22 - Constant.PRE
+        mDeviationValue = size - 15 - Constant.PRE
 
         if(mDeviationValue > 0) {
             val zero = shares[mDeviationValue - 1]
@@ -32,14 +36,14 @@ class UpLine10Mode : BaseMode() {
             val day13 = shares[mDeviationValue + 12]
             val day14 = shares[mDeviationValue + 13]
             val day15 = shares[mDeviationValue + 14]
-            val day16 = shares[mDeviationValue + 15]
-            val day17 = shares[mDeviationValue + 16]
-            val day18 = shares[mDeviationValue + 17]
-            val day19 = shares[mDeviationValue + 18]
-            val day20 = shares[mDeviationValue + 19]
-            val day21 = shares[mDeviationValue + 20]
-            val day22 = shares[mDeviationValue + 21]
-            if(day22.name?.contains("ST") == true) return
+//            val day16 = shares[mDeviationValue + 15]
+//            val day17 = shares[mDeviationValue + 16]
+//            val day18 = shares[mDeviationValue + 17]
+//            val day19 = shares[mDeviationValue + 18]
+//            val day20 = shares[mDeviationValue + 19]
+//            val day21 = shares[mDeviationValue + 20]
+//            val day22 = shares[mDeviationValue + 21]
+            if(day1.name?.contains("ST") == true) return
             if(upLine10(day1)
                 && upLine10(day2)
                 && upLine10(day3)
@@ -55,51 +59,40 @@ class UpLine10Mode : BaseMode() {
                 && upLine10(day13)
                 && upLine10(day14)
                 && upLine10(day15)
-                && upLine10(day16)
-                && upLine10(day17)
-                && upLine10(day18)
-                && upLine10(day19)
-                && upLine10(day20)
-                && upLine10(day21)
-                && upLine10(day22)
+//                && upLine10(day16)
+//                && upLine10(day17)
+//                && upLine10(day18)
+//                && upLine10(day19)
+//                && upLine10(day20)
+//                && upLine10(day21)
+//                && upLine10(day22)
             ) {
-                val r = (day22.nowPrice - day1.beginPrice) / day1.beginPrice * 100
-                if(r > 40 && r < 60) {
+                if(day2.line_10 >= day1.line_10
+                    && day3.line_10 >= day2.line_10
+                    && day4.line_10 >= day3.line_10
+                    && day5.line_10 >= day4.line_10
+                    && day6.line_10 >= day5.line_10
+                    && day7.line_10 >= day6.line_10
+                    && day8.line_10 >= day7.line_10
+                    && day9.line_10 >= day8.line_10
+                    && day10.line_10 >= day9.line_10
+                    && day11.line_10 >= day10.line_10
+                    && day12.line_10 >= day11.line_10
+                    && day13.line_10 >= day12.line_10
+                    && day14.line_10 >= day13.line_10
+                    && day15.line_10 >= day14.line_10
+                ) {
+                    val r = (day15.nowPrice - day1.beginPrice) / day1.beginPrice * 100
+                    if(r > 20 && r < 60) {
 
-                    var yin = shangYinXian(day1)
-                    yin += shangYinXian(day2)
-                    yin += shangYinXian(day3)
-                    yin += shangYinXian(day4)
-                    yin += shangYinXian(day5)
-                    yin += shangYinXian(day6)
-                    yin += shangYinXian(day7)
-                    yin += shangYinXian(day8)
-                    yin += shangYinXian(day9)
-                    yin += shangYinXian(day10)
-                    yin += shangYinXian(day11)
-                    yin += shangYinXian(day12)
-                    yin += shangYinXian(day13)
-                    yin += shangYinXian(day14)
-                    yin += shangYinXian(day15)
-                    yin += shangYinXian(day16)
-                    yin += shangYinXian(day17)
-                    yin += shangYinXian(day18)
-                    yin += shangYinXian(day19)
-                    yin += shangYinXian(day20)
-                    yin += shangYinXian(day21)
-                    yin += shangYinXian(day22)
-
-                    if(yin / r < 0.5) {
-
-                    }
-                    val pian = (day22.nowPrice - day22.line_10) / day22.line_10 * 100
-                    i(TAG, "涨幅：$r, ${day22.brieflyInfo()}, $yin, ${yin/r}, $pian")
-                    mFitModeList.add(
-                        Pair(
-                            r,
-                            day22
+                        i(TAG, "涨幅：$r, ${day15.brieflyInfo()}")
+                        mFitModeList.add(
+                            Pair(
+                                r,
+                                day15
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

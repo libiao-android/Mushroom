@@ -196,12 +196,15 @@ class SharesRecordActivity : AppCompatActivity() {
                 info.liuTongShiZhi = it[44].toDouble()
                 info.zongShiZhi = it[45].toDouble()
 
-                val rangeBegin = String.format("%.2f", (info.beginPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
-                val rangeMin = String.format("%.2f", (info.minPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
-                val rangeMax = String.format("%.2f", (info.maxPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
-                info.rangeBegin = rangeBegin.toDouble()
-                info.rangeMin = rangeMin.toDouble()
-                info.rangeMax = rangeMax.toDouble()
+                if(info.beginPrice > 0) {
+                    val rangeBegin = String.format("%.2f", (info.beginPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
+                    val rangeMin = String.format("%.2f", (info.minPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
+                    val rangeMax = String.format("%.2f", (info.maxPrice - info.yesterdayPrice) / info.yesterdayPrice * 100)
+
+                    info.rangeBegin = rangeBegin.toDouble()
+                    info.rangeMin = rangeMin.toDouble()
+                    info.rangeMax = rangeMax.toDouble()
+                }
 
                 //Log.i(Constant.TAG, info.toString())
 
@@ -492,6 +495,10 @@ class SharesRecordActivity : AppCompatActivity() {
 
         fun followUp(): String {
             return "($rangeBegin, $range, $rangeMin, $rangeMax)"
+        }
+
+        fun simpleInfo(): String {
+            return "$code , $name , ${String.format("%.1f",totalPrice / 100000000)}亿 , ${zongShiZhi}亿 , $post1 , $post2"
         }
 
         companion object CREATOR : Parcelable.Creator<ShareInfo> {

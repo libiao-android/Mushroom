@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:textSize="18dp"
+        android:textColor="@color/blank"
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:visibility="gone"
+        android:id="@+id/candler_chart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:visibility="gone"
+        android:id="@+id/line_chart"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.github.mikephil.charting.charts.CombinedChart
+        android:layout_below="@+id/info"
+        android:layout_marginTop="10dp"
+        android:visibility="visible"
+        android:id="@+id/combined_chart"
+        android:layout_width="match_parent"
+        android:layout_height="290dp"/>
+    <com.github.mikephil.charting.charts.BarChart
+        android:layout_below="@+id/combined_chart"
+        android:id="@+id/bar_chart"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"/>
+
+    <Button
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="18dp"
+        android:id="@+id/btn_plus"
+        android:paddingTop="10dp"
+        android:layout_below="@+id/bar_chart"
+        android:onClick="plus"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:textColor="#000000"
+        android:textSize="12dp"
+        android:text="放大"/>
+
+    <Button
+        android:id="@+id/btn_minus"
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@+id/btn_plus"
+        android:paddingTop="10dp"
+        android:layout_marginLeft="18dp"
+        android:layout_below="@+id/bar_chart"
+        android:onClick="minus"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:textColor="#000000"
+        android:textSize="12dp"
+        android:text="缩小"/>
+
+    <Button
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@+id/btn_minus"
+        android:paddingTop="10dp"
+        android:layout_marginLeft="18dp"
+        android:layout_below="@+id/bar_chart"
+        android:onClick="addToMine"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:textColor="#000000"
+        android:textSize="12dp"
+        android:text="加自选"/>
+
+    <TextView
+        android:layout_marginTop="8dp"
+        android:textSize="15dp"
+        android:layout_marginLeft="18dp"
+        android:layout_below="@+id/btn_plus"
+        android:id="@+id/share_info_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:layout_marginTop="8dp"
+        android:textSize="15dp"
+        android:layout_toRightOf="@+id/share_info_1"
+        android:layout_marginLeft="25dp"
+        android:layout_below="@+id/btn_plus"
+        android:id="@+id/share_info_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+
+
+</RelativeLayout>

@@ -62,4 +62,10 @@
         android:layout_height="wrap_content"
         android:text="创业板涨停"/>
 
+    <CheckBox
+        android:id="@+id/cb_up_10"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="10日线攀升"/>
+
 </LinearLayout>

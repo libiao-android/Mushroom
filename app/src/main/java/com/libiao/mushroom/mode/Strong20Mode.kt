@@ -40,7 +40,6 @@ class Strong20Mode : BaseMode() {
         if(mDeviationValue >=  0) {
 
             val one = shares[mDeviationValue + 0]
-            if(!isChuang(one.code)) return
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
 

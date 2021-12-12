@@ -60,6 +60,10 @@ class MoreMore3Mode : BaseMode {
                     if(ten2.totalPrice > ten1.totalPrice * 0.75) {
                         if(ten3.totalPrice > ten2.totalPrice * 0.75) {
                             i(TAG, "${ten3.brieflyInfo()}, $preAvg")
+                            val avg1 = (ten1.totalPrice + ten2.totalPrice + ten3.totalPrice) / 3
+                            val avg2 = (one.totalPrice + two.totalPrice + three.totalPrice + four.totalPrice + five.totalPrice) / 5
+                            ten3.post1 = String.format("%.1f",avg1 / avg2)
+                            ten3.post2 = String.format("%.1f",(ten1.range + ten2.range + ten3.range))
                             mFitModeList.add(Pair(ten3.range, ten3))
                         }
                     }

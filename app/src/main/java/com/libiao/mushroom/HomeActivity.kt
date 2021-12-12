@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.libiao.mushroom.analysis.SharesAnalysisActivity
+import com.libiao.mushroom.kline.KLineActivity
 import com.permissionx.guolindev.PermissionX
 import okhttp3.*
 import java.io.*
@@ -24,6 +25,10 @@ class HomeActivity : AppCompatActivity() {
 
         applyPermission()
 
+//        val intent = Intent(this, KLineActivity::class.java)
+//        intent.putExtra("code", "sz002520")
+//        intent.putExtra("info", "2021-12-11-6  sz000001  平安银行")
+//        startActivity(intent)
         //test()
     }
 

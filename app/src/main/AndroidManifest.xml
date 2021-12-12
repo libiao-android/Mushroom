@@ -29,6 +29,8 @@
         <activity android:name=".analysis.SharesAnalysisActivity"/>
         <activity android:name=".analysis.SharesRealTimeInfoActivity"/>
         <activity android:name=".setting.SettingActivity"/>
+        <activity android:name=".kline.KLineActivity"
+            android:theme="@style/CommonTheme"/>
     </application>
 
 </manifest>
