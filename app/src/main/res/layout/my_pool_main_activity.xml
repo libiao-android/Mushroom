@@ -13,7 +13,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="pool_50"
-        android:onClick="open50"/>
+        android:text="pool_60"
+        android:onClick="open60"/>
 
 </LinearLayout>

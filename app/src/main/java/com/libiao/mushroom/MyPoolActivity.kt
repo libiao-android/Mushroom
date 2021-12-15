@@ -23,7 +23,7 @@ class MyPoolActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun open50(v: View) {
+    fun open60(v: View) {
         val intent = Intent(this, MyPool50Activity::class.java)
         startActivity(intent)
     }

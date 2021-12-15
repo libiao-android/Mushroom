@@ -28,7 +28,7 @@ class StrongStock50Mode() : BaseMode() {
             var str: String?
             str = reader.readLine()
             while (str != null) {
-                poolList.add(str)
+                poolList.add(str.split(",")[1].trim())
                 str = reader.readLine()
             }
         }
@@ -55,50 +55,50 @@ class StrongStock50Mode() : BaseMode() {
                 var max = day1.nowPrice
 
                 var temp = day2
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day3
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day4
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day5
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day6
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day7
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day8
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day9
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 temp = day10
-                if(min(temp.beginPrice, temp.nowPrice) < min) min = min(temp.beginPrice, temp.nowPrice)
-                if(max(temp.beginPrice, temp.nowPrice) > max) max = max(temp.beginPrice, temp.nowPrice)
+                min = min(min, temp.beginPrice)
+                max = max(max, temp.nowPrice)
 
                 if(day10.beginPrice > day1.beginPrice && min > 0) {
                     val range = (max - min) / min * 100
-                    if(range > 50) {
+                    if(range > 60) {
+                        val info = "${day10.time}, ${day10.code}, ${day10.name}, ${range.toInt()}"
                         if(!poolList.contains(day10.code)) {
                             LogUtil.i(TAG, "${day10.brieflyInfo()}, ${range}")
-                            day10.code?.also {
-                                poolList.add(it)
-                                writeFileAppend(it)
-                            }
+                            poolList.add(day10.code!!)
+                            writeFileAppend(info)
+                            day10.post1 = range.toInt().toString()
                             mFitModeList.add(Pair(range, day10))
 
                         }
@@ -128,6 +128,6 @@ class StrongStock50Mode() : BaseMode() {
     }
 
     override fun des(): String {
-        return "50"
+        return "60"
     }
 }

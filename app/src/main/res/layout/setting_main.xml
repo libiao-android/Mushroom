@@ -28,7 +28,7 @@
         android:id="@+id/cb_50"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="50模式"/>
+        android:text="60模式"/>
     <CheckBox
         android:id="@+id/cb_20"
         android:layout_width="match_parent"

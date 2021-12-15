@@ -1,6 +1,7 @@
 package com.libiao.mushroom
 
 import android.content.Context
+import android.content.Intent
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.libiao.mushroom.kline.KLineActivity
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -30,7 +32,7 @@ class MyPool50Activity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.my_pool_activity)
-        title = "我的股票池-50"
+        title = "我的股票池-60"
 
         mRecyclerView = findViewById(R.id.my_pool_rv)
         mRecyclerView?.layoutManager = LinearLayoutManager(this)
@@ -66,7 +68,7 @@ class MyPool50Activity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPoolHolder {
-            return MyPoolHolder(
+            return MyPoolHolder(context,
                 LayoutInflater.from(context).inflate(
                     R.layout.my_pool_info_item,
                     null
@@ -83,7 +85,7 @@ class MyPool50Activity : AppCompatActivity() {
         }
     }
 
-    class MyPoolHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class MyPoolHolder(context: Context, view: View) : RecyclerView.ViewHolder(view) {
 
         private var mNameTv: TextView? = null
         private var mCodeTv: TextView? = null
@@ -93,6 +95,8 @@ class MyPool50Activity : AppCompatActivity() {
 
         private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
 
+        private var info: String? = null
+
 
         init {
             mNameTv = view.findViewById(R.id.name)
@@ -101,28 +105,37 @@ class MyPool50Activity : AppCompatActivity() {
             mLine10Tv = view.findViewById(R.id.line10)
             mLine20Tv = view.findViewById(R.id.line20)
 
+            view.setOnClickListener {
+                val intent = Intent(context, KLineActivity::class.java)
+                intent.putExtra("code", info?.split(",")?.get(1)?.trim())
+                intent.putExtra("info", info)
+                context.startActivity(intent)
+            }
+
         }
 
         fun bindData(info: String) {
+            this.info = info
+            mNameTv?.text = info
 
-            val f = File(file_2021, info)
-            if(f.exists()) {
-                val stream = FileInputStream(f)
-                val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
-                val lines = reader.readLines()
-                val shares = ArrayList<SharesRecordActivity.ShareInfo>()
-                for(line in lines) {
-                    shares.add(SharesRecordActivity.ShareInfo(line))
-                }
-                if(shares.size > 0) {
-                    val last = shares.last()
-                    mNameTv?.text = last.name
-                    mCodeTv?.text = last.code
-                    mPriceTv?.text = last.nowPrice.toString()
-                    mLine10Tv?.text = last.line_10.toString()
-                    mLine20Tv?.text = last.line_20.toString()
-                }
-            }
+//            val f = File(file_2021, info)
+//            if(f.exists()) {
+//                val stream = FileInputStream(f)
+//                val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+//                val lines = reader.readLines()
+//                val shares = ArrayList<SharesRecordActivity.ShareInfo>()
+//                for(line in lines) {
+//                    shares.add(SharesRecordActivity.ShareInfo(line))
+//                }
+//                if(shares.size > 0) {
+//                    val last = shares.last()
+//                    mNameTv?.text = last.name
+//                    mCodeTv?.text = last.code
+//                    mPriceTv?.text = last.nowPrice.toString()
+//                    mLine10Tv?.text = last.line_10.toString()
+//                    mLine20Tv?.text = last.line_20.toString()
+//                }
+//            }
         }
     }
 }
