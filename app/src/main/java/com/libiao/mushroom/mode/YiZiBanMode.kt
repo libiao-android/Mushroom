@@ -1,6 +1,7 @@
 package com.libiao.mushroom.mode
 
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.bean.SharesInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import kotlin.math.abs
@@ -20,12 +21,16 @@ class YiZiBanMode : BaseMode() {
             val zero = shares[mDeviationValue - 1]
             val one = shares[mDeviationValue + 0]
 
-            if(!zhangTing(zero) && zhangTing(one) && one.minPrice == one.maxPrice) {
+            if(!yiZi(zero) && yiZi(one)) {
                 i(TAG, "${one.brieflyInfo()}")
                 mFitModeList.add(Pair(one.range, one))
             }
 
         }
+    }
+
+    private fun yiZi(info: SharesRecordActivity.ShareInfo): Boolean {
+        return zhangTing(info) && info.minPrice == info.maxPrice
     }
 
     override fun des(): String {
