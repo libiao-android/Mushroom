@@ -16,8 +16,6 @@ abstract class BaseMode {
 
     var showTime = false
 
-
-
     constructor() {
     }
 
@@ -117,11 +115,15 @@ abstract class BaseMode {
         }
         var zhangTingPrice = info.yesterdayPrice * maxRange
         zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
-        return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice
+        return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0
     }
 
     open fun shouldAnalysis(context: Context): Boolean {
         val sharedPreferences = context.getSharedPreferences("mode", Context.MODE_PRIVATE) //私有数据
         return sharedPreferences.getBoolean(TAG, false)
+    }
+
+    fun baoLiuXiaoShu(value: Double): String {
+        return String.format("%.2f", value)
     }
 }

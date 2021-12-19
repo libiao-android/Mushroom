@@ -6,8 +6,8 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:textSize="18dp"
         android:textColor="@color/blank"
         android:id="@+id/info"
@@ -28,7 +28,7 @@
 
     <com.github.mikephil.charting.charts.CombinedChart
         android:layout_below="@+id/info"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:visibility="visible"
         android:id="@+id/combined_chart"
         android:layout_width="match_parent"
@@ -41,7 +41,7 @@
 
     <Button
         android:layout_marginTop="8dp"
-        android:layout_marginLeft="18dp"
+        android:layout_marginLeft="25dp"
         android:id="@+id/btn_plus"
         android:paddingTop="10dp"
         android:layout_below="@+id/bar_chart"
@@ -82,7 +82,7 @@
     <TextView
         android:layout_marginTop="8dp"
         android:textSize="15dp"
-        android:layout_marginLeft="18dp"
+        android:layout_marginLeft="25dp"
         android:layout_below="@+id/btn_plus"
         android:id="@+id/share_info_1"
         android:layout_width="wrap_content"

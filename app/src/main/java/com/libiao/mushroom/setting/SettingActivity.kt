@@ -72,15 +72,39 @@ class SettingActivity : AppCompatActivity() {
                 editor?.commit()//提交修改
             }
 
-            cb_chuang_ye_ban.isChecked = it.getBoolean(ChuangYeBanTouJiMode.KEY, false)
-            cb_chuang_ye_ban.setOnCheckedChangeListener { _, isChecked ->
-                editor?.putBoolean(ChuangYeBanTouJiMode.KEY, isChecked)
-                editor?.commit()//提交修改
-            }
-
             cb_up_10.isChecked = it.getBoolean(UpLine10Mode.KEY, false)
             cb_up_10.setOnCheckedChangeListener { _, isChecked ->
                 editor?.putBoolean(UpLine10Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            lian_ban_2.isChecked = it.getBoolean(LianBan2Mode.KEY, false)
+            lian_ban_2.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan2Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            lian_ban_3.isChecked = it.getBoolean(LianBan3Mode.KEY, false)
+            lian_ban_3.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan3Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            lian_ban_4.isChecked = it.getBoolean(LianBan4Mode.KEY, false)
+            lian_ban_4.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan4Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            chuang_1.isChecked = it.getBoolean(LianBanChuang1Mode.KEY, false)
+            chuang_1.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBanChuang1Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            chuang_2.isChecked = it.getBoolean(LianBanChuang2Mode.KEY, false)
+            chuang_2.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBanChuang2Mode.KEY, isChecked)
                 editor?.commit()//提交修改
             }
         }

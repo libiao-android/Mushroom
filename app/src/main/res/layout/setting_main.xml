@@ -57,15 +57,39 @@
         android:text="分歧转一致"/>
 
     <CheckBox
-        android:id="@+id/cb_chuang_ye_ban"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="创业板涨停"/>
-
-    <CheckBox
         android:id="@+id/cb_up_10"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="10日线攀升"/>
+
+    <CheckBox
+        android:id="@+id/lian_ban_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="二连板"/>
+
+    <CheckBox
+        android:id="@+id/lian_ban_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="三连板"/>
+
+    <CheckBox
+        android:id="@+id/lian_ban_4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="四连板"/>
+
+    <CheckBox
+        android:id="@+id/chuang_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="创一板"/>
+
+    <CheckBox
+        android:id="@+id/chuang_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="创二连板"/>
 
 </LinearLayout>

@@ -162,8 +162,12 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(YiZiBanMode())
         mModeList.add(MoreMore3Mode())
         mModeList.add(Difference2FitMode())
-        mModeList.add(ChuangYeBanTouJiMode())
         mModeList.add(UpLine10Mode())
+        mModeList.add(LianBan2Mode())
+        mModeList.add(LianBan3Mode())
+        mModeList.add(LianBan4Mode())
+        mModeList.add(LianBanChuang1Mode())
+        mModeList.add(LianBanChuang2Mode())
 
 
         val tempList = ArrayList<BaseMode>()
@@ -267,6 +271,10 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     private fun findOutFitMode() {
         if(done == 4) {
             i(TAG, "结束查询: ${allData.size}")
+            if(allData.size > 0) {
+                oneDayTime?.text = allData[0][allData[0].size - Constant.PRE - 1].time
+            }
+
             allData.forEach {shares ->
                 mModeList.forEach {
                     it.analysis(shares)
@@ -274,15 +282,6 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
             }
             mAdapter?.setData(mModeList)
             bigPowerBtn?.isEnabled = true
-
-            var time = ""
-            mModeList.forEach {
-                if(it.mFitModeList.size > 0) {
-                    time = it.mFitModeList[0].second?.time ?: ""
-                    return@forEach
-                }
-            }
-            oneDayTime?.text = time
         }
     }
 

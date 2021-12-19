@@ -502,7 +502,7 @@ class KLineActivity : AppCompatActivity() {
         combined_chart.viewPortHandler.matrixTouch.getValues(f)
         f[0] += 1f
         if(f[0] > 8f) f[0] = 8f
-        LogUtil.i(TAG, "+++++ ${f.toMutableList()}")
+        //LogUtil.i(TAG, "+++++ ${f.toMutableList()}")
         combined_chart.viewPortHandler.matrixTouch.setValues(f)
         combined_chart.invalidate()
 
@@ -512,7 +512,7 @@ class KLineActivity : AppCompatActivity() {
 
     fun minus(v: View) {
         combined_chart.viewPortHandler.matrixTouch.getValues(f)
-        LogUtil.i(TAG, "----- ${f.toMutableList()}")
+        //LogUtil.i(TAG, "----- ${f.toMutableList()}")
         if(f[0] <= 1f) {
             f[0] = 1f
             f[2] = 0f
