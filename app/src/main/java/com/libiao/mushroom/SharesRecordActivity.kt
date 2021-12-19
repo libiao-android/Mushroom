@@ -1,6 +1,7 @@
 package com.libiao.mushroom
 
 import android.os.*
+import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -498,6 +499,9 @@ class SharesRecordActivity : AppCompatActivity() {
         }
 
         fun simpleInfo(): String {
+            if(TextUtils.isEmpty(post1)) {
+                return "$code , $name , ${String.format("%.1f",totalPrice / 100000000)}亿 , ${zongShiZhi}亿"
+            }
             return "$code , $name , ${String.format("%.1f",totalPrice / 100000000)}亿 , ${zongShiZhi}亿 , $post1 , $post2"
         }
 

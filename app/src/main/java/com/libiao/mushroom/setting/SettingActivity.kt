@@ -30,11 +30,11 @@ class SettingActivity : AppCompatActivity() {
     private fun initView() {
         sharedPreferences?.also {
 
-            cb_long_tou.isChecked = it.getBoolean(LeaderMode.KEY, false)
-            cb_long_tou.setOnCheckedChangeListener { _, isChecked ->
-                editor?.putBoolean(LeaderMode.KEY, isChecked)
-                editor?.commit()//提交修改
-            }
+//            cb_long_tou.isChecked = it.getBoolean(LeaderMode.KEY, false)
+//            cb_long_tou.setOnCheckedChangeListener { _, isChecked ->
+//                editor?.putBoolean(LeaderMode.KEY, isChecked)
+//                editor?.commit()//提交修改
+//            }
 
             cb_50.isChecked = it.getBoolean(StrongStock50Mode.KEY, false)
             cb_50.setOnCheckedChangeListener { _, isChecked ->
@@ -105,6 +105,24 @@ class SettingActivity : AppCompatActivity() {
             chuang_2.isChecked = it.getBoolean(LianBanChuang2Mode.KEY, false)
             chuang_2.setOnCheckedChangeListener { _, isChecked ->
                 editor?.putBoolean(LianBanChuang2Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            lian_ban_2_strong.isChecked = it.getBoolean(LianBan2StrongMode.KEY, false)
+            lian_ban_2_strong.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan2StrongMode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            lian_ban_3_strong.isChecked = it.getBoolean(LianBan3StrongMode.KEY, false)
+            lian_ban_3_strong.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan3StrongMode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            chuang_1_strong.isChecked = it.getBoolean(LianBanChuang1StrongMode.KEY, false)
+            chuang_1_strong.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBanChuang1StrongMode.KEY, isChecked)
                 editor?.commit()//提交修改
             }
         }

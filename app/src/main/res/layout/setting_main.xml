@@ -19,11 +19,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="模式选择"/>
-    <CheckBox
-        android:id="@+id/cb_long_tou"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="龙头"/>
+<!--    <CheckBox-->
+<!--        android:id="@+id/cb_long_tou"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="龙头"/>-->
     <CheckBox
         android:id="@+id/cb_50"
         android:layout_width="match_parent"
@@ -91,5 +91,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="创二连板"/>
+
+    <CheckBox
+        android:id="@+id/lian_ban_2_strong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="二连板强势"/>
+
+    <CheckBox
+        android:id="@+id/lian_ban_3_strong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="三连板强势"/>
+
+    <CheckBox
+        android:id="@+id/chuang_1_strong"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="创一板强势"/>
 
 </LinearLayout>
