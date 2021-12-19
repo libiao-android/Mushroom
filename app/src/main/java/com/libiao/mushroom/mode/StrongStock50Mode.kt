@@ -28,7 +28,7 @@ class StrongStock50Mode() : BaseMode() {
             var str: String?
             str = reader.readLine()
             while (str != null) {
-                poolList.add(str.split(",")[1].trim())
+                poolList.add(str)
                 str = reader.readLine()
             }
         }
@@ -94,18 +94,30 @@ class StrongStock50Mode() : BaseMode() {
                     val range = (max - min) / min * 100
                     if(range > 60) {
                         val info = "${day10.time}, ${day10.code}, ${day10.name}, ${range.toInt()}"
-                        if(!poolList.contains(day10.code)) {
-                            LogUtil.i(TAG, "${day10.brieflyInfo()}, ${range}")
-                            poolList.add(day10.code!!)
+                        val result = contains(day10.code!!)
+                        if(result == null) {
+                            LogUtil.i(TAG, "${day10.brieflyInfo()}, $range")
+                            poolList.add(info)
                             writeFileAppend(info)
                             day10.post1 = range.toInt().toString()
                             mFitModeList.add(Pair(range, day10))
-
+                        } else {
+//                            if(result.contains(day10.time!!)) {
+//                                day10.post1 = range.toInt().toString()
+//                                mFitModeList.add(Pair(range, day10))
+//                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    private fun contains(code: String): String? {
+        poolList.reversed().forEach {
+            if(it.contains(code)) return it
+        }
+        return null
     }
 
     private fun writeFileAppend(info: String) {

@@ -74,9 +74,11 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
+        android:paddingBottom="30dp"
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:overScrollMode="never"
         android:scrollbars="none"/>
+
 </LinearLayout>
