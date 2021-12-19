@@ -84,9 +84,10 @@ class Strong20Mode : BaseMode() {
                     && eight.minPrice > eight.line_10
                     && eight.beginPrice > eight.nowPrice
                     && nine.nowPrice > nine.beginPrice
-                    && nine.totalPrice > eight.totalPrice * 0.8
-                    && nine.nowPrice >= nine.line_10
+                    && nine.totalPrice > eight.totalPrice
+                    && nine.minPrice >= nine.line_10
                     && nine.range < 5
+                    && nine.rangeMax > 0
                     && (nine.rangeMax - nine.range) < 5
                     && (nine.minPrice - nine.line_10) / nine.line_10 < 0.03
 
@@ -112,7 +113,7 @@ class Strong20Mode : BaseMode() {
                     val liang = total / list[list.size - 1].totalPrice
                     val d_10 = (nine.minPrice - nine.line_10) / nine.line_10 * 100
 
-                    if(isRedMore && !isHight) {
+                    if(isRedMore && !isHight && liang > 10/7.0 && liang < 10/3.0) {
                         i(TAG, "${nine.brieflyInfo()}, $zhangTing, $index")
                         nine.post1 = baoLiuXiaoShu(d_10)
                         nine.post2 = baoLiuXiaoShu(liang)
@@ -136,7 +137,7 @@ class Strong20Mode : BaseMode() {
         var total_green = 0.00
         for( i in index until list.size) {
             val temp = list[i]
-            if(temp.range < 0) {
+            if(temp.beginPrice > temp.nowPrice) {
                 total_green += temp.totalPrice
             } else {
                 total_red += temp.totalPrice
