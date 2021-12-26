@@ -21,6 +21,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.k_line_main.*
 import java.io.BufferedReader
@@ -113,7 +114,9 @@ class KLineActivity : AppCompatActivity() {
 
     private fun initView() {
         info.text = intent.getStringExtra("info")
-
+        info.setOnClickListener {
+            ClipboardUtil.clip(this, code)
+        }
         //initCandleChart()
         //initLineChart()
         initCombinedChart()

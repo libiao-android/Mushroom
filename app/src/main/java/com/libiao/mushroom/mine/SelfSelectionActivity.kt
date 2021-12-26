@@ -19,6 +19,7 @@ import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.MineShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
+import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
@@ -379,6 +380,10 @@ class SelfSelectionActivity : BaseActivity() {
                 intent.putExtra("code", mineShareInfo?.code)
                 intent.putExtra("info", mineShareInfo.toString())
                 context.startActivity(intent)
+            }
+
+            mCodeTv?.setOnClickListener {
+                ClipboardUtil.clip(context, mineShareInfo?.code)
             }
 
         }
