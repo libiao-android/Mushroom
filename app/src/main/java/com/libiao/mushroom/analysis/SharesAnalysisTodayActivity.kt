@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.*
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -171,6 +172,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(LianBan2StrongMode())
         mModeList.add(LianBan3StrongMode())
         mModeList.add(LianBanChuang1StrongMode())
+        mModeList.add(LianBan1StrongMode())
+        mModeList.add(MineMode())
 
 
         val tempList = ArrayList<BaseMode>()
@@ -415,6 +418,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         fun bindData(info: BaseMode) {
             mData.clear()
             itemView.visibility = View.VISIBLE
+            info.mFitModeList.sortByDescending { it.first }
             info.mFitModeList.forEach {
                 it.second?.also {shareInfo ->
                     mData.add(shareInfo)

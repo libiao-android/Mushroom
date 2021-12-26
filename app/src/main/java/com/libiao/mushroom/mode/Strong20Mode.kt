@@ -1,38 +1,13 @@
 package com.libiao.mushroom.mode
 
-import android.os.Environment
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
-import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
-import java.io.*
-import java.nio.charset.Charset
-import kotlin.math.abs
 
 class Strong20Mode : BaseMode() {
 
     companion object {
         const val KEY = "Strong20Mode"
-    }
-
-    private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
-    private val poolList = java.util.ArrayList<String>()
-    private var poolFile: File? = null
-
-    init {
-        poolFile = File(fileNew, "my_20_pool")
-        if(poolFile?.exists() == false) {
-            poolFile?.createNewFile()
-        } else {
-            val stream = FileInputStream(poolFile)
-            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
-            var str: String?
-            str = reader.readLine()
-            while (str != null) {
-                poolList.add(str)
-                str = reader.readLine()
-            }
-        }
     }
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
@@ -58,7 +33,7 @@ class Strong20Mode : BaseMode() {
 
             var index = 0
 
-            var zhangTing = zhangTing(one)
+            val zhangTing = zhangTing(one)
                     || zhangTing(two)
                     || zhangTing(three)
                     || zhangTing(four)
@@ -144,25 +119,6 @@ class Strong20Mode : BaseMode() {
             }
         }
         return total_red > total_green
-    }
-
-    private fun writeFileAppend(info: String) {
-        var fileWriter: FileWriter? = null
-        try {
-            fileWriter = FileWriter(poolFile, true)
-            fileWriter.append("$info\n")
-            fileWriter.flush()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } finally {
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-        }
     }
 
     override fun des(): String {

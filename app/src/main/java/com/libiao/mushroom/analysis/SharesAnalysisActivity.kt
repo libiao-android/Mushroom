@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.*
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.libiao.mushroom.MyPool20Activity
+import com.libiao.mushroom.MyPool50Activity
 import com.libiao.mushroom.R
 import com.libiao.mushroom.setting.SettingActivity
 
@@ -16,26 +18,19 @@ class SharesAnalysisActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.analysis_activity)
-        title = "股票分析"
+        title = "--分析"
     }
 
-    fun route_2019(v: View) {
-        val intent = Intent(this, SharesAnalysisHistoryActivity::class.java)
-        intent.putExtra("year", "2019")
+    fun open20(v: View) {
+        val intent = Intent(this, MyPool20Activity::class.java)
         startActivity(intent)
     }
 
-    fun route_2020(v: View) {
-        val intent = Intent(this, SharesAnalysisHistoryActivity::class.java)
-        intent.putExtra("year", "2020")
+    fun open60(v: View) {
+        val intent = Intent(this, MyPool50Activity::class.java)
         startActivity(intent)
     }
 
-    fun route_2021(v: View) {
-        val intent = Intent(this, SharesAnalysisHistoryActivity::class.java)
-        intent.putExtra("year", "2021")
-        startActivity(intent)
-    }
 
     fun today(v: View) {
         val intent = Intent(this, SharesAnalysisTodayActivity::class.java)

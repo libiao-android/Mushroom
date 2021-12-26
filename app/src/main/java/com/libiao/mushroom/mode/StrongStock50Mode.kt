@@ -15,9 +15,7 @@ class StrongStock50Mode() : BaseMode() {
         const val KEY = "StrongStock50Mode"
     }
 
-    private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
-    private val poolList = java.util.ArrayList<String>()
-    private var poolFile: File? = null
+
     init {
         poolFile = File(fileNew, "my_50_pool")
         if(poolFile?.exists() == false) {
@@ -118,25 +116,6 @@ class StrongStock50Mode() : BaseMode() {
             if(it.contains(code)) return it
         }
         return null
-    }
-
-    private fun writeFileAppend(info: String) {
-        var fileWriter: FileWriter? = null
-        try {
-            fileWriter = FileWriter(poolFile, true)
-            fileWriter.append("$info\n")
-            fileWriter.flush()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        } finally {
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-        }
     }
 
     override fun des(): String {

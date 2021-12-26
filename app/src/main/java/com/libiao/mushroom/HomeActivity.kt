@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.libiao.mushroom.analysis.SharesAnalysisActivity
 import com.libiao.mushroom.kline.KLineActivity
+import com.libiao.mushroom.mine.SelfSelectionActivity
 import com.permissionx.guolindev.PermissionX
 import okhttp3.*
 import java.io.*
@@ -85,7 +86,9 @@ class HomeActivity : AppCompatActivity() {
     }
 
     fun myPool(v: View) {
-        val intent = Intent(this, MyPoolActivity::class.java)
+//        val intent = Intent(this, MyPoolActivity::class.java)
+//        startActivity(intent)
+        val intent = Intent(this, SelfSelectionActivity::class.java)
         startActivity(intent)
     }
 

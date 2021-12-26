@@ -125,6 +125,18 @@ class SettingActivity : AppCompatActivity() {
                 editor?.putBoolean(LianBanChuang1StrongMode.KEY, isChecked)
                 editor?.commit()//提交修改
             }
+
+            lian_ban_1_strong.isChecked = it.getBoolean(LianBan1StrongMode.KEY, false)
+            lian_ban_1_strong.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan1StrongMode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            mine.isChecked = it.getBoolean(MineMode.KEY, false)
+            mine.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(MineMode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
         }
 
         btn_delete_cache.setOnClickListener {

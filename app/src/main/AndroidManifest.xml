@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
+        android:name=".MushRoomApplication"
         android:allowBackup="true"
         android:icon="@mipmap/icon_launcher"
         android:label="蘑菇"
@@ -30,6 +31,8 @@
         <activity android:name=".analysis.SharesRealTimeInfoActivity"/>
         <activity android:name=".setting.SettingActivity"/>
         <activity android:name=".kline.KLineActivity"
+            android:theme="@style/CommonTheme"/>
+        <activity android:name=".mine.SelfSelectionActivity"
             android:theme="@style/CommonTheme"/>
     </application>
 

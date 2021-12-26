@@ -1,6 +1,7 @@
 package com.libiao.mushroom
 
 import android.content.Context
+import android.content.Intent
 import android.os.*
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.libiao.mushroom.kline.KLineActivity
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -66,7 +68,7 @@ class MyPool20Activity : AppCompatActivity() {
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPoolHolder {
-            return MyPoolHolder(
+            return MyPoolHolder(context,
                 LayoutInflater.from(context).inflate(
                     R.layout.my_pool_info_item,
                     null
@@ -83,13 +85,15 @@ class MyPool20Activity : AppCompatActivity() {
         }
     }
 
-    class MyPoolHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class MyPoolHolder(context: Context, view: View) : RecyclerView.ViewHolder(view) {
 
         private var mNameTv: TextView? = null
         private var mCodeTv: TextView? = null
         private var mPriceTv: TextView? = null
         private var mLine10Tv: TextView? = null
         private var mLine20Tv: TextView? = null
+
+        private var info: String? = null
 
         private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
 
@@ -101,28 +105,18 @@ class MyPool20Activity : AppCompatActivity() {
             mLine10Tv = view.findViewById(R.id.line10)
             mLine20Tv = view.findViewById(R.id.line20)
 
+            view.setOnClickListener {
+                val intent = Intent(context, KLineActivity::class.java)
+                intent.putExtra("code", info?.split(",")?.get(1)?.trim())
+                intent.putExtra("info", info)
+                context.startActivity(intent)
+            }
+
         }
 
         fun bindData(info: String) {
-
-            val f = File(file_2021, info)
-            if(f.exists()) {
-                val stream = FileInputStream(f)
-                val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
-                val lines = reader.readLines()
-                val shares = ArrayList<SharesRecordActivity.ShareInfo>()
-                for(line in lines) {
-                    shares.add(SharesRecordActivity.ShareInfo(line))
-                }
-                if(shares.size > 0) {
-                    val last = shares.last()
-                    mNameTv?.text = last.name
-                    mCodeTv?.text = last.code
-                    mPriceTv?.text = last.nowPrice.toString()
-                    mLine10Tv?.text = last.line_10.toString()
-                    mLine20Tv?.text = last.line_20.toString()
-                }
-            }
+            this.info = info
+            mNameTv?.text = info
         }
     }
 }

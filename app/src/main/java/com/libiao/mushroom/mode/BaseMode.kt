@@ -1,8 +1,12 @@
 package com.libiao.mushroom.mode
 
 import android.content.Context
+import android.os.Environment
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.LogUtil.i
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 import java.lang.StringBuilder
 import kotlin.math.abs
 import kotlin.math.min
@@ -15,6 +19,12 @@ abstract class BaseMode {
     val mFitModeList = ArrayList<Pair<Double, SharesRecordActivity.ShareInfo?>>()
 
     var showTime = false
+
+
+    val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
+    val poolList = java.util.ArrayList<String>()
+    var poolFile: File? = null
+
 
     constructor() {
     }
@@ -105,7 +115,7 @@ abstract class BaseMode {
     }
 
     fun isChuang(code: String?): Boolean {
-        return code?.startsWith("sz300") ?: false
+        return code?.startsWith("sz30") ?: false
     }
 
     fun zhangTing(info: SharesRecordActivity.ShareInfo): Boolean {
@@ -125,5 +135,24 @@ abstract class BaseMode {
 
     fun baoLiuXiaoShu(value: Double): String {
         return String.format("%.2f", value)
+    }
+
+    fun writeFileAppend(info: String) {
+        var fileWriter: FileWriter? = null
+        try {
+            fileWriter = FileWriter(poolFile, true)
+            fileWriter.append("$info\n")
+            fileWriter.flush()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        } finally {
+            if (fileWriter != null) {
+                try {
+                    fileWriter.close()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 }

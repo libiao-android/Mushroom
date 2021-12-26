@@ -10,24 +10,15 @@
         android:onClick="setting"/>
 
     <Button
-        android:enabled="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2019"
-        android:onClick="route_2019"/>
-
-    <Button
-        android:enabled="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="2020"
-        android:onClick="route_2020"/>
-
+        android:text="pool_20"
+        android:onClick="open20"/>
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2021"
-        android:onClick="route_2021"/>
+        android:text="pool_60"
+        android:onClick="open60"/>
 
     <Button
         android:layout_width="wrap_content"
