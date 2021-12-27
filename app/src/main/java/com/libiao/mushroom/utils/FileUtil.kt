@@ -10,7 +10,7 @@ object FileUtil {
         var fileWriter: FileWriter? = null
         try {
             fileWriter = FileWriter(file, true)
-            fileWriter.append(info)
+            fileWriter.append("$info\n")
             fileWriter.flush()
         } catch (e: IOException) {
             e.printStackTrace()

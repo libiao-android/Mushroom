@@ -19,10 +19,7 @@ import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.MineShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
-import com.libiao.mushroom.utils.ClipboardUtil
-import com.libiao.mushroom.utils.LogUtil
-import com.libiao.mushroom.utils.ShareParseUtil
-import com.libiao.mushroom.utils.baoLiuXiaoShu
+import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.self_selection_activity.*
 import okhttp3.*
 import java.io.*
@@ -53,6 +50,10 @@ class SelfSelectionActivity : BaseActivity() {
 
     private var mRefreshCount = 0
 
+    private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
+    private var poolFile: File? = null
+    private var time: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.self_selection_activity)
@@ -62,6 +63,10 @@ class SelfSelectionActivity : BaseActivity() {
         mAdapter = MyPoolInfoAdater(this)
         mRecyclerView?.adapter = mAdapter
 
+        poolFile = File(fileNew, "my_pool")
+        if(poolFile?.exists() == false) {
+            poolFile?.createNewFile()
+        }
         initView()
 
         val data = MineShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
@@ -127,13 +132,20 @@ class SelfSelectionActivity : BaseActivity() {
             }
             val liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
             it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${liangBi}"
+
+            if(cb_network.isChecked && cb_save.isChecked) {
+                if(share.range > 0 && share.nowPrice > share.beginPrice) {
+                    val info = "${time}, ${share.code}, ${share.name}, ${liangBi}, ${share.followUp()}"
+                    FileUtil.writeFileAppend(poolFile!!, info)
+                }
+            }
         }
     }
 
     private fun initView() {
 
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")// HH:mm:ss
-        val time = simpleDateFormat.format(Date())
+        time = simpleDateFormat.format(Date())
         tv_current_time.text = "$time"
 
         cb_network.setOnCheckedChangeListener { buttonView, isChecked ->
