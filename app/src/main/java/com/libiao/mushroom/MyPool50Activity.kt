@@ -32,7 +32,7 @@ class MyPool50Activity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.my_pool_activity)
-        title = "我的股票池-60"
+        title = "我的--池-60"
 
         mRecyclerView = findViewById(R.id.my_pool_rv)
         mRecyclerView?.layoutManager = LinearLayoutManager(this)

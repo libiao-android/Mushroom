@@ -42,7 +42,7 @@ class MineMode : BaseMode {
             val three = shares[mDeviationValue + 2]
             if(poolSet.contains(one.code)) {
                 i(TAG, "contains: ${one.code}")
-                if(three.minPrice < three.line_10) {
+                if(three.nowPrice < three.line_10) {
                     i(TAG, "delete: ${one.code}")
                     MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
                 }

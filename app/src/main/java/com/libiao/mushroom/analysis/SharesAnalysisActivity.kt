@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.*
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.libiao.mushroom.MyPool10Activity
 import com.libiao.mushroom.MyPool20Activity
 import com.libiao.mushroom.MyPool50Activity
 import com.libiao.mushroom.R
@@ -19,6 +20,11 @@ class SharesAnalysisActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.analysis_activity)
         title = "--分析"
+    }
+
+    fun open10(v: View) {
+        val intent = Intent(this, MyPool10Activity::class.java)
+        startActivity(intent)
     }
 
     fun open20(v: View) {

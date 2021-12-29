@@ -18,21 +18,21 @@ import java.io.InputStreamReader
 import java.nio.charset.Charset
 
 
-class MyPool20Activity : AppCompatActivity() {
+class MyPool10Activity : AppCompatActivity() {
 
     companion object {
-        private const val TAG = "MyPool20Activity"
+        private const val TAG = "MyPool10Activity"
     }
 
     private var mRecyclerView: RecyclerView? = null
     private var mAdapter: MyPoolInfoAdater? = null
 
-    private val myPoolFile = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/my_20_pool")
+    private val myPoolFile = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/my_pool")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.my_pool_activity)
-        title = "我的--池-20"
+        title = "我的--池-10"
 
         mRecyclerView = findViewById(R.id.my_pool_rv)
         mRecyclerView?.layoutManager = LinearLayoutManager(this)
@@ -93,9 +93,9 @@ class MyPool20Activity : AppCompatActivity() {
         private var mLine10Tv: TextView? = null
         private var mLine20Tv: TextView? = null
 
-        private var info: String? = null
-
         private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+
+        private var info: String? = null
 
 
         init {
@@ -108,7 +108,9 @@ class MyPool20Activity : AppCompatActivity() {
             view.setOnClickListener {
                 val intent = Intent(context, KLineActivity::class.java)
                 intent.putExtra("code", info?.split(",")?.get(1)?.trim())
-                intent.putExtra("info", info)
+                val values = info?.split(",")
+                val a = "${values?.get(0)}, ${values?.get(1)}, ${values?.get(2)}, ${values?.get(3)}"
+                intent.putExtra("info", a)
                 context.startActivity(intent)
             }
 
@@ -116,7 +118,29 @@ class MyPool20Activity : AppCompatActivity() {
 
         fun bindData(info: String) {
             this.info = info
-            mNameTv?.text = info
+            val values = info.split(",")
+            val a = "${values.get(0)}, ${values.get(1)}, ${values.get(2)}, ${values.get(3)}"
+            val b = "${values.get(4)}, ${values.get(5)}, ${values.get(6)}, ${values.get(7)}"
+            mNameTv?.text = "$a\n$b"
+
+//            val f = File(file_2021, info)
+//            if(f.exists()) {
+//                val stream = FileInputStream(f)
+//                val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+//                val lines = reader.readLines()
+//                val shares = ArrayList<SharesRecordActivity.ShareInfo>()
+//                for(line in lines) {
+//                    shares.add(SharesRecordActivity.ShareInfo(line))
+//                }
+//                if(shares.size > 0) {
+//                    val last = shares.last()
+//                    mNameTv?.text = last.name
+//                    mCodeTv?.text = last.code
+//                    mPriceTv?.text = last.nowPrice.toString()
+//                    mLine10Tv?.text = last.line_10.toString()
+//                    mLine20Tv?.text = last.line_20.toString()
+//                }
+//            }
         }
     }
 }
