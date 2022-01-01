@@ -6,11 +6,15 @@ import java.io.IOException
 
 object FileUtil {
 
-    fun writeFileAppend(file: File, info: String) {
+    fun writeFileAppend(file: File, info: String, lineFeed: Boolean = true) {
         var fileWriter: FileWriter? = null
         try {
             fileWriter = FileWriter(file, true)
-            fileWriter.append("$info\n")
+            if(lineFeed) {
+                fileWriter.append("$info\n")
+            } else {
+                fileWriter.append(info)
+            }
             fileWriter.flush()
         } catch (e: IOException) {
             e.printStackTrace()

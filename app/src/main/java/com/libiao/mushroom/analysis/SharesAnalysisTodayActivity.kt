@@ -312,10 +312,11 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
             val lines = reader.readLines()
-            //Log.i("libiao", "$lines")
+            i(TAG, "${lines.size}")
             val shares = ArrayList<SharesRecordActivity.ShareInfo>()
-            for(line in lines) {
-                shares.add(SharesRecordActivity.ShareInfo(line))
+            lines.forEachIndexed { index, s ->
+                i(TAG, "$index, $s")
+                shares.add(SharesRecordActivity.ShareInfo(s))
             }
             mModeList.forEach {
                 it.analysis(shares)
@@ -362,8 +363,13 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         bigPowerBtn?.isEnabled = false
     }
 
+    override fun onResume() {
+        super.onResume()
+        //test()
+    }
+
     private fun test() {
-        analysis("sz000799")
+        analysis("sz301180")
     }
 
     class SharesInfoAdater(val context: Context) : RecyclerView.Adapter<SharesInfoHolder>() {

@@ -328,7 +328,11 @@ class SharesRecordActivity : AppCompatActivity() {
             val sb = StringBuilder()
             for(i in 0 until lines.size - 1) {
                 //Log.i(Constant.TAG, lines[i])
-                sb.append("${lines[i]}\n")
+                if(!TextUtils.isEmpty(lines[i])) {
+                    sb.append("${lines[i]}\n")
+                } else {
+                    LogUtil.i(TAG, "有空行: $code, ${lines.size}")
+                }
             }
 
             var fileWriter: FileWriter? = null

@@ -438,7 +438,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         if(!file.exists()) {
             file.createNewFile()
         }
-        FileUtil.writeFileAppend(file, info)
+        FileUtil.writeFileAppend(file, info, false)
     }
 }
 
