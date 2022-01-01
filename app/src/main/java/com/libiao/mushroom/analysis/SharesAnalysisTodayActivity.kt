@@ -213,8 +213,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
                 for(i in 0 until avg) {
 
                     count++
-                    if(count % 10 == 0 && count < 601) {
-                        val p = (count / 650F * 100).toInt()
+                    if(count % 10 == 0 && count < (avg -100) ) {
+                        val p = (count / (avg.toFloat()) * 100).toInt()
                         mHandler.post { progressTv?.text = "$p%, ${count * 4}" }
                     }
 

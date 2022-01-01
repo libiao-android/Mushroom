@@ -229,13 +229,17 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             if(code == "sz000001") {
                 latelyTime = time
             }
-            if(time == latelyTime && status != "-3" && status != "-2" && status != "03") {
-                sb.append("$code, $name\n")
-                count++
-                if(count % 400 == 0) {
-                    val infos = sb.toString()
-                    sb.clear()
-                    writeFileAppend(infos)
+            if(time == latelyTime && status != "-3" && status != "-2") {
+                if(code.startsWith("sh") && status == "03") {
+                    i(TAG, " 抛弃sh开头 code: $code, time: $time, status: $status")
+                } else {
+                    sb.append("$code, $name\n")
+                    count++
+                    if(count % 400 == 0) {
+                        val infos = sb.toString()
+                        sb.clear()
+                        writeFileAppend(infos)
+                    }
                 }
             } else {
                 i(TAG, " 抛弃 code: $code, time: $time, status: $status")
@@ -279,12 +283,20 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             while (str != null) {
                 count++
                 if(count % 100 == 0) {
-                    i(TAG, "str: $str, $count")
+                    //i(TAG, "str: $str, $count")
                 }
                 val a = str.split(",")
-                getHistoryData(a[0].trim(), a[1].trim())
+                val code  = a[0].trim()
+                val f = File(fileNew_2021, code)
+                if(f.exists()) {
+
+                } else {
+                    i(TAG, "不存在: $code")
+                    f.createNewFile()
+                    getHistoryData(a[0].trim(), a[1].trim())
+                    Thread.sleep(500)
+                }
                 str = reader.readLine()
-                Thread.sleep(200)
             }
             isHistoryDoing = false
             i(TAG, "history end")
@@ -297,7 +309,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20210927&end=20210930")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20210901&end=20211231")
             .build()
 
         val call = client.newCall(request)

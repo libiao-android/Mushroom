@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.libiao.mushroom.utils.Constant
+import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
 import okhttp3.*
 import java.io.*
@@ -109,8 +110,9 @@ class SharesRecordActivity : AppCompatActivity() {
             mDay = c.get(Calendar.DAY_OF_MONTH)// 获取当前月份的日期号码
         }
 
-        val time = "$mYear-$mMonth-$mDay-$mWay"
-        Log.i("libiao_A", "time: $time")
+        //val time = "$mYear-$mMonth-$mDay-$mWay"
+        val time = "2021-12-31-5"
+        i(TAG, "time: $time")
         this.time = time
 
         val f = File(file_2021, "sz000001")
@@ -144,6 +146,7 @@ class SharesRecordActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        //deleteAllFileLastLine()
     }
 
     private fun queryInfo(code: String) {
@@ -321,9 +324,7 @@ class SharesRecordActivity : AppCompatActivity() {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
             val lines = reader.readLines()
-            if(lines.size != 11) {
-                Log.i(Constant.TAG, "$code, ${lines.size}")
-            }
+
             val sb = StringBuilder()
             for(i in 0 until lines.size - 1) {
                 //Log.i(Constant.TAG, lines[i])
@@ -359,7 +360,7 @@ class SharesRecordActivity : AppCompatActivity() {
             while (str != null) {
                 //Thread.sleep(50)
                 count++
-                //Log.i(Constant.TAG, "$count")
+                LogUtil.i(TAG, "$count")
                 deleteFileLastLine(str.split(",")[0])
                 str = reader.readLine()
             }
