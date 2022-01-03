@@ -3,7 +3,7 @@ package com.libiao.mushroom.room
 import androidx.room.*
 import com.libiao.mushroom.MushRoomApplication
 
-@Database(entities = [MineShareInfo::class], version = 1,exportSchema = false)
+@Database(entities = [MineShareInfo::class, CollectShareInfo::class], version = 1,exportSchema = false)
 abstract class MineShareDatabase: RoomDatabase() {
 
     companion object{
@@ -28,5 +28,7 @@ abstract class MineShareDatabase: RoomDatabase() {
         }
     }
 
-    abstract fun getMineShareDao() : MineShareDao
+    abstract fun getMineShareDao(): MineShareDao
+
+    abstract fun getCollectShareDao(): CollectShareDao
 }

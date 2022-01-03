@@ -35,6 +35,8 @@
             android:theme="@style/CommonTheme"/>
         <activity android:name=".mine.SelfSelectionActivity"
             android:theme="@style/CommonTheme"/>
+        <activity android:name=".mine.CollectActivity"
+            android:theme="@style/CommonTheme"/>
     </application>
 
 </manifest>

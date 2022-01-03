@@ -14,6 +14,9 @@ class MineShareInfo {
     var code: String? = null
     var name: String? = null
     var price: Double = 0.00
+    var nowPrice: Double = 0.00
+    var dayCount: Int = 0
+    var updateTime: String? = null
 
     @Ignore
     var totalRange: Double = 0.00 //涨停后至今日涨幅

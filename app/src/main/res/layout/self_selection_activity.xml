@@ -33,6 +33,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             />
+        <ImageView
+            android:layout_marginBottom="7dp"
+            android:id="@+id/iv_collect"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/heart_selected"/>
+
     </RelativeLayout>
 
 
@@ -47,6 +57,7 @@
             android:layout_height="wrap_content"
             android:text="线上"/>
         <CheckBox
+            android:visibility="gone"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/cb_network"
             android:textSize="13dp"
@@ -100,6 +111,7 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/view_share_bar"
         android:layout_marginTop="5dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -112,6 +124,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="ID"/>
+
+        <LinearLayout
+            android:id="@+id/view_self_time"
+            android:gravity="center"
+            android:layout_weight="2.8"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:textColor="@color/blank"
+                android:textSize="16dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time"/>
+            <ImageView
+                android:layout_marginLeft="2dp"
+                android:id="@+id/iv_self_time"
+                android:paddingTop="3dp"
+                android:src="@mipmap/sort_normal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
         <TextView
             android:textColor="@color/blank"
             android:textSize="16dp"
@@ -119,27 +153,19 @@
             android:layout_weight="2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Time"/>
-        <TextView
-            android:textColor="@color/blank"
-            android:textSize="16dp"
-            android:gravity="center"
-            android:layout_weight="2.4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             android:text="Code"/>
         <TextView
             android:textColor="@color/blank"
             android:textSize="16dp"
             android:gravity="center"
-            android:layout_weight="2.4"
+            android:layout_weight="2.2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Name"/>
         <LinearLayout
             android:id="@+id/view_self_range"
             android:gravity="center"
-            android:layout_weight="1.8"
+            android:layout_weight="1.6"
             android:layout_width="0dp"
             android:layout_height="wrap_content">
             <TextView
@@ -159,7 +185,7 @@
         <LinearLayout
             android:id="@+id/view_self_today"
             android:gravity="center"
-            android:layout_weight="1.8"
+            android:layout_weight="1.6"
             android:layout_width="0dp"
             android:layout_height="wrap_content">
             <TextView

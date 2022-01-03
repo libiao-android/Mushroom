@@ -10,7 +10,7 @@ interface MineShareDao {
     fun getMineShares(): List<MineShareInfo>
 
     @Insert
-    fun insert(info: MineShareInfo)
+    fun insert(info: MineShareInfo): Long
 
     @Update
     fun update(info: MineShareInfo)

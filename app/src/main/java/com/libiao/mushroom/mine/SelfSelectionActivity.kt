@@ -42,6 +42,7 @@ class SelfSelectionActivity : BaseActivity() {
 
     private var mRangeStatus = 0
     private var mTodayStatus = 0
+    private var mTimeStatus = 0
 
     private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
     private val client = OkHttpClient()
@@ -68,7 +69,8 @@ class SelfSelectionActivity : BaseActivity() {
             poolFile?.createNewFile()
         }
         initView()
-
+        self_loading.visibility = View.VISIBLE
+        view_share_bar.visibility = View.GONE
         val data = MineShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
         refreshLocalData(data)
 
@@ -98,9 +100,17 @@ class SelfSelectionActivity : BaseActivity() {
                     mData = it
                     mAdapter?.setData(it)
                     tv_count.text = "count: ${mData.size}"
+                    self_loading.visibility = View.GONE
+                    view_share_bar.visibility = View.VISIBLE
                 }
             })
         })
+    }
+
+    private fun deleteItem(mineShareInfo: MineShareInfo?) {
+        (mData as ArrayList).remove(mineShareInfo)
+        mAdapter?.setData(mData)
+        tv_count.text = "count: ${mData.size}"
     }
 
     private fun updateCurrentData(
@@ -131,7 +141,7 @@ class SelfSelectionActivity : BaseActivity() {
                 it.priority = 1
             }
             val liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
-            it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${liangBi}"
+            it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}"
 
             if(cb_network.isChecked && cb_save.isChecked) {
                 if(share.range > 0 && share.nowPrice > share.beginPrice) {
@@ -167,6 +177,10 @@ class SelfSelectionActivity : BaseActivity() {
             }
         }
 
+        iv_collect.setOnClickListener {
+            val intent = Intent(this, CollectActivity::class.java)
+            startActivity(intent)
+        }
 
         view_self_range.setOnClickListener {
             when(mRangeStatus) {
@@ -174,26 +188,28 @@ class SelfSelectionActivity : BaseActivity() {
                     iv_self_range.setImageResource(R.mipmap.sort_descending)
                     mRangeStatus = 1
                     //高-低
-                    val temp = mData.sortedByDescending { it.totalRange }
-                    mAdapter?.setData(temp)
+                    mData = ArrayList(mData.sortedByDescending { it.totalRange })
+                    mAdapter?.setData(mData)
                 }
                 1 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_ascending)
                     mRangeStatus = 2
                     //低-高
-                    val temp = mData.sortedBy { it.totalRange }
-                    mAdapter?.setData(temp)
+                    mData = ArrayList(mData.sortedBy { it.totalRange })
+                    mAdapter?.setData(mData)
                 }
                 2 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_descending)
                     mRangeStatus = 1
                     //高-低
-                    val temp = mData.sortedByDescending { it.totalRange }
-                    mAdapter?.setData(temp)
+                    mData = ArrayList(mData.sortedByDescending { it.totalRange })
+                    mAdapter?.setData(mData)
                 }
             }
             mTodayStatus = 0
             iv_self_today.setImageResource(R.mipmap.sort_normal)
+            mTimeStatus = 0
+            iv_self_time.setImageResource(R.mipmap.sort_normal)
         }
 
         view_self_today.setOnClickListener {
@@ -202,71 +218,105 @@ class SelfSelectionActivity : BaseActivity() {
                     iv_self_today.setImageResource(R.mipmap.sort_descending)
                     mTodayStatus = 1
                     //高-低
-                    //val temp = mData.sortedByDescending { it.todayRange }
+                    mData = ArrayList(mData.sortedByDescending { it.todayRange })
+                    mAdapter?.setData(mData)
 
-                    val temp = mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
-                        if(o1.priority > o2.priority) {
-                            -1
-                        } else if(o1.priority < o2.priority) {
-                            1
-                        } else {
-                            if(o1.todayRange > o2.todayRange) {
-                                -1
-                            } else {
-                                1
-                            }
-                        }
-                    })
-                    mAdapter?.setData(temp)
+//                    mData = ArrayList(mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
+//                        if(o1.priority > o2.priority) {
+//                            -1
+//                        } else if(o1.priority < o2.priority) {
+//                            1
+//                        } else {
+//                            if(o1.todayRange > o2.todayRange) {
+//                                -1
+//                            } else {
+//                                1
+//                            }
+//                        }
+//                    }))
+                    mAdapter?.setData(mData)
                 }
                 1 -> {
                     iv_self_today.setImageResource(R.mipmap.sort_ascending)
                     mTodayStatus = 2
                     //低-高
-                    //val temp = mData.sortedBy { it.todayRange }
-                    val temp = mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
-                        if(o1.priority > o2.priority) {
-                            1
-                        } else if(o1.priority < o2.priority) {
-                            -1
-                        } else {
-                            if(o1.todayRange > o2.todayRange) {
-                                1
-                            } else {
-                                -1
-                            }
-                        }
-                    })
-                    mAdapter?.setData(temp)
+                    mData = ArrayList(mData.sortedBy { it.todayRange })
+                    mAdapter?.setData(mData)
+//                    mData = ArrayList(mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
+//                        if(o1.priority > o2.priority) {
+//                            1
+//                        } else if(o1.priority < o2.priority) {
+//                            -1
+//                        } else {
+//                            if(o1.todayRange > o2.todayRange) {
+//                                1
+//                            } else {
+//                                -1
+//                            }
+//                        }
+//                    }))
+                    mAdapter?.setData(mData)
 
                 }
                 2 -> {
                     iv_self_today.setImageResource(R.mipmap.sort_descending)
                     mTodayStatus = 1
                     //高-低
-                    //val temp = mData.sortedByDescending { it.todayRange }
-                    val temp = mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
-                        if(o1.priority > o2.priority) {
-                            -1
-                        } else if(o1.priority < o2.priority) {
-                            1
-                        } else {
-                            if(o1.todayRange > o2.todayRange) {
-                                -1
-                            } else {
-                                1
-                            }
-                        }
-                    })
-                    mAdapter?.setData(temp)
+                    mData = ArrayList(mData.sortedByDescending { it.todayRange })
+                    mAdapter?.setData(mData)
+//                    mData = ArrayList(mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
+//                        if(o1.priority > o2.priority) {
+//                            -1
+//                        } else if(o1.priority < o2.priority) {
+//                            1
+//                        } else {
+//                            if(o1.todayRange > o2.todayRange) {
+//                                -1
+//                            } else {
+//                                1
+//                            }
+//                        }
+//                    }))
+//                    mAdapter?.setData(mData)
                 }
             }
             mRangeStatus = 0
             iv_self_range.setImageResource(R.mipmap.sort_normal)
+            mTimeStatus = 0
+            iv_self_time.setImageResource(R.mipmap.sort_normal)
+        }
+
+        view_self_time.setOnClickListener {
+            when(mTimeStatus) {
+                0 -> {
+                    iv_self_time.setImageResource(R.mipmap.sort_descending)
+                    mTimeStatus = 1
+                    //高-低
+                    mData = ArrayList(mData.sortedByDescending { it.dayCount })
+                    mAdapter?.setData(mData)
+                }
+                1 -> {
+                    iv_self_time.setImageResource(R.mipmap.sort_ascending)
+                    mTimeStatus = 2
+                    //低-高
+                    mData = ArrayList(mData.sortedBy { it.dayCount })
+                    mAdapter?.setData(mData)
+                }
+                2 -> {
+                    iv_self_time.setImageResource(R.mipmap.sort_descending)
+                    mTimeStatus = 1
+                    //高-低
+                    mData = ArrayList(mData.sortedByDescending { it.dayCount })
+                    mAdapter?.setData(mData)
+                }
+            }
+            mRangeStatus = 0
+            iv_self_range.setImageResource(R.mipmap.sort_normal)
+
+            mTodayStatus = 0
+            iv_self_today.setImageResource(R.mipmap.sort_normal)
         }
     }
-
-
 
     private fun shiShiQuery(info: MineShareInfo) {
         val code = info.code
@@ -331,8 +381,10 @@ class SelfSelectionActivity : BaseActivity() {
     private fun resetSortUI() {
         mTodayStatus = 0
         mRangeStatus = 0
+        mTimeStatus = 0
         iv_self_range.setImageResource(R.mipmap.sort_normal)
         iv_self_today.setImageResource(R.mipmap.sort_normal)
+        iv_self_time.setImageResource(R.mipmap.sort_normal)
     }
 
     class MyPoolInfoAdater(val context: Context) : RecyclerView.Adapter<MyPoolHolder>() {
@@ -375,6 +427,7 @@ class SelfSelectionActivity : BaseActivity() {
         private var moreInfoTv: TextView? = null
 
         private var mineShareInfo: MineShareInfo? = null
+        private val client = OkHttpClient()
 
 
         init {
@@ -394,18 +447,37 @@ class SelfSelectionActivity : BaseActivity() {
                 context.startActivity(intent)
             }
 
-            mCodeTv?.setOnClickListener {
+            view.setOnLongClickListener {
+                LogUtil.i(TAG, "长按")
+                MoreDialog(context){
+                    when(it.id) {
+                        R.id.btn_dialog_delete -> {
+                            mineShareInfo?.code?.also {
+                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(it)
+                                (context as SelfSelectionActivity).deleteItem(mineShareInfo)
+                            }
+                        }
+                    }
+                }.show()
+                true
+            }
+
+            mIdTv?.setOnClickListener {
                 ClipboardUtil.clip(context, mineShareInfo?.code)
             }
 
+            mTimeTv?.setOnClickListener {
+                //http://image.sinajs.cn/newchart/min/n/sh000001.gif
+                FenShiDialog(context, mineShareInfo?.code!!).show()
+            }
         }
 
         fun bindData(position: Int, info: MineShareInfo) {
             this.mineShareInfo = info
             mIdTv?.text = position.toString()
-            mTimeTv?.text = info.time?.substring(5)
+            mTimeTv?.text = info.time?.substring(5) + "(${info.dayCount})"
             mNameTv?.text = info.name
-            mCodeTv?.text = info.code
+            mCodeTv?.text = info.code?.substring(2)
 
             mRangeTv?.text = baoLiuXiaoShu(info.totalRange)
             if(info.totalRange >= 0) {

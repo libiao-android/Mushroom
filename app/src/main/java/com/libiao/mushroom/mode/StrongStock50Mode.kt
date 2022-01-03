@@ -90,7 +90,7 @@ class StrongStock50Mode() : BaseMode() {
 
                 if(day10.beginPrice > day1.beginPrice && min > 0) {
                     val range = (max - min) / min * 100
-                    if(range > 60) {
+                    if(range > 50) {
                         val info = "${day10.time}, ${day10.code}, ${day10.name}, ${range.toInt()}"
                         val result = contains(day10.code!!)
                         if(result == null) {

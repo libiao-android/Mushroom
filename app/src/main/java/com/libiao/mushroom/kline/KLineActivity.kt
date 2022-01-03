@@ -21,6 +21,8 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.room.CollectShareInfo
+import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.k_line_main.*
@@ -51,6 +53,9 @@ class KLineActivity : AppCompatActivity() {
     private val colors_liang_neng = ArrayList<Int>()
 
     private var code: String? = null
+    private var name: String? = null
+
+    private var collected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +71,7 @@ class KLineActivity : AppCompatActivity() {
     }
 
     private fun initData() {
+        collected = MineShareDatabase.getInstance()?.getCollectShareDao()?.find(code!!) ?: false
         val f = File(file_2021, code)
         if(f.exists()) {
             val stream = FileInputStream(f)
@@ -73,6 +79,7 @@ class KLineActivity : AppCompatActivity() {
             val lines = reader.readLines()
             lines.forEachIndexed { index, s ->
                 val info = SharesRecordActivity.ShareInfo(s)
+                if(name == null) name = info.name
                 infos.add(info)
                 if(info.beginPrice == 0.00) {
                     values.add(CandleEntry((index).toFloat(), info.nowPrice.toFloat(), info.nowPrice.toFloat(), info.nowPrice.toFloat(), info.nowPrice.toFloat()))
@@ -122,6 +129,25 @@ class KLineActivity : AppCompatActivity() {
         initCombinedChart()
         initBarChart()
 
+        if(collected) {
+            iv_collect.setImageResource(R.mipmap.heart_selected)
+        } else {
+            iv_collect.setImageResource(R.mipmap.heart)
+        }
+        iv_collect.setOnClickListener {
+            collected = !collected
+            if(collected) {
+                iv_collect.setImageResource(R.mipmap.heart_selected)
+                val info = CollectShareInfo()
+                info.code = code
+                info.time = System.currentTimeMillis()
+                info.name = name
+                MineShareDatabase.getInstance()?.getCollectShareDao()?.insert(info)
+            } else {
+                iv_collect.setImageResource(R.mipmap.heart)
+                MineShareDatabase.getInstance()?.getCollectShareDao()?.delete(code!!)
+            }
+        }
     }
 
     private fun initBarChart() {
@@ -144,7 +170,7 @@ class KLineActivity : AppCompatActivity() {
 
             override fun getAxisLabel(value: Float, axis: AxisBase?): String {
                 val index = value.toInt()
-                if(index < infos.size) {
+                if(index < infos.size && index >= 0) {
                     val times = infos[index].time?.split("-")
                     var m = times?.get(1)?.toInt()
                     val d = times?.get(2)?.toInt()
@@ -305,7 +331,7 @@ class KLineActivity : AppCompatActivity() {
 
             override fun getAxisLabel(value: Float, axis: AxisBase?): String {
                 val index = value.toInt()
-                if(index < infos.size) {
+                if(index < infos.size && index >= 0) {
                     val times = infos[index].time?.split("-")
                     var m = times?.get(1)?.toInt()
                     val d = times?.get(2)?.toInt()
@@ -527,9 +553,5 @@ class KLineActivity : AppCompatActivity() {
 
         bar_chart.viewPortHandler.matrixTouch.setValues(f)
         bar_chart.invalidate()
-    }
-
-    fun addToMine(v: View) {
-
     }
 }
