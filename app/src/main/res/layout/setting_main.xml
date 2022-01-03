@@ -30,15 +30,16 @@
         android:layout_height="wrap_content"
         android:text="我的"/>
     <CheckBox
+        android:id="@+id/cb_50"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="50模式"/>
+    <CheckBox
         android:id="@+id/lian_ban_1_strong"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="一连板强势"/>
-    <CheckBox
-        android:id="@+id/cb_50"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="60模式"/>
+
     <CheckBox
         android:id="@+id/cb_20"
         android:layout_width="match_parent"

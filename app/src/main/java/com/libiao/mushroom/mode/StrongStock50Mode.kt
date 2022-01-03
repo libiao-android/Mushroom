@@ -119,6 +119,6 @@ class StrongStock50Mode() : BaseMode() {
     }
 
     override fun des(): String {
-        return "60"
+        return "50"
     }
 }
