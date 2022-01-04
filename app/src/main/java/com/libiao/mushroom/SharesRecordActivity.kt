@@ -110,8 +110,8 @@ class SharesRecordActivity : AppCompatActivity() {
             mDay = c.get(Calendar.DAY_OF_MONTH)// 获取当前月份的日期号码
         }
 
-        //val time = "$mYear-$mMonth-$mDay-$mWay"
-        val time = "2021-12-31-5"
+        val time = "$mYear-$mMonth-$mDay-$mWay"
+        //val time = "2021-12-31-5"
         i(TAG, "time: $time")
         this.time = time
 
