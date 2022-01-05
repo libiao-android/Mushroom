@@ -3,17 +3,24 @@ package com.libiao.mushroom.mine
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.os.*
+import android.graphics.Paint
+import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.charts.CandleStickChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.CandleData
+import com.github.mikephil.charting.data.CandleDataSet
+import com.github.mikephil.charting.data.CandleEntry
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
-import com.libiao.mushroom.analysis.SharesRealTimeInfoActivity
 import com.libiao.mushroom.base.BaseActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.room.MineShareDatabase
@@ -23,11 +30,9 @@ import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.self_selection_activity.*
 import okhttp3.*
 import java.io.*
-import java.lang.Exception
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.Comparator
 import kotlin.collections.ArrayList
 
 
@@ -84,6 +89,19 @@ class SelfSelectionActivity : BaseActivity() {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                     val lines = reader.readLines()
+                    if(it.candleEntryList == null) {
+                        val records = lines.subList(lines.size - it.dayCount - 2, lines.size)
+                        val entrys = java.util.ArrayList<CandleEntry>()
+                        records.forEachIndexed { index, s ->
+                            val item = SharesRecordActivity.ShareInfo(s)
+                            if(item.beginPrice == 0.00) {
+                                entrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+                            } else {
+                                entrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                            }
+                        }
+                        it.candleEntryList = entrys
+                    }
 
                     val info = lines.get(lines.size - 1)
                     val info_pre = lines.get(lines.size - 2)
@@ -427,7 +445,7 @@ class SelfSelectionActivity : BaseActivity() {
         private var moreInfoTv: TextView? = null
 
         private var mineShareInfo: MineShareInfo? = null
-        private val client = OkHttpClient()
+        private var chart: CandleStickChart? = null
 
 
         init {
@@ -439,6 +457,8 @@ class SelfSelectionActivity : BaseActivity() {
             mTodayTv = view.findViewById(R.id.self_item_today)
 
             moreInfoTv = view.findViewById(R.id.tv_more_info)
+            chart = view.findViewById(R.id.item_candler_chart)
+            initCandleChart()
 
             view.setOnClickListener {
                 val intent = Intent(context, KLineActivity::class.java)
@@ -472,7 +492,36 @@ class SelfSelectionActivity : BaseActivity() {
             }
         }
 
+        private fun initCandleChart() {
+            chart?.also {
+                it.setTouchEnabled(false)
+                it.description.isEnabled = false
+                it.setDrawGridBackground(false) // 是否显示表格颜色
+                //it.setBackgroundColor(Color.WHITE) // 设置背景
+                it.setPinchZoom(false) // if disabled, scaling can be done on x- and y-axis separately
+                it.isLogEnabled = true
+                it.isSelected = false
+
+                val xAxis: XAxis = it.xAxis
+                xAxis.isEnabled = false
+
+
+
+                val leftAxis: YAxis = it.axisLeft
+                leftAxis.isEnabled = false
+
+
+                val rightAxis: YAxis = it.axisRight
+                rightAxis.isEnabled = false
+
+                val l: Legend = it.legend // 设置比例图标示
+                l.isEnabled = false //决定显不显示标签
+
+            }
+        }
+
         fun bindData(position: Int, info: MineShareInfo) {
+            LogUtil.i(TAG, "bindData: ${info.code}, ${info.candleEntryList?.size}")
             this.mineShareInfo = info
             mIdTv?.text = position.toString()
             mTimeTv?.text = info.time?.substring(5) + "(${info.dayCount})"
@@ -490,11 +539,54 @@ class SelfSelectionActivity : BaseActivity() {
             if(info.priority >= 3) {
                 mTodayTv?.setTextColor(Color.parseColor("#ed1941"))
             } else if(info.priority == 2) {
-                mTodayTv?.setTextColor(Color.parseColor("#59ed1941"))
+                mTodayTv?.setTextColor(Color.parseColor("#80ed1941"))
             } else {
                 mTodayTv?.setTextColor(Color.parseColor("#7fb80e"))
             }
             moreInfoTv?.text = info.moreInfo
+
+            info.candleEntryList?.also {
+                val data = CandleData(getCanleDataSet(it))
+                val params = chart?.layoutParams
+                params?.width = getWidth(it.size)
+                chart?.layoutParams = params
+                chart?.data = data
+                chart?.invalidate()
+            }
+
+        }
+
+        private fun getWidth(size: Int): Int {
+            if(size == 2) return 120
+            if(size == 3) return 140
+            var w:Int
+            if(size > 10) {
+                w = 300 + (size - 10) * 20
+            } else {
+                w = size * 30
+            }
+            if(w < 150) w = 150
+            if(w > 800) w = 800
+            return w
+        }
+
+        private fun getCanleDataSet(values: List<CandleEntry>): CandleDataSet {
+            val set1 = CandleDataSet(values, "")
+            set1.formSize = 0f
+            set1.isHighlightEnabled = false
+            set1.enableDashedHighlightLine(10f, 5f, 0f)
+            set1.setDrawValues(false)
+            set1.setDrawIcons(false)
+            set1.shadowColorSameAsCandle = true
+            //set1.shadowColor = Color.BLUE
+            set1.shadowWidth = 1f
+            set1.decreasingColor = Color.GREEN
+            set1.decreasingPaintStyle = Paint.Style.FILL
+            set1.increasingColor = Color.RED
+            set1.increasingPaintStyle = Paint.Style.STROKE
+            set1.neutralColor = Color.RED
+            //set1.highLightColor = Color.BLACK
+            return set1
         }
     }
 }

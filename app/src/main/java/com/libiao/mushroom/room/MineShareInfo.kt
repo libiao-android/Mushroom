@@ -3,6 +3,7 @@ package com.libiao.mushroom.room
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.github.mikephil.charting.data.CandleEntry
 
 @Entity
 class MineShareInfo {
@@ -30,6 +31,8 @@ class MineShareInfo {
     var priority: Int = 0
     @Ignore
     var moreInfo: String? = null
+    @Ignore
+    var candleEntryList: List<CandleEntry>? = null
 
     override fun toString(): String {
         return "${time}, ${code}, $name"
