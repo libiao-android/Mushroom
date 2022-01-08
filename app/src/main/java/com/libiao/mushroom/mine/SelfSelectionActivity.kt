@@ -9,6 +9,7 @@ import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,7 @@ import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.base.BaseActivity
 import com.libiao.mushroom.kline.KLineActivity
+import com.libiao.mushroom.room.CollectShareInfo
 import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.MineShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
@@ -53,6 +55,7 @@ class SelfSelectionActivity : BaseActivity() {
     private val client = OkHttpClient()
 
     private var mData: List<MineShareInfo> = ArrayList()
+    private var mTempData: List<MineShareInfo> = ArrayList()
 
     private var mRefreshCount = 0
 
@@ -77,13 +80,18 @@ class SelfSelectionActivity : BaseActivity() {
         self_loading.visibility = View.VISIBLE
         view_share_bar.visibility = View.GONE
         val data = MineShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
-        refreshLocalData(data)
+        data?.also {
+            mData = it
+            mTempData = it
+        }
+        refreshLocalData(mData)
 
     }
 
-    private fun refreshLocalData(data: List<MineShareInfo>?) {
+    private fun refreshLocalData(data: List<MineShareInfo>) {
+        showLoading()
         ThreadPoolUtil.execute(Runnable {
-            data?.forEach {
+            data.forEach {
                 val f = File(file_2021, it.code)
                 if(f.exists()) {
                     val stream = FileInputStream(f)
@@ -114,21 +122,38 @@ class SelfSelectionActivity : BaseActivity() {
                 }
             }
             ThreadPoolUtil.executeUI(Runnable {
-                data?.also {
-                    mData = it
-                    mAdapter?.setData(it)
-                    tv_count.text = "count: ${mData.size}"
-                    self_loading.visibility = View.GONE
-                    view_share_bar.visibility = View.VISIBLE
-                }
+                refreshTempData()
+                refreshCount()
+                hideLoading()
+                view_share_bar.visibility = View.VISIBLE
             })
         })
     }
 
+    private fun refreshTempData() {
+        if(cb_heart.isChecked) {
+            val temp  = ArrayList<MineShareInfo>()
+            mData.forEach {
+                if(it.heart) {
+                    temp.add(it)
+                }
+            }
+            mTempData = temp
+        } else {
+            mTempData = mData
+        }
+        mAdapter?.setData(mTempData)
+    }
+
     private fun deleteItem(mineShareInfo: MineShareInfo?) {
         (mData as ArrayList).remove(mineShareInfo)
-        mAdapter?.setData(mData)
-        tv_count.text = "count: ${mData.size}"
+        (mTempData as ArrayList).remove(mineShareInfo)
+        mAdapter?.setData(mTempData)
+        refreshCount()
+    }
+
+    private fun refreshCount() {
+        tv_count.text = "count: ${mTempData.size}"
     }
 
     private fun updateCurrentData(
@@ -160,7 +185,7 @@ class SelfSelectionActivity : BaseActivity() {
             }
             val liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
             it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}"
-
+            it.heart = MineShareDatabase.getInstance()?.getCollectShareDao()?.find(it.code!!) ?: false
             if(cb_network.isChecked && cb_save.isChecked) {
                 if(share.range > 0 && share.nowPrice > share.beginPrice) {
                     val info = "${time}, ${share.code}, ${share.name}, ${liangBi}, ${share.followUp()}"
@@ -170,11 +195,28 @@ class SelfSelectionActivity : BaseActivity() {
         }
     }
 
+    private fun showLoading() {
+        self_loading.visibility = View.VISIBLE
+    }
+    private fun hideLoading() {
+        self_loading.visibility = View.GONE
+    }
+
     private fun initView() {
 
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")// HH:mm:ss
         time = simpleDateFormat.format(Date())
         tv_current_time.text = "$time"
+
+        iv_self_setting?.setOnClickListener {
+            SelfSettingDialog(this).show()
+        }
+
+        cb_heart.setOnCheckedChangeListener { buttonView, isChecked ->
+            refreshTempData()
+            resetSortUI()
+            refreshCount()
+        }
 
         cb_network.setOnCheckedChangeListener { buttonView, isChecked ->
             btn_refresh.isEnabled = isChecked
@@ -190,7 +232,7 @@ class SelfSelectionActivity : BaseActivity() {
             btn_refresh.isEnabled = false
             cb_network.isEnabled = false
             mRefreshCount = 0
-            mData.forEach {
+            mTempData.forEach {
                 shiShiQuery(it)
             }
         }
@@ -206,22 +248,23 @@ class SelfSelectionActivity : BaseActivity() {
                     iv_self_range.setImageResource(R.mipmap.sort_descending)
                     mRangeStatus = 1
                     //高-低
-                    mData = ArrayList(mData.sortedByDescending { it.totalRange })
-                    mAdapter?.setData(mData)
+                    //为什么不用temp， 主要考虑删除时要保持顺序
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
+                    mAdapter?.setData(mTempData)
                 }
                 1 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_ascending)
                     mRangeStatus = 2
                     //低-高
-                    mData = ArrayList(mData.sortedBy { it.totalRange })
-                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedBy { it.totalRange })
+                    mAdapter?.setData(mTempData)
                 }
                 2 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_descending)
                     mRangeStatus = 1
                     //高-低
-                    mData = ArrayList(mData.sortedByDescending { it.totalRange })
-                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
+                    mAdapter?.setData(mTempData)
                 }
             }
             mTodayStatus = 0
@@ -236,66 +279,24 @@ class SelfSelectionActivity : BaseActivity() {
                     iv_self_today.setImageResource(R.mipmap.sort_descending)
                     mTodayStatus = 1
                     //高-低
-                    mData = ArrayList(mData.sortedByDescending { it.todayRange })
-                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.todayRange })
+                    mAdapter?.setData(mTempData)
 
-//                    mData = ArrayList(mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
-//                        if(o1.priority > o2.priority) {
-//                            -1
-//                        } else if(o1.priority < o2.priority) {
-//                            1
-//                        } else {
-//                            if(o1.todayRange > o2.todayRange) {
-//                                -1
-//                            } else {
-//                                1
-//                            }
-//                        }
-//                    }))
-                    mAdapter?.setData(mData)
                 }
                 1 -> {
                     iv_self_today.setImageResource(R.mipmap.sort_ascending)
                     mTodayStatus = 2
                     //低-高
-                    mData = ArrayList(mData.sortedBy { it.todayRange })
-                    mAdapter?.setData(mData)
-//                    mData = ArrayList(mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
-//                        if(o1.priority > o2.priority) {
-//                            1
-//                        } else if(o1.priority < o2.priority) {
-//                            -1
-//                        } else {
-//                            if(o1.todayRange > o2.todayRange) {
-//                                1
-//                            } else {
-//                                -1
-//                            }
-//                        }
-//                    }))
-                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedBy { it.todayRange })
+                    mAdapter?.setData(mTempData)
 
                 }
                 2 -> {
                     iv_self_today.setImageResource(R.mipmap.sort_descending)
                     mTodayStatus = 1
                     //高-低
-                    mData = ArrayList(mData.sortedByDescending { it.todayRange })
-                    mAdapter?.setData(mData)
-//                    mData = ArrayList(mData.sortedWith(Comparator<MineShareInfo> { o1, o2 ->
-//                        if(o1.priority > o2.priority) {
-//                            -1
-//                        } else if(o1.priority < o2.priority) {
-//                            1
-//                        } else {
-//                            if(o1.todayRange > o2.todayRange) {
-//                                -1
-//                            } else {
-//                                1
-//                            }
-//                        }
-//                    }))
-//                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.todayRange })
+                    mAdapter?.setData(mTempData)
                 }
             }
             mRangeStatus = 0
@@ -310,22 +311,22 @@ class SelfSelectionActivity : BaseActivity() {
                     iv_self_time.setImageResource(R.mipmap.sort_descending)
                     mTimeStatus = 1
                     //高-低
-                    mData = ArrayList(mData.sortedByDescending { it.dayCount })
-                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.dayCount })
+                    mAdapter?.setData(mTempData)
                 }
                 1 -> {
                     iv_self_time.setImageResource(R.mipmap.sort_ascending)
                     mTimeStatus = 2
                     //低-高
-                    mData = ArrayList(mData.sortedBy { it.dayCount })
-                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedBy { it.dayCount })
+                    mAdapter?.setData(mTempData)
                 }
                 2 -> {
                     iv_self_time.setImageResource(R.mipmap.sort_descending)
                     mTimeStatus = 1
                     //高-低
-                    mData = ArrayList(mData.sortedByDescending { it.dayCount })
-                    mAdapter?.setData(mData)
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.dayCount })
+                    mAdapter?.setData(mTempData)
                 }
             }
             mRangeStatus = 0
@@ -383,8 +384,8 @@ class SelfSelectionActivity : BaseActivity() {
                     mRefreshCount ++
                     tv_counting.text = "$mRefreshCount"
                     LogUtil.i(TAG, "mRefreshCount: $mRefreshCount")
-                    if(mRefreshCount == mData.size) {
-                        mAdapter?.setData(mData)
+                    if(mRefreshCount == mTempData.size) {
+                        mAdapter?.setData(mTempData)
                         self_loading.visibility = View.GONE
                         btn_refresh.isEnabled = true
                         cb_network.isEnabled = true
@@ -443,9 +444,12 @@ class SelfSelectionActivity : BaseActivity() {
         private var mTodayTv: TextView? = null
 
         private var moreInfoTv: TextView? = null
+        private var heartIv: ImageView? = null
 
         private var mineShareInfo: MineShareInfo? = null
         private var chart: CandleStickChart? = null
+
+        private var heart: Boolean = false
 
 
         init {
@@ -457,6 +461,7 @@ class SelfSelectionActivity : BaseActivity() {
             mTodayTv = view.findViewById(R.id.self_item_today)
 
             moreInfoTv = view.findViewById(R.id.tv_more_info)
+            heartIv = view.findViewById(R.id.iv_item_heart)
             chart = view.findViewById(R.id.item_candler_chart)
             initCandleChart()
 
@@ -489,6 +494,22 @@ class SelfSelectionActivity : BaseActivity() {
             mTimeTv?.setOnClickListener {
                 //http://image.sinajs.cn/newchart/min/n/sh000001.gif
                 FenShiDialog(context, mineShareInfo?.code!!).show()
+            }
+
+            heartIv?.setOnClickListener {
+                heart = !heart
+                mineShareInfo?.heart = heart
+                if(heart) {
+                    heartIv?.setImageResource(R.mipmap.heart_selected)
+                    val info = CollectShareInfo()
+                    info.code = mineShareInfo?.code
+                    info.time = System.currentTimeMillis()
+                    info.name = mineShareInfo?.name
+                    MineShareDatabase.getInstance()?.getCollectShareDao()?.insert(info)
+                } else {
+                    heartIv?.setImageResource(R.mipmap.heart)
+                    MineShareDatabase.getInstance()?.getCollectShareDao()?.delete(mineShareInfo?.code!!)
+                }
             }
         }
 
@@ -552,6 +573,13 @@ class SelfSelectionActivity : BaseActivity() {
                 chart?.layoutParams = params
                 chart?.data = data
                 chart?.invalidate()
+            }
+
+            heart = info.heart
+            if(heart) {
+                heartIv?.setImageResource(R.mipmap.heart_selected)
+            } else {
+                heartIv?.setImageResource(R.mipmap.heart)
             }
 
         }

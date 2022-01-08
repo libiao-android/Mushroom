@@ -16,9 +16,22 @@ object ThreadPoolUtil {
 
     }
 
+    fun execute(run: ()->Unit) {
+        val runnable = Runnable {
+            run()
+        }
+        HANDER_THREAD_CORE.execute(runnable)
+    }
+
     fun executeUI(runnable: Runnable) {
         HANDER_THREAD_CORE.mHandler.post {
             runnable.run()
+        }
+    }
+
+    fun executeUI(run: () -> Unit) {
+        HANDER_THREAD_CORE.mHandler.post {
+            run()
         }
     }
 }

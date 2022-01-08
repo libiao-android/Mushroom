@@ -33,6 +33,8 @@ class MineShareInfo {
     var moreInfo: String? = null
     @Ignore
     var candleEntryList: List<CandleEntry>? = null
+    @Ignore
+    var heart: Boolean = false
 
     override fun toString(): String {
         return "${time}, ${code}, $name"
