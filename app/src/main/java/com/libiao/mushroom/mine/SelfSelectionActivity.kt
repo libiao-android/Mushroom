@@ -64,6 +64,7 @@ class SelfSelectionActivity : BaseActivity() {
     private var time: String? = null
 
     private var settingDialog: SelfSettingDialog? = null
+    private var settingBean: SelfSettingBean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,13 +132,14 @@ class SelfSelectionActivity : BaseActivity() {
         })
     }
 
-    private fun refreshTempData(selfSettingBean: SelfSettingBean? = null) {
+    private fun refreshTempData() {
         val temp  = ArrayList<MineShareInfo>()
         for (info in mData) {
 
             if(cb_heart.isChecked && !info.heart) {
                 continue
             }
+            val selfSettingBean = settingBean
             if(selfSettingBean?.timeChecked == true && info.dayCount < selfSettingBean.timeValue) {
                 continue
             }
@@ -234,7 +236,8 @@ class SelfSelectionActivity : BaseActivity() {
 
         settingDialog = SelfSettingDialog(this) {
             LogUtil.i(TAG, "$it")
-            refreshTempData(it)
+            settingBean = it
+            refreshTempData()
             refreshCount()
             resetSortUI()
         }
