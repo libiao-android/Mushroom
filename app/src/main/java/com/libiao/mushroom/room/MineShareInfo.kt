@@ -24,6 +24,8 @@ class MineShareInfo {
     @Ignore
     var todayRange: Double = 0.00 //今日涨幅
     @Ignore
+    var todayLiang: Double = 0.00 //今日量能
+    @Ignore
     var fangLiang: Boolean = false //是否放量
     @Ignore
     var redLine: Boolean = false //是否阳线

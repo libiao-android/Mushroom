@@ -63,6 +63,8 @@ class SelfSelectionActivity : BaseActivity() {
     private var poolFile: File? = null
     private var time: String? = null
 
+    private var settingDialog: SelfSettingDialog? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.self_selection_activity)
@@ -85,7 +87,6 @@ class SelfSelectionActivity : BaseActivity() {
             mTempData = it
         }
         refreshLocalData(mData)
-
     }
 
     private fun refreshLocalData(data: List<MineShareInfo>) {
@@ -130,18 +131,40 @@ class SelfSelectionActivity : BaseActivity() {
         })
     }
 
-    private fun refreshTempData() {
-        if(cb_heart.isChecked) {
-            val temp  = ArrayList<MineShareInfo>()
-            mData.forEach {
-                if(it.heart) {
-                    temp.add(it)
-                }
+    private fun refreshTempData(selfSettingBean: SelfSettingBean? = null) {
+        val temp  = ArrayList<MineShareInfo>()
+        for (info in mData) {
+
+            if(cb_heart.isChecked && !info.heart) {
+                continue
             }
-            mTempData = temp
-        } else {
-            mTempData = mData
+            if(selfSettingBean?.timeChecked == true && info.dayCount < selfSettingBean.timeValue) {
+                continue
+            }
+
+            if(selfSettingBean?.rangeLeftChecked == true && info.todayRange < selfSettingBean.rangeLeftValue) {
+                continue
+            }
+
+            if(selfSettingBean?.rangeRightChecked == true && info.todayRange > selfSettingBean.rangeRightValue) {
+                continue
+            }
+
+            if(selfSettingBean?.liangLeftChecked == true && info.todayLiang < selfSettingBean.liangLeftValue) {
+                continue
+            }
+
+            if(selfSettingBean?.liangRightChecked == true && info.todayLiang > selfSettingBean.liangRightValue) {
+                continue
+            }
+
+            if(selfSettingBean?.redLine == true && !info.redLine) {
+                continue
+            }
+
+            temp.add(info)
         }
+        mTempData = temp
         mAdapter?.setData(mTempData)
     }
 
@@ -165,6 +188,7 @@ class SelfSelectionActivity : BaseActivity() {
             it.totalRange = (share.nowPrice - it.price) / it.price * 100
             it.todayRange = share.range
             it.fangLiang = share.totalPrice > sharePre.totalPrice
+            it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
             if(share.nowPrice > share.beginPrice) {
                 it.redLine = true
             } else if(share.nowPrice == share.beginPrice) {
@@ -208,8 +232,15 @@ class SelfSelectionActivity : BaseActivity() {
         time = simpleDateFormat.format(Date())
         tv_current_time.text = "$time"
 
+        settingDialog = SelfSettingDialog(this) {
+            LogUtil.i(TAG, "$it")
+            refreshTempData(it)
+            refreshCount()
+            resetSortUI()
+        }
+
         iv_self_setting?.setOnClickListener {
-            SelfSettingDialog(this).show()
+            settingDialog?.show()
         }
 
         cb_heart.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -526,11 +557,8 @@ class SelfSelectionActivity : BaseActivity() {
                 val xAxis: XAxis = it.xAxis
                 xAxis.isEnabled = false
 
-
-
                 val leftAxis: YAxis = it.axisLeft
                 leftAxis.isEnabled = false
-
 
                 val rightAxis: YAxis = it.axisRight
                 rightAxis.isEnabled = false
@@ -542,7 +570,7 @@ class SelfSelectionActivity : BaseActivity() {
         }
 
         fun bindData(position: Int, info: MineShareInfo) {
-            LogUtil.i(TAG, "bindData: ${info.code}, ${info.candleEntryList?.size}")
+            //LogUtil.i(TAG, "bindData: ${info.code}, ${info.candleEntryList?.size}")
             this.mineShareInfo = info
             mIdTv?.text = position.toString()
             mTimeTv?.text = info.time?.substring(5) + "(${info.dayCount})"

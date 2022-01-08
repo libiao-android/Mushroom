@@ -36,44 +36,43 @@ class MineMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 2
+        mDeviationValue = day - 1
         if(mDeviationValue >=  0) {
             val one = shares[mDeviationValue + 0]
-            val two = shares[mDeviationValue + 1]
             if(poolMap.contains(one.code)) {
                 i(TAG, "contains: ${one.code}")
-                if(two.nowPrice < two.line_20) {
+                if(one.nowPrice < one.line_20) {
                     i(TAG, "delete: ${one.code}")
                     MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
                     poolMap.remove(one.code)
                 } else {
                     val info = poolMap[one.code]
                     info?.also {
-                        if(info.updateTime == two.time) {
+                        if(info.updateTime == one.time) {
                             i(TAG, "重复记录")
                         } else {
                             i(TAG, "更新记录")
-                            it.updateTime = two.time
+                            it.updateTime = one.time
                             it.dayCount = it.dayCount + 1
-                            it.nowPrice = two.nowPrice
+                            it.nowPrice = one.nowPrice
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
                         }
                     }
                 }
             } else {
-                if((zhangTing(two) || (one.range + two.range) > 11) && two.nowPrice > two.line_20) {
+                if(one.range >= 7 && one.nowPrice >= one.line_20) {
                     val info = MineShareInfo()
-                    info.time = two.time
-                    info.code = two.code
-                    info.name = two.name
-                    info.price = two.nowPrice
-                    info.nowPrice = two.nowPrice
-                    info.updateTime = two.time
+                    info.time = one.time
+                    info.code = one.code
+                    info.name = one.name
+                    info.price = one.nowPrice
+                    info.nowPrice = one.nowPrice
+                    info.updateTime = one.time
                     val id = MineShareDatabase.getInstance()?.getMineShareDao()?.insert(info)
                     info.id = id?.toInt() ?: 0
                     poolMap.put(one.code!!, info)
-                    i(TAG, "${two.brieflyInfo()}")
-                    mFitModeList.add(Pair(two.range, two))
+                    i(TAG, "${one.brieflyInfo()}")
+                    mFitModeList.add(Pair(one.range, one))
                 }
             }
         }
