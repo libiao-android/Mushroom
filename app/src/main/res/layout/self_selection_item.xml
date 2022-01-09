@@ -61,12 +61,64 @@
     </LinearLayout>
 
     <TextView
-        android:textSize="12dp"
-        android:background="#0d000000"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:textSize="11dp"
+        android:background="@drawable/type_more_info_bg"
         android:layout_marginRight="10dp"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/item_view"
         android:id="@+id/tv_more_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:textSize="11dp"
+        android:background="@drawable/type_max_range_bg"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/tv_more_info"
+        android:layout_toLeftOf="@+id/tv_more_info"
+        android:id="@+id/tv_type_max_rang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:text="放量"
+        android:textSize="11dp"
+        android:background="@drawable/type_fang_liang_bg"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/tv_more_info"
+        android:layout_toLeftOf="@+id/tv_type_max_rang"
+        android:id="@+id/tv_type_fangliang"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:text="止跌"
+        android:textSize="11dp"
+        android:background="@drawable/type_zhi_die_bg"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/tv_more_info"
+        android:layout_toLeftOf="@+id/tv_type_fangliang"
+        android:id="@+id/tv_type_zhi_die"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
@@ -78,9 +130,9 @@
 
     <ImageView
         android:layout_marginRight="10dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/iv_item_heart"
-        android:layout_below="@+id/tv_more_info"
+        android:layout_below="@+id/tv_type_max_rang"
         android:layout_alignParentRight="true"
         android:src="@mipmap/heart"
         android:layout_width="25dp"

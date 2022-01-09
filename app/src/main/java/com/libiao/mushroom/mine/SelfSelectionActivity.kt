@@ -99,24 +99,53 @@ class SelfSelectionActivity : BaseActivity() {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                     val lines = reader.readLines()
+                    val one = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 2])
+                    val two = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 1])
                     if(it.candleEntryList == null) {
+
+                        if(it.dayCount >= 2) {
+                            val three = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount])
+                            val four = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount + 1])
+                            it.historyFangLiang = ShareParseUtil.isFangLiang(one, two, three, four)
+                        }
+
                         val records = lines.subList(lines.size - it.dayCount - 2, lines.size)
                         val entrys = java.util.ArrayList<CandleEntry>()
+                        var maxPrice = one.nowPrice
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
+                            if(item.nowPrice > maxPrice) maxPrice = item.nowPrice
                             if(item.beginPrice == 0.00) {
                                 entrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
                             } else {
                                 entrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
                             }
                         }
+                        var minP = one.nowPrice
+                        if(minP == 0.00) minP = two.yesterdayPrice
+                        if(minP == 0.00) minP = two.beginPrice
+                        it.maxRange = (maxPrice - minP) / minP * 100
                         it.candleEntryList = entrys
                     }
-
+                    it.price = one.nowPrice
                     val info = lines.get(lines.size - 1)
                     val info_pre = lines.get(lines.size - 2)
                     val share = SharesRecordActivity.ShareInfo(info)
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
+                    if(it.dayCount >= 2) {
+                        val info_pre2 = lines.get(lines.size - 3)
+                        val info_pre3 = lines.get(lines.size - 4)
+                        val share_pre2 = SharesRecordActivity.ShareInfo(info_pre2)
+                        val share_pre3 = SharesRecordActivity.ShareInfo(info_pre3)
+                        if(share.nowPrice >= share.beginPrice
+                            && share_pre.beginPrice > share_pre.nowPrice
+                            && share_pre2.beginPrice > share_pre2.nowPrice
+                            && share_pre3.beginPrice > share_pre3.nowPrice
+                        ) {
+                            it.zhiDie = true
+                        }
+                    }
+
                     updateCurrentData(it, share, share_pre)
 
                     //LogUtil.i(TAG, "info: $info")
@@ -161,6 +190,18 @@ class SelfSelectionActivity : BaseActivity() {
             }
 
             if(selfSettingBean?.redLine == true && !info.redLine) {
+                continue
+            }
+
+            if(selfSettingBean?.fangLiang == true && !info.historyFangLiang) {
+                continue
+            }
+
+            if(selfSettingBean?.maxRangChecked == true && info.maxRange < selfSettingBean.maxRangValue) {
+                continue
+            }
+
+            if(selfSettingBean?.zhiDie == true && !info.zhiDie) {
                 continue
             }
 
@@ -209,7 +250,10 @@ class SelfSelectionActivity : BaseActivity() {
             } else {
                 it.priority = 1
             }
-            val liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
+            var liangBi = "0"
+            if(sharePre.totalPrice > 0) {
+                liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
+            }
             it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}"
             it.heart = MineShareDatabase.getInstance()?.getCollectShareDao()?.find(it.code!!) ?: false
             if(cb_network.isChecked && cb_save.isChecked) {
@@ -485,6 +529,10 @@ class SelfSelectionActivity : BaseActivity() {
 
         private var heart: Boolean = false
 
+        private var mTypeFangLiangTv: TextView? = null
+        private var mTypeMaxRangeTv: TextView? = null
+        private var mTypeZhiDieTv: TextView? = null
+
 
         init {
             mIdTv = view.findViewById(R.id.self_item_id)
@@ -493,6 +541,9 @@ class SelfSelectionActivity : BaseActivity() {
             mCodeTv = view.findViewById(R.id.self_item_code)
             mRangeTv = view.findViewById(R.id.self_item_range)
             mTodayTv = view.findViewById(R.id.self_item_today)
+            mTypeFangLiangTv = view.findViewById(R.id.tv_type_fangliang)
+            mTypeMaxRangeTv = view.findViewById(R.id.tv_type_max_rang)
+            mTypeZhiDieTv = view.findViewById(R.id.tv_type_zhi_die)
 
             moreInfoTv = view.findViewById(R.id.tv_more_info)
             heartIv = view.findViewById(R.id.iv_item_heart)
@@ -613,6 +664,19 @@ class SelfSelectionActivity : BaseActivity() {
                 heartIv?.setImageResource(R.mipmap.heart)
             }
 
+            if(info.historyFangLiang) {
+                mTypeFangLiangTv?.visibility = View.VISIBLE
+            } else {
+                mTypeFangLiangTv?.visibility = View.GONE
+            }
+
+            if(info.zhiDie) {
+                mTypeZhiDieTv?.visibility = View.VISIBLE
+            } else {
+                mTypeZhiDieTv?.visibility = View.GONE
+            }
+
+            mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.maxRange)
         }
 
         private fun getWidth(size: Int): Int {

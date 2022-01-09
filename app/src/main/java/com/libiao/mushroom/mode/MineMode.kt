@@ -36,9 +36,10 @@ class MineMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 1
+        mDeviationValue = day - 2
         if(mDeviationValue >=  0) {
-            val one = shares[mDeviationValue + 0]
+            val zero = shares[mDeviationValue]
+            val one = shares[mDeviationValue + 1]
             if(poolMap.contains(one.code)) {
                 i(TAG, "contains: ${one.code}")
                 if(one.nowPrice < one.line_20) {

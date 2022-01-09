@@ -15,6 +15,11 @@ class SelfSettingBean {
     var liangLeftValue: Double = 0.00
     var liangRightValue: Double = 0.00
 
+    var fangLiang: Boolean = false
+    var maxRangChecked: Boolean = false
+    var maxRangValue: Double = 0.00
+    var zhiDie: Boolean = false
+
     override fun toString(): String {
         return "[$timeChecked, $timeValue], [$rangeLeftChecked, $rangeLeftValue], [$rangeRightChecked, $rangeRightValue]" +
                 ", [$liangLeftChecked, $liangLeftValue], [$liangRightChecked, $liangRightValue], [$redLine]"

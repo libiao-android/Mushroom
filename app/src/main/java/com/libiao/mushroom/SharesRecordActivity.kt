@@ -71,7 +71,7 @@ class SharesRecordActivity : AppCompatActivity() {
             while (str != null) {
                 count++
                 if(count % 100 == 0) {
-                    val p = (count / 4000F * 100).toInt()
+                    val p = (count / 4223F * 100).toInt()
                     mHandler.post { progressTv?.text = "$p%, $count" }
                 }
                 //Log.i("libiao_A", "str: $str, $count")

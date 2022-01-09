@@ -20,7 +20,7 @@ class MineShareInfo {
     var updateTime: String? = null
 
     @Ignore
-    var totalRange: Double = 0.00 //涨停后至今日涨幅
+    var totalRange: Double = 0.00 //记录后至今日涨幅
     @Ignore
     var todayRange: Double = 0.00 //今日涨幅
     @Ignore
@@ -37,6 +37,12 @@ class MineShareInfo {
     var candleEntryList: List<CandleEntry>? = null
     @Ignore
     var heart: Boolean = false
+    @Ignore
+    var historyFangLiang: Boolean = false //历史放量
+    @Ignore
+    var maxRange: Double = 0.00
+    @Ignore
+    var zhiDie: Boolean = false
 
     override fun toString(): String {
         return "${time}, ${code}, $name"

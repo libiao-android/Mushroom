@@ -35,5 +35,38 @@ class ShareParseUtil {
             }
             return info
         }
+
+        fun isFangLiang(one: SharesRecordActivity.ShareInfo,
+                        two: SharesRecordActivity.ShareInfo,
+                        three: SharesRecordActivity.ShareInfo,
+                        four: SharesRecordActivity.ShareInfo
+                        ): Boolean {
+            val preAvg = one.totalPrice
+
+            var beiShu = 4.0
+            if(preAvg > 2000000000) {
+                beiShu = 2.0
+            } else if(preAvg > 1000000000) {
+                beiShu = 2.5
+            } else if(preAvg > 500000000) {
+                beiShu = 3.0
+            } else if(preAvg > 100000000) {
+                beiShu = 3.5
+            }
+
+            val moreAvg = preAvg * beiShu
+
+            if(moreAvg > 0 && two.totalPrice > moreAvg && three.totalPrice > moreAvg && four.totalPrice > moreAvg) {
+
+                if(four.totalPrice > 100000000) {
+                    if(three.totalPrice > two.totalPrice * 0.75) {
+                        if(four.totalPrice > three.totalPrice * 0.75) {
+                            return true
+                        }
+                    }
+                }
+            }
+            return false
+        }
     }
 }
