@@ -128,6 +128,16 @@ abstract class BaseMode {
         return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0
     }
 
+    fun dieTing(info: SharesRecordActivity.ShareInfo): Boolean {
+        var maxRange = 0.9
+        if(info.code?.startsWith("sz300") == true) {
+            maxRange = 0.8
+        }
+        var dieTing = info.yesterdayPrice * maxRange + 0.005
+        dieTing = String.format("%.2f",dieTing).toDouble()
+        return info.nowPrice > 0 && info.nowPrice == dieTing
+    }
+
     open fun shouldAnalysis(context: Context): Boolean {
         val sharedPreferences = context.getSharedPreferences("mode", Context.MODE_PRIVATE) //私有数据
         return sharedPreferences.getBoolean(TAG, false)

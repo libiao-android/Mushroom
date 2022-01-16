@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.libiao.mushroom.mine.fangliang.FangLiangItemView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/fl_item_info_view"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginLeft="6dp"
+            android:textColor="@color/blank_60"
+            android:textSize="15dp"
+            android:id="@+id/fl_item_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:textColor="@color/blank_60"
+            android:layout_marginLeft="10dp"
+            android:textSize="15dp"
+            android:id="@+id/fl_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:textColor="@color/blank_60"
+            android:layout_marginLeft="10dp"
+            android:textSize="15dp"
+            android:id="@+id/fl_item_total_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textColor="@color/blank_60"
+            android:layout_marginLeft="10dp"
+            android:textSize="15dp"
+            android:id="@+id/fl_item_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:visibility="visible"
+        android:id="@+id/fl_item_heart"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@mipmap/heart"/>
+
+    <TextView
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="6dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:textSize="11dp"
+        android:background="@drawable/type_more_info_bg"
+        android:layout_below="@+id/fl_item_info_view"
+        android:id="@+id/fl_item_pre_avg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:layout_below="@+id/fl_item_info_view"
+        android:id="@+id/fl_item_candler_chart"
+        android:layout_width="200dp"
+        android:layout_height="90dp"/>
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:layout_marginTop="-30dp"
+        android:layout_below="@+id/fl_item_candler_chart"
+        android:id="@+id/fl_item_bar_chart"
+        android:layout_width="200dp"
+        android:layout_height="70dp"/>
+
+    <LinearLayout
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/fl_item_info_view"
+        android:layout_toRightOf="@+id/fl_item_candler_chart"
+        android:orientation="vertical"
+        android:id="@+id/fl_item_label_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</com.libiao.mushroom.mine.fangliang.FangLiangItemView>

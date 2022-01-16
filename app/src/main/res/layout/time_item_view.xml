@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.libiao.mushroom.mine.TimeItemView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_marginBottom="5dp"
+    android:background="#f1f1f1"
+    android:layout_height="35dp">
+    <TextView
+        android:layout_marginLeft="6dp"
+        android:textColor="@color/blank"
+        android:textSize="16dp"
+        android:layout_centerVertical="true"
+        android:id="@+id/time_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</com.libiao.mushroom.mine.TimeItemView>
