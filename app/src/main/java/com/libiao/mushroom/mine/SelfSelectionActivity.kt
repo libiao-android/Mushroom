@@ -170,12 +170,33 @@ class SelfSelectionActivity : BaseActivity() {
     }
 
 
-    fun notifyData(s: String, size: Int) {
-        if(currentTab?.tag() == s) {
-            hideLoading()
-            tv_count.visibility = View.VISIBLE
-            tv_count.text = "count: ${size}"
+    fun notifyData(type: Int, tabTag: String, size: Int) {
+        when(type) {
+            1 -> {
+                //更新size
+                if(currentTab?.tag() == tabTag) {
+                    hideLoading()
+                    tv_count.visibility = View.VISIBLE
+                    tv_count.text = "count: ${size}"
+                }
+            }
+            2 -> {
+                //更新count
+                if(currentTab?.tag() == tabTag) {
+                    tv_counting.text = "$size"
+                }
+            }
+            3 -> {
+                // 线上刷新结束后更新UI
+                if(currentTab?.tag() == tabTag) {
+                    self_loading.visibility = View.GONE
+                    btn_refresh.isEnabled = true
+                    cb_network.isEnabled = true
+                    tv_counting.visibility = View.GONE
+                }
+            }
         }
+
     }
 
 

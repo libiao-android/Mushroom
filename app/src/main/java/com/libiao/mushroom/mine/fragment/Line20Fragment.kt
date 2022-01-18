@@ -349,7 +349,7 @@ class Line20Fragment: Fragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun refreshCount() {
-        (activity as SelfSelectionActivity).notifyData(Line20Tab.TAG, mTempData.size)
+        (activity as SelfSelectionActivity).notifyData(1, Line20Tab.TAG, mTempData.size)
     }
 
     private fun updateCurrentData(
@@ -434,14 +434,11 @@ class Line20Fragment: Fragment(R.layout.line_20_fragment), ICommand {
                 }
                 ThreadPoolUtil.executeUI(Runnable {
                     mRefreshCount ++
-                    tv_counting.text = "$mRefreshCount"
+                    (activity as SelfSelectionActivity).notifyData(2, Line20Tab.TAG, mRefreshCount)
                     LogUtil.i(TAG, "mRefreshCount: $mRefreshCount")
                     if(mRefreshCount == mTempData.size) {
                         mAdapter?.setData(mTempData)
-                        self_loading.visibility = View.GONE
-                        btn_refresh.isEnabled = true
-                        cb_network.isEnabled = true
-                        tv_counting.visibility = View.GONE
+                        (activity as SelfSelectionActivity).notifyData(3, Line20Tab.TAG, 0)
                         resetSortUI()
                     }
                 })

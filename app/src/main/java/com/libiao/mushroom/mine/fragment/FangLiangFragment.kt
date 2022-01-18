@@ -74,7 +74,7 @@ class FangLiangFragment: Fragment(R.layout.fang_liang_fragment), MavericksView, 
             LogUtil.i(TAG, "buildModels: ${data?.infoList?.size}")
             size = data?.infoList?.size ?: 0
             if(size > 0) {
-                (activity as SelfSelectionActivity).notifyData(FangLiangTab.TAG, size)
+                (activity as SelfSelectionActivity).notifyData(1, FangLiangTab.TAG, size)
             }
             var time = ""
             data?.infoList?.forEach {
