@@ -20,6 +20,7 @@ import com.libiao.mushroom.mine.tab.FangLiangTab
 import com.libiao.mushroom.mine.tab.Line20Tab
 import com.libiao.mushroom.mine.timeItemView
 import com.libiao.mushroom.room.FangLiangShareDatabase
+import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.fang_liang_fragment.*
 import java.util.*
@@ -117,10 +118,18 @@ class FangLiangFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksVi
                     id(it.id)
                     data(it)
                     click {view ->
-                        val intent = Intent(context, KLineActivity::class.java)
-                        intent.putExtra("code", it.code)
-                        intent.putExtra("info", it.toString())
-                        context?.startActivity(intent)
+                        val id = view.id
+                        when(id) {
+                            R.id.fl_item_code -> {
+                                ClipboardUtil.clip(context!!, it.code)
+                            }
+                            else -> {
+                                val intent = Intent(context, KLineActivity::class.java)
+                                intent.putExtra("code", it.code)
+                                intent.putExtra("info", it.toString())
+                                context?.startActivity(intent)
+                            }
+                        }
                     }
                     longClick {view ->
                         MoreDialog(context!!){view2 ->

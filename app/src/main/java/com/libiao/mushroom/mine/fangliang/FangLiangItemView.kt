@@ -189,7 +189,10 @@ class FangLiangItemView @JvmOverloads constructor(
     @CallbackProp
     fun setClick(callback: ((view: View) -> Unit)?) {
         setOnClickListener {
-            callback?.invoke(this)
+            callback?.invoke(it)
+        }
+        fl_item_code.setOnClickListener {
+            callback?.invoke(it)
         }
     }
 
