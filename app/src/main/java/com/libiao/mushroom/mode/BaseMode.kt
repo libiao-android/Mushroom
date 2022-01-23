@@ -115,12 +115,12 @@ abstract class BaseMode {
     }
 
     fun isChuang(code: String?): Boolean {
-        return code?.startsWith("sz30") ?: false
+        return code?.startsWith("sz3") ?: false
     }
 
     fun zhangTing(info: SharesRecordActivity.ShareInfo): Boolean {
         var maxRange = 1.1
-        if(info.code?.startsWith("sz300") == true) {
+        if(info.code?.startsWith("sz3") == true) {
             maxRange = 1.2
         }
         var zhangTingPrice = info.yesterdayPrice * maxRange
@@ -130,7 +130,7 @@ abstract class BaseMode {
 
     fun dieTing(info: SharesRecordActivity.ShareInfo): Boolean {
         var maxRange = 0.9
-        if(info.code?.startsWith("sz300") == true) {
+        if(info.code?.startsWith("sz3") == true) {
             maxRange = 0.8
         }
         var dieTing = info.yesterdayPrice * maxRange + 0.005

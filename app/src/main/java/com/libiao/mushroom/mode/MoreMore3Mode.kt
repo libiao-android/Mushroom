@@ -153,11 +153,18 @@ class MoreMore3Mode : BaseMode {
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
-        analysis(mDeviationValue, shares)
+
+        //analysis(mDeviationValue, shares)
+
+        if(Constant.PRE == 0) {
+            analysis(mDeviationValue, shares)
+        } else {
+            i(TAG, "只记录当天")
+        }
     }
 
     override fun des(): String {
-        return "连续三天放量"
+        return "连续五天放量"
     }
 }
 //失败的量能

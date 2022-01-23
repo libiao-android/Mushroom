@@ -46,6 +46,7 @@ class MineMode : BaseMode {
                     i(TAG, "delete: ${one.code}")
                     MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
                     poolMap.remove(one.code)
+                    mFitModeList.add(Pair(one.range, one))
                 } else {
                     val info = poolMap[one.code]
                     info?.also {
@@ -61,7 +62,7 @@ class MineMode : BaseMode {
                     }
                 }
             } else {
-                if(one.range >= 7 && one.nowPrice >= one.line_20) {
+                if(zhangTing(one) && one.nowPrice >= one.line_20) {
                     val info = MineShareInfo()
                     info.time = one.time
                     info.code = one.code
@@ -73,7 +74,6 @@ class MineMode : BaseMode {
                     info.id = id?.toInt() ?: 0
                     poolMap.put(one.code!!, info)
                     i(TAG, "${one.brieflyInfo()}")
-                    mFitModeList.add(Pair(one.range, one))
                 }
             }
         }
@@ -83,7 +83,7 @@ class MineMode : BaseMode {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
 
-        //analysis(mDeviationValue, shares)
+  //      analysis(mDeviationValue, shares)
 
         if(Constant.PRE == 0) {
             analysis(mDeviationValue, shares)

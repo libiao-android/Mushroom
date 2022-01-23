@@ -34,6 +34,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="50模式"/>
+
+    <CheckBox
+        android:id="@+id/cb_fang_liang_3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="放量5天"/>
+
     <CheckBox
         android:id="@+id/lian_ban_1_strong"
         android:layout_width="match_parent"
@@ -55,11 +62,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="一字板"/>
-    <CheckBox
-        android:id="@+id/cb_fang_liang_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="放量3天"/>
 
     <CheckBox
         android:id="@+id/cb_fen_qi_to_yi_zhi"

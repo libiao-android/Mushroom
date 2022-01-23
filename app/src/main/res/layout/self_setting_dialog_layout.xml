@@ -223,10 +223,10 @@
             android:scaleY="0.8"
             android:textColor="@color/blank"
             android:textSize="15dp"
-            android:id="@+id/dialog_cb_fang_liang"
+            android:id="@+id/dialog_cb_san_lian_yin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="放量"/>
+            android:text="三连阴"/>
 
         <CheckBox
             android:scaleX="0.8"
@@ -247,11 +247,41 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="止跌"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/setting_view_line"
+        android:id="@+id/setting_view_line_2"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+
+        <CheckBox
+            android:scaleX="0.8"
+            android:scaleY="0.8"
+            android:textColor="@color/blank"
+            android:textSize="15dp"
+            android:id="@+id/dialog_cb_line_10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10日线"/>
+
+        <CheckBox
+            android:scaleX="0.8"
+            android:scaleY="0.8"
+            android:textColor="@color/blank"
+            android:textSize="15dp"
+            android:id="@+id/dialog_cb_xin_gao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新高"/>
     </LinearLayout>
 
 
     <RelativeLayout
-        android:layout_below="@+id/setting_view_line"
+        android:layout_below="@+id/setting_view_line_2"
         android:layout_width="match_parent"
         android:layout_height="60dp">
         <Button

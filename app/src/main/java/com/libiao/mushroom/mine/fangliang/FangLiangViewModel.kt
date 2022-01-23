@@ -7,6 +7,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.room.FangLiangShareDatabase
+import com.libiao.mushroom.room.FangLiangShareInfo
 import com.libiao.mushroom.utils.LogUtil
 import java.io.BufferedReader
 import java.io.File
@@ -49,15 +50,24 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
 
                             val p = item.totalPrice.toFloat() / 100000000
                             barEntrys.add(BarEntry(index.toFloat(), p))
-                            if(item.beginPrice > item.nowPrice) {
-                                colorEntrys.add(Color.GREEN)
-                            } else if(item.beginPrice < item.nowPrice) {
-                                colorEntrys.add(Color.RED)
+                            if(index == 14) {
+                                colorEntrys.add(Color.BLACK)
                             } else {
-                                if(item.range >= 0) {
-                                    colorEntrys.add(Color.RED)
+                                var p = it.preAvg * 3
+                                if(p < 100000000.00) p = 100000000.00
+                                val suoLiang = item.totalPrice < p
+                                val green = if(suoLiang && index > 14) "#6628FF28" else "#28FF28"
+                                val red = if(suoLiang && index > 14) "#66FF0000" else "#FF0000"
+                                if(item.beginPrice > item.nowPrice) {
+                                    colorEntrys.add(Color.parseColor(green))
+                                } else if(item.beginPrice < item.nowPrice) {
+                                    colorEntrys.add(Color.parseColor(red))
                                 } else {
-                                    colorEntrys.add(Color.GREEN)
+                                    if(item.range >= 0) {
+                                        colorEntrys.add(Color.parseColor(red))
+                                    } else {
+                                        colorEntrys.add(Color.parseColor(green))
+                                    }
                                 }
                             }
 
@@ -76,6 +86,17 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
                 setState {
                     copy(infoList = it)
                 }
+            }
+        }
+    }
+
+    fun deleteItem(item: FangLiangShareInfo) {
+        withState {
+            val list = mutableListOf<FangLiangShareInfo>()
+            list.addAll(it.infoList)
+            list.remove(item)
+            setState {
+                it.copy(infoList = list)
             }
         }
     }

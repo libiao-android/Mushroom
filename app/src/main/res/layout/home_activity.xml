@@ -7,31 +7,36 @@
         android:enabled="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="--池更新"
+        android:text="--数更新"
         android:onClick="update"/>
 
     <Button
+        android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="当天--信息记录"
         android:onClick="record"/>
 
     <Button
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="我的收藏"
         android:onClick="myCollect"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="我的--池"
-        android:onClick="myPool"/>
-
-    <Button
+        android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="--分析"
         android:onClick="analysis"/>
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="我的--池"
+        android:onClick="myPool"/>
 
 </LinearLayout>

@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.github.mikephil.charting.data.CandleEntry
+import com.libiao.mushroom.SharesRecordActivity
 
 @Entity
 class MineShareInfo {
@@ -18,6 +19,23 @@ class MineShareInfo {
     var nowPrice: Double = 0.00
     var dayCount: Int = 0
     var updateTime: String? = null
+    var heart: Boolean = false
+
+    var label1: String? = null
+    var label2: String? = null
+    var label3: String? = null
+    var label4: String? = null
+    var label5: String? = null
+    var label6: String? = null
+    var label7: String? = null
+    var label8: String? = null
+    var label9: String? = null
+    var label10: String? = null
+    var ext1: String? = null
+    var ext2: String? = null
+    var ext3: String? = null
+    var ext4: String? = null
+    var ext5: String? = null
 
     @Ignore
     var totalRange: Double = 0.00 //记录后至今日涨幅
@@ -36,13 +54,14 @@ class MineShareInfo {
     @Ignore
     var candleEntryList: List<CandleEntry>? = null
     @Ignore
-    var heart: Boolean = false
-    @Ignore
-    var historyFangLiang: Boolean = false //历史放量
+    var sanLianYin: Boolean = false //三连阴
     @Ignore
     var maxRange: Double = 0.00
     @Ignore
     var zhiDie: Boolean = false
+
+    @Ignore
+    var shareInfo: SharesRecordActivity.ShareInfo? = null
 
     override fun toString(): String {
         return "${time}, ${code}, $name"

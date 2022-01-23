@@ -8,6 +8,9 @@ interface ICommand {
         const val NETWORK = 4
 
         const val OBTAIN_SIZE = 5
+        const val LOADING_STATUS = 6
+        const val HEART_STATUS = 7
+        const val ONLINE_STATUS = 8
     }
     fun order(type: Int, data: Any? = null)
     fun obtain(type: Int): Any?

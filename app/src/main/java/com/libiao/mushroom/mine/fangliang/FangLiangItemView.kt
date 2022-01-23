@@ -193,4 +193,12 @@ class FangLiangItemView @JvmOverloads constructor(
         }
     }
 
+    @CallbackProp
+    fun setLongClick(callback: ((view: View) -> Unit)?) {
+        setOnLongClickListener {
+            callback?.invoke(this)
+            true
+        }
+    }
+
 }

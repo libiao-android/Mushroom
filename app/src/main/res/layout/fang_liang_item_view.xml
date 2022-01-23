@@ -88,4 +88,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <View
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="-8dp"
+        android:layout_below="@+id/fl_item_bar_chart"
+        android:background="#e5e5e5"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
 </com.libiao.mushroom.mine.fangliang.FangLiangItemView>

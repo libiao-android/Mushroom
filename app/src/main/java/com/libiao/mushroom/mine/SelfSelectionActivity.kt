@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.libiao.mushroom.R
 import com.libiao.mushroom.base.BaseActivity
@@ -14,6 +15,7 @@ import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.dip
 import kotlinx.android.synthetic.main.self_selection_activity.*
+import java.lang.reflect.Field
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,6 +39,19 @@ class SelfSelectionActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.self_selection_activity)
+
+
+        try {
+            val recyclerViewField: Field = ViewPager2::class.java.getDeclaredField("mRecyclerView")
+            recyclerViewField.isAccessible = true
+            val recyclerView = recyclerViewField.get(self_view_pager) as RecyclerView
+            val touchSlopField: Field = RecyclerView::class.java.getDeclaredField("mTouchSlop")
+            touchSlopField.isAccessible = true
+            val touchSlop = touchSlopField.get(recyclerView) as Int
+            touchSlopField.set(recyclerView, touchSlop * 3) //6 is empirical value
+        } catch (ignore: java.lang.Exception) {
+        }
+
         initView()
         self_loading.visibility = View.VISIBLE
     }
@@ -133,10 +148,9 @@ class SelfSelectionActivity : BaseActivity() {
 
         cb_network.setOnCheckedChangeListener { buttonView, isChecked ->
             btn_refresh.isEnabled = isChecked
-            if(!isChecked) {
-                currentTab?.fragment?.also {
-                    (it as ICommand).order(ICommand.LOCAL)
-                }
+
+            currentTab?.fragment?.also {
+                (it as ICommand).order(ICommand.LOCAL, isChecked)
             }
         }
 
@@ -166,6 +180,19 @@ class SelfSelectionActivity : BaseActivity() {
             } else {
                 tv_count.visibility = View.GONE
             }
+
+            val loadingStatus = (it as ICommand).obtain(ICommand.LOADING_STATUS) as Int
+            if(loadingStatus == 1) {
+                showLoading()
+            } else {
+                hideLoading()
+            }
+
+            val heartStatus = (it as ICommand).obtain(ICommand.HEART_STATUS) as Boolean
+            cb_heart.isChecked = heartStatus
+
+            val onLineStatus = (it as ICommand).obtain(ICommand.ONLINE_STATUS) as Boolean
+            cb_network.isChecked = onLineStatus
         }
     }
 
