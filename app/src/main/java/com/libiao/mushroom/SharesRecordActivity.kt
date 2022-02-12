@@ -111,7 +111,7 @@ class SharesRecordActivity : AppCompatActivity() {
         }
 
         val time = "$mYear-$mMonth-$mDay-$mWay"
-        //val time = "2021-12-31-5"
+        //val time = "2022-1-28-5"
         i(TAG, "time: $time")
         this.time = time
 
@@ -150,8 +150,23 @@ class SharesRecordActivity : AppCompatActivity() {
     }
 
     private fun queryInfo(code: String) {
-        networkRequestForQt(code)
-        Thread.sleep(80)
+        val file = File(file_2021, code)
+        if(file.exists()) {
+            val stream = FileInputStream(file)
+            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+            val lines = reader.readLines()
+            lines.last {
+                if(!it.startsWith(time!!)) {
+                    i(TAG, "$it")
+                    networkRequestForQt(code)
+                    Thread.sleep(80)
+                }
+                true
+            }
+            reader.close()
+            stream.close()
+            //i(TAG, info.toFile())
+        }
     }
 
     private fun networkRequestForQt(code: String) {

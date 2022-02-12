@@ -267,13 +267,16 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
                     if(it.dayCount >= 2) {
                         val info_pre2 = lines.get(lines.size - 3)
-                        val info_pre3 = lines.get(lines.size - 4)
                         val share_pre2 = SharesRecordActivity.ShareInfo(info_pre2)
-                        val share_pre3 = SharesRecordActivity.ShareInfo(info_pre3)
-                        if(share.nowPrice >= share.beginPrice
-                            && share_pre.beginPrice > share_pre.nowPrice
-                            && share_pre2.beginPrice > share_pre2.nowPrice
-                            && share_pre3.beginPrice > share_pre3.nowPrice
+
+                        val one = share
+                        val two = share_pre
+
+                        if(one.maxPrice < two.maxPrice
+                            && one.minPrice > two.minPrice
+                            && !ShareParseUtil.dieTing(one)
+                            && one.beginPrice >= one.nowPrice
+                            && two.beginPrice >= two.nowPrice
                         ) {
                             it.zhiDie = true
                         }

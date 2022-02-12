@@ -68,5 +68,15 @@ class ShareParseUtil {
             }
             return false
         }
+
+        fun dieTing(info: SharesRecordActivity.ShareInfo): Boolean {
+            var maxRange = 0.9
+            if(info.code?.startsWith("sz3") == true) {
+                maxRange = 0.8
+            }
+            var dieTing = info.yesterdayPrice * maxRange
+            dieTing = String.format("%.2f",dieTing).toDouble()
+            return info.nowPrice > 0 && info.nowPrice == dieTing
+        }
     }
 }
