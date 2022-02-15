@@ -3,8 +3,10 @@ package com.libiao.mushroom.room
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 import com.libiao.mushroom.SharesRecordActivity
+import java.util.ArrayList
 
 @Entity
 class MineShareInfo {
@@ -52,7 +54,11 @@ class MineShareInfo {
     @Ignore
     var moreInfo: String? = null
     @Ignore
-    var candleEntryList: List<CandleEntry>? = null
+    var candleEntryList: ArrayList<CandleEntry>? = null
+    @Ignore
+    var barEntryList: ArrayList<BarEntry>? = null
+    @Ignore
+    var colorsList: ArrayList<Int>? = null
     @Ignore
     var sanLianYin: Boolean = false //三连阴
     @Ignore

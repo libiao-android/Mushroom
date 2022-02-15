@@ -6,9 +6,11 @@ import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.FangLiangShareDatabase
 import com.libiao.mushroom.room.FangLiangShareInfo
 import com.libiao.mushroom.utils.LogUtil
+import com.libiao.mushroom.utils.baoLiuXiaoShu
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -22,6 +24,8 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
     }
 
     private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+
+    var localList = mutableListOf<FangLiangShareInfo>()
 
     fun fetchInfo() {
         withState {
@@ -83,6 +87,7 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
             }
             data?.sortBy { it.dayCount }
             data?.also {
+                localList = it
                 setState {
                     copy(infoList = it)
                 }
@@ -97,6 +102,58 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
             list.remove(item)
             setState {
                 it.copy(infoList = list)
+            }
+        }
+    }
+
+    fun updateNetWork(baseFragment: BaseFragment) {
+        withState {s ->
+            val temp = mutableListOf<FangLiangShareInfo>()
+            temp.addAll(s.infoList)
+            var count = 0
+            temp.forEachIndexed { index, fangLiangShareInfo ->
+                baseFragment.shiShiQuery(fangLiangShareInfo.code!!) {share ->
+                    LogUtil.i(TAG, "share: ${share}")
+                    count ++
+
+                    val fangInfo = fangLiangShareInfo.copy()
+
+                    val candleSize = fangInfo.candleEntryList?.size ?: 0
+                    val lastShare = fangInfo.lastShareInfo
+
+                    var liangBi = "0"
+                    if(share.totalPrice > 0) {
+                        liangBi = baoLiuXiaoShu(share.totalPrice / lastShare!!.totalPrice)
+                    }
+
+                    fangInfo.lastShareInfo = share
+
+                    if(share.beginPrice == 0.00) {
+                        fangInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat()))
+                    } else {
+                        fangInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
+                    }
+                    fangInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi"
+                    val p = share.totalPrice.toFloat() / 100000000
+                    fangInfo.barEntryList?.add(BarEntry(candleSize.toFloat(), p))
+                    fangInfo.colorsList?.add(Color.GRAY)
+                    temp[index] = fangInfo
+
+                    if(count == temp.size) {
+                        LogUtil.i(TAG, "setState.......................")
+                        setState {
+                            copy(infoList = temp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateLocal() {
+        withState {s ->
+            setState {
+                copy(infoList = localList)
             }
         }
     }

@@ -83,8 +83,8 @@ class MoreMore3Mode : BaseMode {
             val beiShu = 2.9
 
             var moreAvg = preAvg * beiShu
-            if(moreAvg < 100000000.00) {
-                moreAvg = 100000000.00
+            if(moreAvg < 50000000.00) {
+                moreAvg = 50000000.00
             }
 
             if(moreAvg > 0

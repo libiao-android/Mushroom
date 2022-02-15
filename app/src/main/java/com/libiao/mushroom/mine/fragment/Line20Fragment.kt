@@ -13,13 +13,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.CandleData
-import com.github.mikephil.charting.data.CandleDataSet
-import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
@@ -50,14 +50,35 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             ICommand.LOCAL -> {
                 onLineChecked = data as Boolean
                 if(!onLineChecked) {
-                    refreshLocalData(mData)
+                    refreshLocalData(mData, true)
                     resetSortUI()
                 }
             }
             ICommand.NETWORK -> {
                 mRefreshCount = 0
                 mTempData.forEach {
-                    shiShiQuery(it)
+                    shiShiQuery(it.code!!) {share ->
+                        val f = File(file_2021, it.code!!)
+                        if(f.exists()) {
+                            val stream = FileInputStream(f)
+                            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+                            val lines = reader.readLines()
+                            val share_pre = SharesRecordActivity.ShareInfo(lines.last())
+                            val index = it.candleEntryList?.size ?: 0
+                            if(share.beginPrice == 0.00) {
+                                it.candleEntryList?.add(CandleEntry((index).toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat()))
+                            } else {
+                                it.candleEntryList?.add(CandleEntry((index).toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
+                            }
+
+                            val p = share.totalPrice.toFloat() / 100000000
+                            it.barEntryList?.add(BarEntry(index.toFloat(), p))
+
+                            it.colorsList?.add(Color.GRAY)
+
+                            updateCurrentData(it, share, share_pre)
+                        }
+                    }
                 }
             }
         }
@@ -90,16 +111,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     private var mTodayStatus = 0
     private var mTimeStatus = 0
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
-    private val client = OkHttpClient()
-
     private var mData: List<MineShareInfo> = ArrayList()
     private var mTempData: List<MineShareInfo> = ArrayList()
 
     private var settingDialog: SelfSettingDialog? = null
     private var settingBean: SelfSettingBean? = null
-
-    private var mRefreshCount = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -227,7 +243,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         }
     }
 
-    private fun refreshLocalData(data: List<MineShareInfo>) {
+    private fun refreshLocalData(data: List<MineShareInfo>, reload: Boolean = false) {
         //(activity as SelfSelectionActivity).showLoading()
         loadingStatus = 1
         ThreadPoolUtil.execute(Runnable {
@@ -239,10 +255,13 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val lines = reader.readLines()
                     val one = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 2])
                     val two = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 1])
-                    if(it.candleEntryList == null) {
-
-                        val records = lines.subList(lines.size - it.dayCount - 2, lines.size)
+                    if(it.candleEntryList == null || reload) {
+                        var begin = lines.size - it.dayCount - 2
+                        if(begin < 0) begin = 0
+                        val records = lines.subList(begin, lines.size)
                         val entrys = java.util.ArrayList<CandleEntry>()
+                        val barEntrys = java.util.ArrayList<BarEntry>()
+                        val colorEntrys = java.util.ArrayList<Int>()
                         var maxPrice = one.nowPrice
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
@@ -252,12 +271,30 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             } else {
                                 entrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
                             }
+
+                            val p = item.totalPrice.toFloat() / 100000000
+                            barEntrys.add(BarEntry(index.toFloat(), p))
+                            val green = "#28FF28"
+                            val red = "#FF0000"
+                            if(item.beginPrice > item.nowPrice) {
+                                colorEntrys.add(Color.parseColor(green))
+                            } else if(item.beginPrice < item.nowPrice) {
+                                colorEntrys.add(Color.parseColor(red))
+                            } else {
+                                if(item.range >= 0) {
+                                    colorEntrys.add(Color.parseColor(red))
+                                } else {
+                                    colorEntrys.add(Color.parseColor(green))
+                                }
+                            }
                         }
                         var minP = one.nowPrice
                         if(minP == 0.00) minP = two.yesterdayPrice
                         if(minP == 0.00) minP = two.beginPrice
                         it.maxRange = (maxPrice - minP) / minP * 100
                         it.candleEntryList = entrys
+                        it.barEntryList = barEntrys
+                        it.colorsList = colorEntrys
                     }
                     it.price = one.nowPrice
                     val info = lines.get(lines.size - 1)
@@ -408,63 +445,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         }
     }
 
-    private fun shiShiQuery(info: MineShareInfo) {
-        val code = info.code
-        //http://qt.gtimg.cn/q=s_sz000858
-        val request = Request.Builder()
-            .url("https://qt.gtimg.cn/q=$code")
-            .build()
-        val call = client.newCall(request)
-        call.enqueue(object : Callback {
-            override fun onFailure(call: Call?, e: IOException?) {
-                LogUtil.i(TAG, "onFailure: ${e}, $code")
-            }
-
-            override fun onResponse(call: Call?, response: Response?) {
-                val value = response?.body()?.string()
-                //Log.i("libiao_A", "response: ${value}")
-                try {
-                    if (value != null) {
-                        //LogUtil.i(TAG, "response: ${value}")
-                        val strs = value.split("~")
-                        if(strs.size > 45) {
-                            val share = ShareParseUtil.parseFromNetwork(code!!, strs)
-                            LogUtil.i(TAG, "share: $share")
-                            val f = File(file_2021, code)
-                            if(f.exists()) {
-                                val stream = FileInputStream(f)
-                                val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
-                                val lines = reader.readLines()
-                                val share_pre = SharesRecordActivity.ShareInfo(lines.last())
-                                updateCurrentData(info, share, share_pre)
-                            }
-                        }
-                    } else {
-                        LogUtil.i(
-                            TAG,
-                            "exception value: $value, $code"
-                        )
-                    }
-                } catch (e: Exception) {
-                    LogUtil.i(
-                        TAG,
-                        "parseSharesInfo exception: ${e.message}, $code, $value"
-                    )
-                }
-                ThreadPoolUtil.executeUI(Runnable {
-                    mRefreshCount ++
-                    (activity as SelfSelectionActivity).notifyData(2, Line20Tab.TAG, mRefreshCount)
-                    LogUtil.i(TAG, "mRefreshCount: $mRefreshCount")
-                    if(mRefreshCount == mTempData.size) {
-                        mAdapter?.setData(mTempData)
-                        (activity as SelfSelectionActivity).notifyData(3, Line20Tab.TAG, 0)
-                        resetSortUI()
-                    }
-                })
-            }
-        })
-    }
-
     private fun resetSortUI() {
         mTodayStatus = 0
         mRangeStatus = 0
@@ -516,6 +496,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
         private var mineShareInfo: MineShareInfo? = null
         private var chart: CandleStickChart? = null
+        private var bar: BarChart? = null
 
         private var heart: Boolean = false
 
@@ -538,7 +519,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             moreInfoTv = view.findViewById(R.id.tv_more_info)
             heartIv = view.findViewById(R.id.iv_item_heart)
             chart = view.findViewById(R.id.item_candler_chart)
+            bar = view.findViewById(R.id.item_bar_chart)
             initCandleChart()
+            intBarChart()
 
             view.setOnClickListener {
                 val intent = Intent(context, KLineActivity::class.java)
@@ -644,6 +627,17 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 chart?.invalidate()
             }
 
+            info.barEntryList?.also {
+                val barData = BarData(getBarDataSet(info.barEntryList, info.colorsList))
+                barData.setDrawValues(false)
+
+                val barParams = bar?.layoutParams
+                barParams?.width = getWidth(it.size)
+                bar?.layoutParams = barParams
+                bar?.data = barData
+                bar?.invalidate()
+            }
+
             heart = info.heart
             if(heart) {
                 heartIv?.setImageResource(R.mipmap.heart_selected)
@@ -697,6 +691,51 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             set1.neutralColor = Color.RED
             //set1.highLightColor = Color.BLACK
             return set1
+        }
+
+        private fun intBarChart() {
+            bar?.also {
+                it.description.isEnabled = false
+                it.setTouchEnabled(false)
+                //it.setBackgroundColor(Color.WHITE)
+                it.setDrawGridBackground(false)
+                it.setDrawBarShadow(false)
+                it.isHighlightFullBarEnabled = false
+
+                it.legend.isEnabled = false
+
+                var xAxis = it.xAxis
+                xAxis.isEnabled = false
+
+                var yAxis = it.axisLeft
+                yAxis.isEnabled = false
+                //yAxis.labelCount = 2
+                yAxis.axisMinimum = 0f
+                it.axisRight.isEnabled = false
+
+            }
+        }
+
+        private fun getBarDataSet(barData: List<BarEntry>?, colorData: List<Int>?): MutableList<IBarDataSet>? {
+            val set = BarDataSet(barData, "liang neng")
+            set.setDrawIcons(false)
+            set.isHighlightEnabled = false
+            set.colors = colorData
+            val dataSets = ArrayList<IBarDataSet>()
+            dataSets.add(set)
+
+            return dataSets
+        }
+    }
+
+    override fun shiShiRefresh() {
+        mRefreshCount ++
+        (activity as SelfSelectionActivity).notifyData(2, Line20Tab.TAG, mRefreshCount)
+        LogUtil.i(TAG, "mRefreshCount: $mRefreshCount")
+        if(mRefreshCount == mTempData.size) {
+            mAdapter?.setData(mTempData)
+            (activity as SelfSelectionActivity).notifyData(3, Line20Tab.TAG, 0)
+            resetSortUI()
         }
     }
 }

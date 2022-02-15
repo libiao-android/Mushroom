@@ -50,6 +50,8 @@ class FangLiangItemView @JvmOverloads constructor(
             var yAxis = it.axisLeft
             yAxis.isEnabled = false
 
+            yAxis.axisMinimum = 0f
+
             it.axisRight.isEnabled = false
 
         }
@@ -114,6 +116,13 @@ class FangLiangItemView @JvmOverloads constructor(
             fl_item_bar_chart.layoutParams = barParams
             fl_item_bar_chart.data = barData
             fl_item_bar_chart.invalidate()
+        }
+
+        if(info.moreInfo == null) {
+            fl_item_more_info.visibility = View.GONE
+        } else {
+            fl_item_more_info.visibility = View.VISIBLE
+            fl_item_more_info.text = info.moreInfo
         }
 
         fl_item_label_view.removeAllViews()

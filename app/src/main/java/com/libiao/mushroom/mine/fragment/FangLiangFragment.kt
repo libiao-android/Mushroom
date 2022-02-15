@@ -3,7 +3,6 @@ package com.libiao.mushroom.mine.fragment
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.Fragment
 import com.airbnb.epoxy.TypedEpoxyController
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.UniqueOnly
@@ -17,7 +16,6 @@ import com.libiao.mushroom.mine.fangliang.FangLiangState
 import com.libiao.mushroom.mine.fangliang.FangLiangViewModel
 import com.libiao.mushroom.mine.fangliang.fangLiangItemView
 import com.libiao.mushroom.mine.tab.FangLiangTab
-import com.libiao.mushroom.mine.tab.Line20Tab
 import com.libiao.mushroom.mine.timeItemView
 import com.libiao.mushroom.room.FangLiangShareDatabase
 import com.libiao.mushroom.utils.ClipboardUtil
@@ -38,10 +36,14 @@ class FangLiangFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksVi
             }
             ICommand.LOCAL -> {
                 onLineChecked = data as Boolean
+                if(!onLineChecked) {
+                    fangLiangViewModel.updateLocal()
+                }
 
             }
             ICommand.NETWORK -> {
-                (activity as SelfSelectionActivity).notifyData(3, FangLiangTab.TAG, 0)
+                mRefreshCount = 0
+                fangLiangViewModel.updateNetWork(this)
             }
         }
     }
@@ -110,7 +112,7 @@ class FangLiangFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksVi
                 if(it.time != time) {
                     time = it.time ?: ""
                     timeItemView {
-                        id(it.id)
+                        id(time)
                         time(it.time)
                     }
                 }
@@ -145,5 +147,14 @@ class FangLiangFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksVi
             }
         }
 
+    }
+
+    override fun shiShiRefresh() {
+        mRefreshCount ++
+        (activity as SelfSelectionActivity).notifyData(2, FangLiangTab.TAG, mRefreshCount)
+        LogUtil.i(TAG, "mRefreshCount: $mRefreshCount")
+        if(mRefreshCount == size) {
+            (activity as SelfSelectionActivity).notifyData(3, FangLiangTab.TAG, 0)
+        }
     }
 }
