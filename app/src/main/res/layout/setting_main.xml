@@ -1,126 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="10dp"
     android:layout_marginLeft="20dp">
 
-    <Button
-        android:id="@+id/btn_delete_cache"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="删除缓存"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:layout_marginTop="10dp"
-        android:textColor="#000000"
-        android:textSize="20sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="模式选择"/>
-<!--    <CheckBox-->
-<!--        android:id="@+id/cb_long_tou"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="龙头"/>-->
-    <CheckBox
-        android:id="@+id/mine"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="我的"/>
-    <CheckBox
-        android:id="@+id/cb_50"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="50模式"/>
+        <Button
+            android:id="@+id/btn_delete_cache"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除缓存"/>
 
-    <CheckBox
-        android:id="@+id/cb_fang_liang_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="放量5天"/>
+        <TextView
+            android:layout_marginTop="10dp"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="模式选择"/>
+        <!--    <CheckBox-->
+        <!--        android:id="@+id/cb_long_tou"-->
+        <!--        android:layout_width="match_parent"-->
+        <!--        android:layout_height="wrap_content"-->
+        <!--        android:text="龙头"/>-->
+        <CheckBox
+            android:id="@+id/mine"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="我的"/>
+        <CheckBox
+            android:id="@+id/cb_50"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="50模式"/>
 
-    <CheckBox
-        android:id="@+id/lian_ban_1_strong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="一连板强势"/>
+        <CheckBox
+            android:id="@+id/cb_fang_liang_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="放量5天"/>
 
-    <CheckBox
-        android:id="@+id/cb_20"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="20模式"/>
-    <CheckBox
-        android:id="@+id/cb_10"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="10模式"/>
-    <CheckBox
-        android:id="@+id/cb_yi_zi_ban"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="一字板"/>
+        <CheckBox
+            android:id="@+id/lian_ban_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="二连板"/>
 
-    <CheckBox
-        android:id="@+id/cb_fen_qi_to_yi_zhi"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="分歧转一致"/>
+        <CheckBox
+            android:id="@+id/lian_ban_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="三连板"/>
 
-    <CheckBox
-        android:id="@+id/cb_up_10"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="10日线攀升"/>
+        <CheckBox
+            android:id="@+id/lian_ban_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="四连板"/>
+        <CheckBox
+            android:id="@+id/lian_ban_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="五连板"/>
+        <CheckBox
+            android:id="@+id/lian_ban_6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="六连板"/>
 
-    <CheckBox
-        android:id="@+id/lian_ban_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="二连板"/>
+        <CheckBox
+            android:id="@+id/chuang_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="创一板"/>
 
-    <CheckBox
-        android:id="@+id/lian_ban_3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="三连板"/>
+        <CheckBox
+            android:id="@+id/chuang_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="创二连板"/>
 
-    <CheckBox
-        android:id="@+id/lian_ban_4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="四连板"/>
+        <CheckBox
+            android:id="@+id/chuang_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="创三连板"/>
 
-    <CheckBox
-        android:id="@+id/chuang_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="创一板"/>
 
-    <CheckBox
-        android:id="@+id/chuang_2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="创二连板"/>
+        <CheckBox
+            android:id="@+id/lian_ban_1_strong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="一连板强势"/>
 
-    <CheckBox
-        android:id="@+id/lian_ban_2_strong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="二连板强势"/>
+        <CheckBox
+            android:id="@+id/cb_20"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="20模式"/>
+        <CheckBox
+            android:id="@+id/cb_10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="10模式"/>
+        <CheckBox
+            android:id="@+id/cb_yi_zi_ban"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="一字板"/>
 
-    <CheckBox
-        android:id="@+id/lian_ban_3_strong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="三连板强势"/>
+        <CheckBox
+            android:id="@+id/cb_fen_qi_to_yi_zhi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="分歧转一致"/>
 
-    <CheckBox
-        android:id="@+id/chuang_1_strong"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="创一板强势"/>
+        <CheckBox
+            android:id="@+id/cb_up_10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="10日线攀升"/>
 
-</LinearLayout>
+        <CheckBox
+            android:id="@+id/lian_ban_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="一板"/>
+
+        <CheckBox
+            android:id="@+id/lian_ban_2_strong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="二连板强势"/>
+
+        <CheckBox
+            android:id="@+id/lian_ban_3_strong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="三连板强势"/>
+
+        <CheckBox
+            android:id="@+id/chuang_1_strong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="创一板强势"/>
+
+    </LinearLayout>
+
+</ScrollView>

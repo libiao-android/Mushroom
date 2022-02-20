@@ -2,14 +2,14 @@ package com.libiao.mushroom.mode
 
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.room.ban.BanShareDatabase
-import com.libiao.mushroom.room.ban.two.BanTwoShareInfo
+import com.libiao.mushroom.room.ban.one.BanOneShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
-class LianBan2Mode : BaseMode {
+class LianBan1Mode : BaseMode {
 
     companion object {
-        const val KEY = "LianBan2Mode"
+        const val KEY = "LianBan1Mode"
     }
 
     constructor(): super() {
@@ -17,10 +17,10 @@ class LianBan2Mode : BaseMode {
     constructor(showTime: Boolean): super(showTime) {
     }
 
-    private val poolMap = HashMap<String, BanTwoShareInfo>()
+    private val poolMap = HashMap<String, BanOneShareInfo>()
 
     init {
-        val allShares = BanShareDatabase.getInstance()?.getBanTwoShareDao()?.getAllShares()
+        val allShares = BanShareDatabase.getInstance()?.getBanOneShareDao()?.getAllShares()
         allShares?.forEach {
             //LogUtil.i(TAG, "getMineShares: ${it.code}")
             poolMap[it.code!!] = it
@@ -28,26 +28,26 @@ class LianBan2Mode : BaseMode {
         i(TAG, "init: ${poolMap.size}")
     }
 
+
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 4
+        mDeviationValue = day - 3
         if(mDeviationValue >=  0) {
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
-            val four = shares[mDeviationValue + 3]
 
             if(poolMap.contains(one.code)) {
                 val info = poolMap[one.code]
                 info?.also {
 
-                    if(info.updateTime == four.time) {
+                    if(info.updateTime == three.time) {
                         i(TAG, "重复记录")
                     } else {
                         i(TAG, "更新记录")
-                        it.updateTime = four.time
+                        it.updateTime = three.time
                         it.dayCount = it.dayCount + 1
-                        BanShareDatabase.getInstance()?.getBanTwoShareDao()?.update(it)
+                        BanShareDatabase.getInstance()?.getBanOneShareDao()?.update(it)
                     }
                 }
                 return
@@ -56,20 +56,19 @@ class LianBan2Mode : BaseMode {
             if(!isChuang(one.code)
                 && !zhangTing(one)
                 && zhangTing(two)
-                && zhangTing(three)
-                && !zhangTing(four)
+                && !zhangTing(three)
             ) {
-                i(TAG, "${four.brieflyInfo()}")
-                mFitModeList.add(Pair(four.range, four))
+                i(TAG, "${three.brieflyInfo()}")
+                mFitModeList.add(Pair(three.range, three))
 
-                val info = BanTwoShareInfo()
-                info.time = four.time
-                info.code = four.code
-                info.name = four.name
-                info.dayCount = 4
-                info.updateTime = four.time
+                val info = BanOneShareInfo()
+                info.time = three.time
+                info.code = three.code
+                info.name = three.name
+                info.dayCount = 3
+                info.updateTime = three.time
 
-                val id = BanShareDatabase.getInstance()?.getBanTwoShareDao()?.insert(info)
+                val id = BanShareDatabase.getInstance()?.getBanOneShareDao()?.insert(info)
                 info.id = id?.toInt() ?: 0
                 poolMap[one.code!!] = info
             }
@@ -90,6 +89,6 @@ class LianBan2Mode : BaseMode {
     }
 
     override fun des(): String {
-        return "二连板"
+        return "一板"
     }
 }

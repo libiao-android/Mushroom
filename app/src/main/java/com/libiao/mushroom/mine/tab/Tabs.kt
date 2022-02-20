@@ -6,6 +6,15 @@ class Tabs {
 
     init {
         tabInfos.add(FangLiangTab())
+
+        tabInfos.add(BanOneChuangTab())
+        tabInfos.add(BanTwoChuangTab())
+        tabInfos.add(BanTwoTab())
+        tabInfos.add(BanThreeTab())
+        tabInfos.add(BanFourTab())
+        tabInfos.add(BanFiveTab())
+        tabInfos.add(BanSixTab())
+
         tabInfos.add(Line20Tab())
         tabInfos.add(MineTab())
     }

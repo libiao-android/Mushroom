@@ -164,17 +164,23 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(MoreMore3Mode())
         mModeList.add(Difference2FitMode())
         mModeList.add(UpLine10Mode())
+        mModeList.add(LianBan1Mode())
         mModeList.add(LianBan2Mode())
         mModeList.add(LianBan3Mode())
         mModeList.add(LianBan4Mode())
+        mModeList.add(LianBan5Mode())
+        mModeList.add(LianBan6Mode())
         mModeList.add(LianBanChuang1Mode())
         mModeList.add(LianBanChuang2Mode())
+        mModeList.add(LianBanChuang3Mode())
         mModeList.add(LianBan2StrongMode())
         mModeList.add(LianBan3StrongMode())
         mModeList.add(LianBanChuang1StrongMode())
         mModeList.add(LianBan1StrongMode())
-        mModeList.add(MineMode())
 
+        mModeList.add(MoreMore4Mode())
+
+        mModeList.add(MineMode())
 
         val tempList = ArrayList<BaseMode>()
         mModeList.forEach {

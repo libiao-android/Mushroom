@@ -1,6 +1,8 @@
 package com.libiao.mushroom.mode
 
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.room.ban.BanShareDatabase
+import com.libiao.mushroom.room.ban.three.BanThreeShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
@@ -15,6 +17,17 @@ class LianBan3Mode : BaseMode {
     constructor(showTime: Boolean): super(showTime) {
     }
 
+    private val poolMap = HashMap<String, BanThreeShareInfo>()
+
+    init {
+        val allShares = BanShareDatabase.getInstance()?.getBanThreeShareDao()?.getAllShares()
+        allShares?.forEach {
+            //LogUtil.i(TAG, "getMineShares: ${it.code}")
+            poolMap[it.code!!] = it
+        }
+        i(TAG, "init: ${poolMap.size}")
+    }
+
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = day - 5
@@ -24,6 +37,23 @@ class LianBan3Mode : BaseMode {
             val three = shares[mDeviationValue + 2]
             val four = shares[mDeviationValue + 3]
             val five = shares[mDeviationValue + 4]
+
+            if(poolMap.contains(one.code)) {
+                val info = poolMap[one.code]
+                info?.also {
+
+                    if(info.updateTime == five.time) {
+                        i(TAG, "重复记录")
+                    } else {
+                        i(TAG, "更新记录")
+                        it.updateTime = five.time
+                        it.dayCount = it.dayCount + 1
+                        BanShareDatabase.getInstance()?.getBanThreeShareDao()?.update(it)
+                    }
+                }
+                return
+            }
+
             if(!isChuang(one.code)
                 && !zhangTing(one)
                 && zhangTing(two)
@@ -33,6 +63,17 @@ class LianBan3Mode : BaseMode {
             ) {
                 i(TAG, "${five.brieflyInfo()}")
                 mFitModeList.add(Pair(five.range, five))
+
+                val info = BanThreeShareInfo()
+                info.time = five.time
+                info.code = five.code
+                info.name = five.name
+                info.dayCount = 5
+                info.updateTime = five.time
+
+                val id = BanShareDatabase.getInstance()?.getBanThreeShareDao()?.insert(info)
+                info.id = id?.toInt() ?: 0
+                poolMap[one.code!!] = info
             }
         }
     }
@@ -40,7 +81,14 @@ class LianBan3Mode : BaseMode {
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
-        analysis(mDeviationValue, shares)
+
+        //analysis(mDeviationValue, shares)
+
+        if(Constant.PRE == 0) {
+            analysis(mDeviationValue, shares)
+        } else {
+            i(TAG, "只记录当天")
+        }
     }
 
     override fun des(): String {

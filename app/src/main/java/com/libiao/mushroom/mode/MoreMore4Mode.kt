@@ -1,5 +1,6 @@
 package com.libiao.mushroom.mode
 
+import android.content.Context
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fangliang.FangLiangLabel
 import com.libiao.mushroom.room.FangLiangShareDatabase
@@ -8,10 +9,10 @@ import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
 
-class MoreMore3Mode : BaseMode {
+class MoreMore4Mode : BaseMode {
 
     companion object {
-        const val KEY = "MoreMore3Mode"
+        const val KEY = "MoreMore4Mode"
     }
 
     constructor(): super() {
@@ -32,7 +33,7 @@ class MoreMore3Mode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 15
+        mDeviationValue = day - 14
         if(mDeviationValue >  0) {
 
             val one = shares[mDeviationValue + 0]
@@ -50,23 +51,23 @@ class MoreMore3Mode : BaseMode {
             val ten2 = shares[mDeviationValue + 11]
             val ten3 = shares[mDeviationValue + 12]
             val ten4 = shares[mDeviationValue + 13]
-            val ten5 = shares[mDeviationValue + 14]
 
             if(poolMap.contains(one.code)) {
                 val info = poolMap[one.code]
                 info?.also {
 
-                    if(info.updateTime == ten5.time) {
+                    if(info.updateTime == ten4.time) {
                         i(TAG, "重复记录")
                     } else {
-                        i(TAG, "更新记录")
-                        it.updateTime = ten5.time
-                        it.dayCount = it.dayCount + 1
-                        FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.update(it)
+//                        i(TAG, "更新记录")
+//                        it.updateTime = ten5.time
+//                        it.dayCount = it.dayCount + 1
+//                        FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.update(it)
                     }
                 }
                 return
             }
+
             var max = one.totalPrice
             if(two.totalPrice > max) max = two.totalPrice
             if(three.totalPrice > max) max = three.totalPrice
@@ -78,17 +79,6 @@ class MoreMore3Mode : BaseMode {
             if(nine.totalPrice > max) max = nine.totalPrice
             if(ten.totalPrice > max) max = ten.totalPrice
 
-//            val preAvg = (one.totalPrice
-//                    + two.totalPrice
-//                    + three.totalPrice
-//                    + four.totalPrice
-//                    + five.totalPrice
-//                    + six.totalPrice
-//                    + seven.totalPrice
-//                    + eight.totalPrice
-//                    + nine.totalPrice
-//                    + ten.totalPrice
-//                    ) / 10
             val preAvg = max
 
             val beiShu = 2.0
@@ -99,29 +89,28 @@ class MoreMore3Mode : BaseMode {
             }
 
             if(moreAvg > 0
-                && (ten1.totalPrice > moreAvg || zhangTing(ten1))
+                && (ten1.totalPrice > moreAvg)
                 && (ten2.totalPrice > moreAvg)
                 && ten3.totalPrice > moreAvg
                 && ten4.totalPrice > moreAvg
-                && ten5.totalPrice > moreAvg
             ) {
                 val info = FangLiangShareInfo()
-                info.time = ten5.time
-                info.code = ten5.code
-                info.name = ten5.name
+                info.time = ten4.time
+                info.code = ten4.code
+                info.name = ten4.name
                 info.beginPrice = ten1.beginPrice
                 info.preAvg = preAvg
-                info.dayCount = 15
-                info.updateTime = ten5.time
+                info.dayCount = 14
+                info.updateTime = ten4.time
 
                 if(zhangTing(ten1)) {
                     info.label1 = FangLiangLabel.ZHANG_TING
                 }
 
-                if((ten3.totalPrice > ten4.totalPrice && ten4.totalPrice > ten5.totalPrice)) {
+                if((ten2.totalPrice > ten3.totalPrice && ten3.totalPrice > ten4.totalPrice)) {
                     info.label2 = FangLiangLabel.LESS_PRICE
                 }
-                if(ten5.nowPrice < ten1.beginPrice ) {
+                if(ten4.nowPrice < ten1.beginPrice ) {
                     info.label3 = FangLiangLabel.MORE_BELOW
                 }
                 var redLine = 0
@@ -129,7 +118,6 @@ class MoreMore3Mode : BaseMode {
                 if(ten2.nowPrice >= ten2.beginPrice) redLine++
                 if(ten3.nowPrice >= ten3.beginPrice) redLine++
                 if(ten4.nowPrice >= ten4.beginPrice) redLine++
-                if(ten5.nowPrice >= ten5.beginPrice) redLine++
 
                 if(redLine < 3) {
                     info.label4 = FangLiangLabel.LESS_RED
@@ -141,21 +129,20 @@ class MoreMore3Mode : BaseMode {
                 if(ten2.totalPrice > max) max = ten2.totalPrice
                 if(ten3.totalPrice > max) max = ten3.totalPrice
                 if(ten4.totalPrice > max) max = ten4.totalPrice
-                if(ten5.totalPrice > max) max = ten5.totalPrice
                 if(max == ten1.totalPrice) {
                     info.label5 = FangLiangLabel.FIRST_PRICE
                 }
 
 
-                val id = FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.insert(info)
-                info.id = id?.toInt() ?: 0
-                poolMap[one.code!!] = info
+//                val id = FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.insert(info)
+//                info.id = id?.toInt() ?: 0
+//                poolMap[one.code!!] = info
 
-                i(TAG, "${ten5.brieflyInfo()}, $preAvg")
-                ten5.post1 = "${String.format("%.2f",preAvg / 100000000)}亿"
+                i(TAG, "${ten4.brieflyInfo()}, $preAvg")
+                ten4.post1 = "${String.format("%.2f",preAvg / 100000000)}亿"
                 //ten5.post2 = String.format("%.1f",(ten1.range + ten2.range + ten3.range + ten4.range + ten5.range))
                 //ten5.post2 = baoLiuXiaoShu(liangBi)
-                mFitModeList.add(Pair(ten5.range, ten5))
+                mFitModeList.add(Pair(ten4.range, ten4))
             }
         }
     }
@@ -164,17 +151,21 @@ class MoreMore3Mode : BaseMode {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
 
-        //analysis(mDeviationValue, shares)
+        analysis(mDeviationValue, shares)
 
-        if(Constant.PRE == 0) {
-            analysis(mDeviationValue, shares)
-        } else {
-            i(TAG, "只记录当天")
-        }
+//        if(Constant.PRE == 0) {
+////            analysis(mDeviationValue, shares)
+////        } else {
+////            i(TAG, "只记录当天")
+////        }
     }
 
     override fun des(): String {
-        return "连续五天放量"
+        return "连续四天放量"
+    }
+
+    override fun shouldAnalysis(context: Context): Boolean {
+        return true
     }
 }
 //失败的量能

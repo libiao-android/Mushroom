@@ -1,4 +1,4 @@
-package com.libiao.mushroom.mine.fangliang
+package com.libiao.mushroom.mine.ban
 
 import android.graphics.Color
 import android.os.Environment
@@ -7,8 +7,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
-import com.libiao.mushroom.room.FangLiangShareDatabase
-import com.libiao.mushroom.room.FangLiangShareInfo
+import com.libiao.mushroom.room.ban.BanShareInfo
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
 import java.io.BufferedReader
@@ -17,20 +16,19 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
-class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangState>(initial) {
+class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
 
     companion object {
-        private const val TAG = "FangLiangViewModel"
+        private const val TAG = "BanViewModel"
     }
 
     private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
 
-    var localList = mutableListOf<FangLiangShareInfo>()
+    var localList = mutableListOf<BanShareInfo>()
 
-    fun fetchInfo() {
+    fun fetchInfo(data: MutableList<BanShareInfo>?) {
         withState {
             LogUtil.i(TAG, "fetchInfo")
-            val data = FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.getFangLiangShares()
             data?.forEach {
                 val f = File(file_2021, it.code)
                 if(f.exists()) {
@@ -40,7 +38,10 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
 
                     if(it.candleEntryList == null) {
 
-                        val records = lines.subList(lines.size - it.dayCount, lines.size)
+                        var c = it.dayCount + 9
+                        if(lines.size < c) c = lines.size
+
+                        val records = lines.subList(lines.size - c, lines.size)
                         val candleEntrys = java.util.ArrayList<CandleEntry>()
                         val barEntrys = java.util.ArrayList<BarEntry>()
                         val colorEntrys = java.util.ArrayList<Int>()
@@ -54,14 +55,11 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
 
                             val p = item.totalPrice.toFloat() / 100000000
                             barEntrys.add(BarEntry(index.toFloat(), p))
-                            if(index == 14) {
+                            if(index == c - it.dayCount + it.ban) {
                                 colorEntrys.add(Color.BLACK)
                             } else {
-                                var p = it.preAvg * 2
-                                if(p < 50000000.00) p = 50000000.00
-                                val suoLiang = item.totalPrice < p
-                                val green = if(suoLiang && index > 14) "#6628FF28" else "#28FF28"
-                                val red = if(suoLiang && index > 14) "#66FF0000" else "#FF0000"
+                                val green = "#28FF28"
+                                val red = "#FF0000"
                                 if(item.beginPrice > item.nowPrice) {
                                     colorEntrys.add(Color.parseColor(green))
                                 } else if(item.beginPrice < item.nowPrice) {
@@ -95,9 +93,9 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
         }
     }
 
-    fun deleteItem(item: FangLiangShareInfo) {
+    fun deleteItem(item: BanShareInfo) {
         withState {
-            val list = mutableListOf<FangLiangShareInfo>()
+            val list = mutableListOf<BanShareInfo>()
             list.addAll(it.infoList)
             list.remove(item)
             setState {
@@ -108,36 +106,36 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
 
     fun updateNetWork(baseFragment: BaseFragment) {
         withState {s ->
-            val temp = mutableListOf<FangLiangShareInfo>()
+            val temp = mutableListOf<BanShareInfo>()
             temp.addAll(s.infoList)
             var count = 0
-            temp.forEachIndexed { index, fangLiangShareInfo ->
-                baseFragment.shiShiQuery(fangLiangShareInfo.code!!) {share ->
+            temp.forEachIndexed { index, banShareInfo ->
+                baseFragment.shiShiQuery(banShareInfo.code!!) {share ->
                     LogUtil.i(TAG, "share: ${share}")
                     count ++
 
-                    val fangInfo = fangLiangShareInfo.copy()
+                    val oneInfo = banShareInfo.copy()
 
-                    val candleSize = fangInfo.candleEntryList?.size ?: 0
-                    val lastShare = fangInfo.lastShareInfo
+                    val candleSize = oneInfo.candleEntryList?.size ?: 0
+                    val lastShare = oneInfo.lastShareInfo
 
                     var liangBi = "0"
                     if(share.totalPrice > 0) {
                         liangBi = baoLiuXiaoShu(share.totalPrice / lastShare!!.totalPrice)
                     }
 
-                    fangInfo.lastShareInfo = share
+                    oneInfo.lastShareInfo = share
 
                     if(share.beginPrice == 0.00) {
-                        fangInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat()))
+                        oneInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat()))
                     } else {
-                        fangInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
+                        oneInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
                     }
-                    fangInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi"
+                    oneInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi"
                     val p = share.totalPrice.toFloat() / 100000000
-                    fangInfo.barEntryList?.add(BarEntry(candleSize.toFloat(), p))
-                    fangInfo.colorsList?.add(Color.GRAY)
-                    temp[index] = fangInfo
+                    oneInfo.barEntryList?.add(BarEntry(candleSize.toFloat(), p))
+                    oneInfo.colorsList?.add(Color.GRAY)
+                    temp[index] = oneInfo
 
                     if(count == temp.size) {
                         LogUtil.i(TAG, "setState.......................")

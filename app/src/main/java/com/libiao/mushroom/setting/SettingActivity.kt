@@ -78,6 +78,12 @@ class SettingActivity : AppCompatActivity() {
                 editor?.commit()//提交修改
             }
 
+            lian_ban_1.isChecked = it.getBoolean(LianBan1Mode.KEY, false)
+            lian_ban_1.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan1Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
             lian_ban_2.isChecked = it.getBoolean(LianBan2Mode.KEY, false)
             lian_ban_2.setOnCheckedChangeListener { _, isChecked ->
                 editor?.putBoolean(LianBan2Mode.KEY, isChecked)
@@ -96,6 +102,18 @@ class SettingActivity : AppCompatActivity() {
                 editor?.commit()//提交修改
             }
 
+            lian_ban_5.isChecked = it.getBoolean(LianBan5Mode.KEY, false)
+            lian_ban_5.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan5Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            lian_ban_6.isChecked = it.getBoolean(LianBan6Mode.KEY, false)
+            lian_ban_6.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBan6Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
             chuang_1.isChecked = it.getBoolean(LianBanChuang1Mode.KEY, false)
             chuang_1.setOnCheckedChangeListener { _, isChecked ->
                 editor?.putBoolean(LianBanChuang1Mode.KEY, isChecked)
@@ -105,6 +123,12 @@ class SettingActivity : AppCompatActivity() {
             chuang_2.isChecked = it.getBoolean(LianBanChuang2Mode.KEY, false)
             chuang_2.setOnCheckedChangeListener { _, isChecked ->
                 editor?.putBoolean(LianBanChuang2Mode.KEY, isChecked)
+                editor?.commit()//提交修改
+            }
+
+            chuang_3.isChecked = it.getBoolean(LianBanChuang3Mode.KEY, false)
+            chuang_3.setOnCheckedChangeListener { _, isChecked ->
+                editor?.putBoolean(LianBanChuang3Mode.KEY, isChecked)
                 editor?.commit()//提交修改
             }
 

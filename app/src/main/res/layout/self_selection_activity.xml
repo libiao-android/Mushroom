@@ -46,13 +46,18 @@
 
     </RelativeLayout>
 
-    <LinearLayout
-        android:id="@+id/self_tab_layout"
-        android:gravity="bottom"
-        android:orientation="horizontal"
+    <HorizontalScrollView
+        android:overScrollMode="never"
+        android:scrollbars="none"
         android:layout_width="match_parent"
-        android:layout_height="30dp"/>
-
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/self_tab_layout"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"/>
+    </HorizontalScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"

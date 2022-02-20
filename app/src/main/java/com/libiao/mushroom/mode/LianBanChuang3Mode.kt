@@ -2,14 +2,15 @@ package com.libiao.mushroom.mode
 
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.room.ban.BanShareDatabase
-import com.libiao.mushroom.room.ban.two.BanTwoShareInfo
+import com.libiao.mushroom.room.ban.six.BanSixShareInfo
+import com.libiao.mushroom.room.ban.twochuang.BanTwoChuangShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
-class LianBan2Mode : BaseMode {
+class LianBanChuang3Mode : BaseMode {
 
     companion object {
-        const val KEY = "LianBan2Mode"
+        const val KEY = "LianBanChuang3Mode"
     }
 
     constructor(): super() {
@@ -17,10 +18,10 @@ class LianBan2Mode : BaseMode {
     constructor(showTime: Boolean): super(showTime) {
     }
 
-    private val poolMap = HashMap<String, BanTwoShareInfo>()
+    private val poolMap = HashMap<String, BanSixShareInfo>()
 
     init {
-        val allShares = BanShareDatabase.getInstance()?.getBanTwoShareDao()?.getAllShares()
+        val allShares = BanShareDatabase.getInstance()?.getBanSixShareDao()?.getAllShares()
         allShares?.forEach {
             //LogUtil.i(TAG, "getMineShares: ${it.code}")
             poolMap[it.code!!] = it
@@ -47,29 +48,29 @@ class LianBan2Mode : BaseMode {
                         i(TAG, "更新记录")
                         it.updateTime = four.time
                         it.dayCount = it.dayCount + 1
-                        BanShareDatabase.getInstance()?.getBanTwoShareDao()?.update(it)
+                        BanShareDatabase.getInstance()?.getBanSixShareDao()?.update(it)
                     }
                 }
                 return
             }
 
-            if(!isChuang(one.code)
+            if(isChuang(one.code)
                 && !zhangTing(one)
                 && zhangTing(two)
                 && zhangTing(three)
-                && !zhangTing(four)
+                && zhangTing(four)
             ) {
                 i(TAG, "${four.brieflyInfo()}")
                 mFitModeList.add(Pair(four.range, four))
 
-                val info = BanTwoShareInfo()
+                val info = BanSixShareInfo()
                 info.time = four.time
                 info.code = four.code
                 info.name = four.name
                 info.dayCount = 4
                 info.updateTime = four.time
 
-                val id = BanShareDatabase.getInstance()?.getBanTwoShareDao()?.insert(info)
+                val id = BanShareDatabase.getInstance()?.getBanSixShareDao()?.insert(info)
                 info.id = id?.toInt() ?: 0
                 poolMap[one.code!!] = info
             }
@@ -90,6 +91,6 @@ class LianBan2Mode : BaseMode {
     }
 
     override fun des(): String {
-        return "二连板"
+        return "创业板三连板及以上"
     }
 }
