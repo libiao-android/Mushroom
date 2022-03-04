@@ -36,6 +36,8 @@ class SelfSelectionActivity : BaseActivity() {
 
     private var mScrollPosition = 0
 
+    private val tabs = Tabs()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.self_selection_activity)
@@ -64,7 +66,6 @@ class SelfSelectionActivity : BaseActivity() {
     }
 
     private fun initView() {
-        val tabs = Tabs()
         mViewPageAdapter = SelfViewPagerAdapter(tabs, supportFragmentManager, lifecycle)
         self_view_pager.adapter = mViewPageAdapter
         self_view_pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -226,5 +227,12 @@ class SelfSelectionActivity : BaseActivity() {
 
     }
 
+    fun onItemClick(tabItem: TabItem) {
+        val position = tabs.position(tabItem)
+        LogUtil.i(TAG, "onItemClick: ${tabItem.name()}, $position")
+        currentTab?.scale(Constant.ORIGIN, 0f)
+        self_view_pager.setCurrentItem(position, false)
+        tabItem.scale(Constant.ORIGIN, 1f)
+    }
 
 }

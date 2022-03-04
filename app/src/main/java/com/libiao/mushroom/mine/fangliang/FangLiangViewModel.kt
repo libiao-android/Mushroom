@@ -157,4 +157,21 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
             }
         }
     }
+
+    fun expand(time: String) {
+        withState {
+            val list = mutableListOf<FangLiangShareInfo>()
+            list.addAll(it.infoList)
+            list.forEachIndexed {index, info ->
+                val temp = info.copy()
+                if(temp.time == time) {
+                    temp.expand = !temp.expand
+                }
+                list[index] = temp
+            }
+            setState {
+                it.copy(infoList = list)
+            }
+        }
+    }
 }

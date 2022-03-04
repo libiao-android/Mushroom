@@ -13,4 +13,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <ImageView
+        android:src="@mipmap/icon_green_arrow_up"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:id="@+id/iv_time_expand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"/>
+
 </com.libiao.mushroom.mine.TimeItemView>

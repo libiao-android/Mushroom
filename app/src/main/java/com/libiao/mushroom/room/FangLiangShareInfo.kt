@@ -41,6 +41,9 @@ data class FangLiangShareInfo(
     var moreInfo: String? = null,
 
     @Ignore
+    var expand: Boolean = true,
+
+    @Ignore
     var candleEntryList: ArrayList<CandleEntry>? = null,
     @Ignore
     var barEntryList: ArrayList<BarEntry>? = null,
@@ -83,6 +86,9 @@ data class FangLiangShareInfo(
         info.ext3 = this.ext3
         info.ext4 = this.ext4
         info.ext5 = this.ext5
+
+        info.expand = this.expand
+        info.moreInfo = this.moreInfo
 
 
         candleEntryList?.also {

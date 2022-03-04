@@ -128,34 +128,40 @@ class BanFiveFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView
                     timeItemView {
                         id(time)
                         time(it.time)
-                    }
-                }
-                banItemView {
-                    id(it.id)
-                    data(it)
-                    click {view ->
-                        val id = view.id
-                        when(id) {
-                            R.id.ban_item_code -> {
-                                ClipboardUtil.clip(context!!, it.code)
-                            }
-                            else -> {
-                                val intent = Intent(context, KLineActivity::class.java)
-                                intent.putExtra("code", it.code)
-                                intent.putExtra("info", it.toString())
-                                context?.startActivity(intent)
-                            }
+                        expand(it.expand)
+                        click {v ->
+                            fiveBanViewModel.expand(it.time!!)
                         }
                     }
-                    longClick {view ->
-                        MoreDialog(context!!){view2 ->
-                            when(view2.id) {
-                                R.id.btn_dialog_delete -> {
-                                    BanShareDatabase.getInstance()?.getBanFiveShareDao()?.delete(it.code!!)
-                                    fiveBanViewModel.deleteItem(it)
+                }
+                if(it.expand) {
+                    banItemView {
+                        id(it.id)
+                        data(it)
+                        click {view ->
+                            val id = view.id
+                            when(id) {
+                                R.id.ban_item_code -> {
+                                    ClipboardUtil.clip(context!!, it.code)
+                                }
+                                else -> {
+                                    val intent = Intent(context, KLineActivity::class.java)
+                                    intent.putExtra("code", it.code)
+                                    intent.putExtra("info", it.toString())
+                                    context?.startActivity(intent)
                                 }
                             }
-                        }.show()
+                        }
+                        longClick {view ->
+                            MoreDialog(context!!){view2 ->
+                                when(view2.id) {
+                                    R.id.btn_dialog_delete -> {
+                                        BanShareDatabase.getInstance()?.getBanFiveShareDao()?.delete(it.code!!)
+                                        fiveBanViewModel.deleteItem(it)
+                                    }
+                                }
+                            }.show()
+                        }
                     }
                 }
             }

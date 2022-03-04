@@ -33,6 +33,8 @@ open class BanShareInfo(
     var ext5: String? = null,
     @Ignore
     var moreInfo: String? = null,
+    @Ignore
+    var expand: Boolean = true,
 
     @Ignore
     var candleEntryList: ArrayList<CandleEntry>? = null,
@@ -78,6 +80,7 @@ open class BanShareInfo(
         info.ext5 = this.ext5
 
         info.ban = this.ban
+        info.expand = this.expand
 
 
         candleEntryList?.also {
@@ -115,6 +118,7 @@ open class BanShareInfo(
             if(other.candleEntryList?.size != this.candleEntryList?.size) {
                 return false
             }
+            if(other.expand != this.expand) return false
             return other.code == this.code
         }
         return false

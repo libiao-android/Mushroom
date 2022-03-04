@@ -114,34 +114,40 @@ class FangLiangFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksVi
                     timeItemView {
                         id(time)
                         time(it.time)
-                    }
-                }
-                fangLiangItemView {
-                    id(it.id)
-                    data(it)
-                    click {view ->
-                        val id = view.id
-                        when(id) {
-                            R.id.fl_item_code -> {
-                                ClipboardUtil.clip(context!!, it.code)
-                            }
-                            else -> {
-                                val intent = Intent(context, KLineActivity::class.java)
-                                intent.putExtra("code", it.code)
-                                intent.putExtra("info", it.toString())
-                                context?.startActivity(intent)
-                            }
+                        expand(it.expand)
+                        click {v ->
+                            fangLiangViewModel.expand(it.time!!)
                         }
                     }
-                    longClick {view ->
-                        MoreDialog(context!!){view2 ->
-                            when(view2.id) {
-                                R.id.btn_dialog_delete -> {
-                                    FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.delete(it.code!!)
-                                    fangLiangViewModel.deleteItem(it)
+                }
+                if(it.expand) {
+                    fangLiangItemView {
+                        id(it.id)
+                        data(it)
+                        click {view ->
+                            val id = view.id
+                            when(id) {
+                                R.id.fl_item_code -> {
+                                    ClipboardUtil.clip(context!!, it.code)
+                                }
+                                else -> {
+                                    val intent = Intent(context, KLineActivity::class.java)
+                                    intent.putExtra("code", it.code)
+                                    intent.putExtra("info", it.toString())
+                                    context?.startActivity(intent)
                                 }
                             }
-                        }.show()
+                        }
+                        longClick {view ->
+                            MoreDialog(context!!){view2 ->
+                                when(view2.id) {
+                                    R.id.btn_dialog_delete -> {
+                                        FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.delete(it.code!!)
+                                        fangLiangViewModel.deleteItem(it)
+                                    }
+                                }
+                            }.show()
+                        }
                     }
                 }
             }

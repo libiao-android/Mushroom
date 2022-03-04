@@ -317,11 +317,17 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         ) {
                             it.zhiDie = true
                         }
-                        if(share.beginPrice >= share.nowPrice
-                            && share_pre.beginPrice > share_pre.nowPrice
-                            && share_pre2.beginPrice > share_pre2.nowPrice
+                        val ten1 = share
+                        val ten2 = share_pre
+                        if(ten1.nowPrice > ten1.beginPrice
+                            && ten1.totalPrice > ten2.totalPrice
                         ) {
-                            it.sanLianYin = true
+                            val d1 = ten1.rangeMax - ten1.range
+                            val d2 = ten1.range - ten1.rangeBegin
+                            val d3 = ten1.rangeBegin - ten1.rangeMin
+                            if(d1 > d2 && d1 > d3) {
+                                it.sanLianYin = true
+                            }
                         }
                     }
 

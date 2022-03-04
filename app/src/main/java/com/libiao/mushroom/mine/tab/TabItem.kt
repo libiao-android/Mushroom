@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.libiao.mushroom.mine.SelfSelectionActivity
 import com.libiao.mushroom.utils.Constant
 
 abstract class TabItem {
@@ -20,6 +21,11 @@ abstract class TabItem {
             tv?.text = name()
             tv?.setTextSize(TypedValue.COMPLEX_UNIT_PX, Constant.ORIGIN)
             tv?.setTextColor(Color.BLACK)
+            tv?.setOnClickListener {
+                if(context is SelfSelectionActivity) {
+                    context.onItemClick(this)
+                }
+            }
         }
         return tv!!
     }
