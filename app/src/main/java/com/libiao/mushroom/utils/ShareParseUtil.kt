@@ -78,5 +78,15 @@ class ShareParseUtil {
             dieTing = String.format("%.2f",dieTing).toDouble()
             return info.nowPrice > 0 && info.nowPrice == dieTing
         }
+
+        fun zhangTing(info: SharesRecordActivity.ShareInfo): Boolean {
+            var maxRange = 1.1
+            if(info.code?.startsWith("sz3") == true) {
+                maxRange = 1.2
+            }
+            var zhangTingPrice = info.yesterdayPrice * maxRange - 0.05
+            zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
+            return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0
+        }
     }
 }

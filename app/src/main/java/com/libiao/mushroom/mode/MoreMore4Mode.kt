@@ -165,7 +165,7 @@ class MoreMore4Mode : BaseMode {
     }
 
     override fun shouldAnalysis(context: Context): Boolean {
-        return true
+        return false
     }
 }
 //失败的量能

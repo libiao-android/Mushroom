@@ -299,36 +299,65 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     it.price = one.nowPrice
                     val info = lines.get(lines.size - 1)
                     val info_pre = lines.get(lines.size - 2)
+
                     val share = SharesRecordActivity.ShareInfo(info)
                     it.shareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
                     if(it.dayCount >= 2) {
-                        val info_pre2 = lines.get(lines.size - 3)
-                        val share_pre2 = SharesRecordActivity.ShareInfo(info_pre2)
 
-                        val one = share
-                        val two = share_pre
+                        val ten1 = share
+                        val ten2 = share_pre
 
-                        if(one.maxPrice < two.maxPrice
-                            && one.minPrice > two.minPrice
-                            && !ShareParseUtil.dieTing(one)
-                            && one.beginPrice >= one.nowPrice
-                            && two.beginPrice >= two.nowPrice
+                        if(ten1.maxPrice < ten2.maxPrice
+                            && ten1.minPrice > ten2.minPrice
+                            && !ShareParseUtil.dieTing(ten1)
+                            && ten1.beginPrice >= ten1.nowPrice
+                            && ten2.beginPrice >= ten2.nowPrice
                         ) {
                             it.zhiDie = true
                         }
-                        val ten1 = share
-                        val ten2 = share_pre
-                        if(ten1.nowPrice > ten1.beginPrice
-                            && ten1.totalPrice > ten2.totalPrice
-                        ) {
-                            val d1 = ten1.rangeMax - ten1.range
-                            val d2 = ten1.range - ten1.rangeBegin
-                            val d3 = ten1.rangeBegin - ten1.rangeMin
-                            if(d1 > d2 && d1 > d3) {
-                                it.sanLianYin = true
+
+                        //智能选择
+                        it.sanLianYin = false
+                        it.tips = ""
+                        if(ten1.nowPrice >= ten1.beginPrice && ten2.nowPrice >= ten2.beginPrice) {
+                            //双阳
+                            if(!ShareParseUtil.zhangTing(ten1) && !ShareParseUtil.zhangTing(ten2)) {
+                                if(ten1.totalPrice >= ten2.totalPrice && ten1.range > 0 || ten1.totalPrice < ten2.totalPrice && ten1.range < 0) {
+                                    it.sanLianYin = true
+                                    it.tips += "双阳 "
+                                }
                             }
                         }
+
+                        if(lines.size >= 3) {
+                            //放量收阳止跌
+                            val info_pre2 = lines.get(lines.size - 3)
+                            val share_pre2 = SharesRecordActivity.ShareInfo(info_pre2)
+                            val ten3 = share_pre2
+                            if(ten1.nowPrice >= ten1.beginPrice && ten2.beginPrice >= ten2.nowPrice && ten1.totalPrice > ten2.totalPrice * 1.3) {
+                                if(!ShareParseUtil.zhangTing(ten1) && !ShareParseUtil.zhangTing(ten2)) {
+                                    if(ten3.beginPrice >= ten3.nowPrice) {
+                                        it.sanLianYin = true
+                                        it.tips += "放量止跌收阳 "
+                                    }
+                                }
+                            }
+                            if(lines.size >= 4) {
+                                val info_pre3 = lines.get(lines.size - 4)
+                                val share_pre3 = SharesRecordActivity.ShareInfo(info_pre3)
+                                val ten4 = share_pre3
+                                // 缩量回调
+                                if(ten4.nowPrice > ten4.beginPrice && ten3.nowPrice > ten3.beginPrice && ten2.beginPrice >= ten2.nowPrice && ten1.beginPrice >= ten1.nowPrice) {
+                                    if(ten3.totalPrice > ten2.totalPrice && ten2.totalPrice > ten1.totalPrice) {
+                                        it.sanLianYin = true
+                                        it.tips += "缩量回调 "
+                                    }
+                                }
+                            }
+
+                        }
+
                     }
 
                     updateCurrentData(it, share, share_pre)

@@ -62,6 +62,8 @@ class MineShareInfo {
     @Ignore
     var sanLianYin: Boolean = false //三连阴
     @Ignore
+    var tips: String = ""
+    @Ignore
     var maxRange: Double = 0.00
     @Ignore
     var zhiDie: Boolean = false

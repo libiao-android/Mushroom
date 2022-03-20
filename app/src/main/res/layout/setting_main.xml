@@ -46,6 +46,12 @@
             android:text="放量5天"/>
 
         <CheckBox
+            android:id="@+id/lian_ban_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="一板"/>
+
+        <CheckBox
             android:id="@+id/lian_ban_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,11 +132,6 @@
             android:layout_height="wrap_content"
             android:text="10日线攀升"/>
 
-        <CheckBox
-            android:id="@+id/lian_ban_1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="一板"/>
 
         <CheckBox
             android:id="@+id/lian_ban_2_strong"

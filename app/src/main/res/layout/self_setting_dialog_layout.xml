@@ -226,7 +226,7 @@
             android:id="@+id/dialog_cb_san_lian_yin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="上引线"/>
+            android:text="智能选"/>
 
         <CheckBox
             android:scaleX="0.8"

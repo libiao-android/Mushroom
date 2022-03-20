@@ -123,7 +123,7 @@ abstract class BaseMode {
         if(info.code?.startsWith("sz3") == true) {
             maxRange = 1.2
         }
-        var zhangTingPrice = info.yesterdayPrice * maxRange
+        var zhangTingPrice = info.yesterdayPrice * maxRange - 0.05
         zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
         return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0
     }
