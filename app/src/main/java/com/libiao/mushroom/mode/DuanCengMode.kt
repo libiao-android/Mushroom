@@ -29,7 +29,7 @@ class DuanCengMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 5
+        mDeviationValue = day - 6
         if(mDeviationValue >  0) {
 
             val one = shares[mDeviationValue + 0]
@@ -37,17 +37,18 @@ class DuanCengMode : BaseMode {
             val three = shares[mDeviationValue + 2]
             val four = shares[mDeviationValue + 3]
             val five = shares[mDeviationValue + 4]
+            val six = shares[mDeviationValue + 5]
 
 
             if(poolMap.contains(one.code)) {
                 val info = poolMap[one.code]
                 info?.also {
 
-                    if(info.updateTime == five.time) {
+                    if(info.updateTime == six.time) {
                         i(TAG, "重复记录")
                     } else {
                         i(TAG, "更新记录")
-                        it.updateTime = five.time
+                        it.updateTime = six.time
                         it.dayCount = it.dayCount + 1
                         TestShareDatabase.getInstance()?.getTestShareDao()?.update(it)
                     }
@@ -57,25 +58,27 @@ class DuanCengMode : BaseMode {
 
             if(two.range > 0 && two.nowPrice > two.beginPrice) {
                 if(three.range > 0 && three.nowPrice > three.beginPrice) {
-                    if(two.totalPrice > one.totalPrice * 1.5 && three.totalPrice > one.totalPrice * 1.5 && two.totalPrice > three.totalPrice) {
+                    if(two.totalPrice > one.totalPrice * 1.5 && three.totalPrice > one.totalPrice * 1.5) {
                         if(four.beginPrice > four.nowPrice && five.beginPrice > five.nowPrice) {
                             if(four.totalPrice * 1.5 < three.totalPrice) {
                                 if(four.totalPrice > five.totalPrice) {
-                                    if(!zhangTing(one) && !zhangTing(two) && !zhangTing(three)) {
-                                        i(TAG, "${five.brieflyInfo()}")
-                                        mFitModeList.add(Pair(five.range, three))
+                                    if(!zhangTing(one) && !zhangTing(three)) {
+                                        if(six.nowPrice > six.beginPrice) {
+                                            i(TAG, "${six.brieflyInfo()}")
+                                            mFitModeList.add(Pair(six.range, six))
 
 
-                                        val info = TestShareInfo()
-                                        info.time = five.time
-                                        info.code = five.code
-                                        info.name = five.name
-                                        info.dayCount = 5
-                                        info.updateTime = five.time
+                                            val info = TestShareInfo()
+                                            info.time = six.time
+                                            info.code = six.code
+                                            info.name = six.name
+                                            info.dayCount = 6
+                                            info.updateTime = six.time
 
-                                        val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
-                                        info.id = id?.toInt() ?: 0
-                                        poolMap[one.code!!] = info
+                                            val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
+                                            info.id = id?.toInt() ?: 0
+                                            poolMap[one.code!!] = info
+                                        }
                                     }
                                 }
                             }

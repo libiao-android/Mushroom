@@ -7,12 +7,13 @@ class Tabs {
     init {
 
         tabInfos.add(Line20Tab())
+        tabInfos.add(Up50Tab())
 
-        tabInfos.add(TestTab())
+        //tabInfos.add(TestTab())
 
         tabInfos.add(FangLiangTab())
 
-        tabInfos.add(BanOneTab())
+        //tabInfos.add(BanOneTab())
 
         tabInfos.add(BanOneChuangTab())
         tabInfos.add(BanTwoChuangTab())

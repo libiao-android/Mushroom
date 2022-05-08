@@ -150,6 +150,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
 
         mModeList.add(DuanCengMode())
+        mModeList.add(TestMode())
 
         //mModeList.add(ChuangYeBanTouJiMode())
         //        mModeList.add(StrongStock10Mode())

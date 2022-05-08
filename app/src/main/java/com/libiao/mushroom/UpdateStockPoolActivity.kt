@@ -18,8 +18,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
 import java.lang.Exception
-import java.lang.StringBuilder
 import java.nio.charset.Charset
+import kotlin.text.StringBuilder
 
 class UpdateStockPoolActivity : AppCompatActivity() {
 
@@ -110,37 +110,47 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             //深圳股票sz000，sz001，sz002，sz003
             for(i in 1 .. 3999) {
                 val code = CodeUtil.getSzCode(i)
-                // Log.i("libiao", "$code")
+                if(i % 100 == 0) {
+                    i(TAG, "sz00, $i, $code")
+                }
                 queryInfo(code)
             }
-            Log.i("libiao", "进度：40%")
+            i(TAG, "进度：40%")
             mHandler.post { progressTv?.text = "40%, $count" }
             //上海股票 sh600，sh601，sh603，sh605
             for(i in 0 .. 1999) {
                 val code = CodeUtil.getShCode(i)
-                //Log.i("libiao", "$code")
+                if(i % 100 == 0) {
+                    i(TAG, "sh60, $i, $code")
+                }
                 queryInfo(code)
             }
-            Log.i("libiao", "进度：60%")
+            i(TAG, "进度：60%")
             mHandler.post { progressTv?.text = "60%, $count" }
             for(i in 3000 .. 3999) {
                 val code = CodeUtil.getShCode(i)
-                // Log.i("libiao", "$code")
+                if(i % 100 == 0) {
+                    i(TAG, "sh603, $i, $code")
+                }
                 queryInfo(code)
             }
-            Log.i("libiao", "进度：80%")
+            i(TAG, "进度：80%")
             mHandler.post { progressTv?.text = "80%, $count" }
             for(i in 5001 .. 5999) {
                 val code = CodeUtil.getShCode(i)
-                // Log.i("libiao", "$code")
+                if(i % 100 == 0) {
+                    i(TAG, "sh605, $i, $code")
+                }
                 queryInfo(code)
             }
-            Log.i("libiao", "进度：90%")
+            i(TAG, "进度：90%")
             mHandler.post { progressTv?.text = "90%, $count" }
             //创业板股票 sz300
             for(i in 1 .. 1500) {
                 val code = CodeUtil.getCyCode(i)
-                //Log.i("libiao", code)
+                if(i % 100 == 0) {
+                    i(TAG, "sz300, $i, $code")
+                }
                 queryInfo(code)
             }
             mHandler.post { progressTv?.text = "100%, $count" }
@@ -152,7 +162,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 //                queryInfo(code)
 //            }
             val totalTime = System.currentTimeMillis() - startTime
-            Log.i("libiao", "结束查询: $count, totalTime: $totalTime")
+            i(TAG, "结束查询: $count, totalTime: ${totalTime/(1000*60)}")
 
             val infos = sb.toString()
             sb.clear()
@@ -177,7 +187,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
     private fun initData(code: String) {
 
         val request = Request.Builder()
-            .url("https://hq.sinajs.cn/list=$code")
+            .url("https://qt.gtimg.cn/q=$code")
             .build()
 
         val call = client.newCall(request)
@@ -189,7 +199,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call?, response: Response?) {
                 val value = response?.body()?.string()
-                //Log.i("libiao", "response: ${value}")
+                Log.i("libiao", "response: ${value}")
                 mHandler.post {
                     try {
                         if (value != null && value.length > 50) {
@@ -208,16 +218,29 @@ class UpdateStockPoolActivity : AppCompatActivity() {
     private fun parseSharesInfo(response: String?) {
         response?.also {
 
-            val leftRight = it.split("=")
-            if (leftRight.size < 2) return
-            val info = leftRight[0].split("_")
-            val code = info[info.size - 1]
-            val params = leftRight[1].split(",")
-            val name = params[0].substring(1)
-            val time = params[30]
-            val statusP = params[32]
-            val status = statusP.substring(0, 2)
-            set.add(status)
+
+
+            val leftRight = it.split("~")
+            if (leftRight.size > 2) {
+                val name = leftRight[1]
+                val code = leftRight[0].substring(2, 10)
+                //i(TAG, "$name, $code")
+                sb.append("$code, $name\n")
+                count++
+                if(count % 400 == 0) {
+                    val infos = sb.toString()
+                    sb.clear()
+                    writeFileAppend(infos)
+                }
+            }
+//            val info = leftRight[0].split("_")
+//            val code = info[info.size - 1]
+//            val params = leftRight[1].split(",")
+//            val name = params[0].substring(1)
+//            val time = params[30]
+//            val statusP = params[32]
+//            val status = statusP.substring(0, 2)
+//            set.add(status)
             //i(TAG, "status: $status")
 //            if(status == "-3" || status == "-2" || status == "03") {
 //                i(TAG, "$it")
@@ -226,24 +249,24 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 //                i(TAG, "$it")
 //            }
             //Log.i("libiao", "code: $code, name: $name, price: $price")
-            if(code == "sz000001") {
-                latelyTime = time
-            }
-            if(time == latelyTime && status != "-3" && status != "-2") {
-                if(code.startsWith("sh") && status == "03") {
-                    i(TAG, " 抛弃sh开头 code: $code, time: $time, status: $status")
-                } else {
-                    sb.append("$code, $name\n")
-                    count++
-                    if(count % 400 == 0) {
-                        val infos = sb.toString()
-                        sb.clear()
-                        writeFileAppend(infos)
-                    }
-                }
-            } else {
-                i(TAG, " 抛弃 code: $code, time: $time, status: $status")
-            }
+//            if(code == "sz000001") {
+//                latelyTime = time
+//            }
+//            if(time == latelyTime && status != "-3" && status != "-2") {
+//                if(code.startsWith("sh") && status == "03") {
+//                    i(TAG, " 抛弃sh开头 code: $code, time: $time, status: $status")
+//                } else {
+//                    sb.append("$code, $name\n")
+//                    count++
+//                    if(count % 400 == 0) {
+//                        val infos = sb.toString()
+//                        sb.clear()
+//                        writeFileAppend(infos)
+//                    }
+//                }
+//            } else {
+//                i(TAG, " 抛弃 code: $code, time: $time, status: $status")
+//            }
         }
     }
 
@@ -305,11 +328,97 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //getHistoryData("sz300999", "瑞玛工业")
     }
 
+    private var isDeleteTuiShiDoing = false
+    private val codes = arrayListOf<String>()
+    fun deleteTuiShi(v: View) {
+        i(TAG, "isDeleteTuiShiDoing: $isDeleteTuiShiDoing")
+        if(isDeleteTuiShiDoing) return
+        isDeleteTuiShiDoing = true
+
+        Thread{
+
+            val stream = FileInputStream(File(fileNew, "stock_pool"))
+            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+            var str: String?
+            str = reader.readLine()
+            var count = 0
+            while (str != null) {
+                count++
+                if(count % 100 == 0) {
+                    //i(TAG, "str: $str, $count")
+                }
+                val a = str.split(",")
+
+                deleteTuiShiData(a[0].trim(), a[1].trim())
+                Thread.sleep(100)
+
+                str = reader.readLine()
+            }
+            isDeleteTuiShiDoing = false
+            i(TAG, "deleteTuiShi end")
+            i(TAG, "3s后开始重新写入：${codes.size}")
+            mHandler.postDelayed({
+                stockPoolFile = File(fileNew, "stock_pool")
+                stockPoolFile?.also {
+                    it.delete()
+                    it.createNewFile()
+                }
+                val sb = StringBuilder()
+                codes.forEach {
+                    sb.append("$it\n")
+                }
+                writeFileAppend(sb.toString())
+                i(TAG, "重新写入完成")
+            }, 3000)
+        }.start()
+
+    }
+    private fun deleteTuiShiData(code: String, name: String) {
+        i(TAG, "deleteTuiShiData: $code, $name")
+        //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
+        val request = Request.Builder()
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20220508")
+            .build()
+
+        val call = client.newCall(request)
+
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call?, e: IOException?) {
+                i(TAG, "onFailure: ${e}")
+            }
+
+            override fun onResponse(call: Call?, response: Response?) {
+                val value = response?.body()?.string()
+                //Log.i("libiao", "response: ${value}")
+                try {
+                    if (value != null && value.length > 100) {
+                        mHandler.post {
+                            codes.add("$code, $name")
+                        }
+                    } else {
+                        i(TAG, "getHistoryData exception value: ${value}, $code, $name")
+                        val f = File(fileNew_2021, code)
+                        if(f.exists()) {
+                            f.delete()
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    i(TAG, "getHistoryData exception: ${e.message}, $code, $name")
+                    val f = File(fileNew_2021, code)
+                    if(f.exists()) {
+                        f.delete()
+                    }
+                }
+            }
+        })
+    }
+
     private fun getHistoryData(code: String, name: String) {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20210901&end=20211231")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20220508")
             .build()
 
         val call = client.newCall(request)
@@ -327,10 +436,19 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                         parseHistoryInfo(value, code, name)
                     } else {
                         i(TAG, "getHistoryData exception value: ${value}, $code, $name")
+                        val f = File(fileNew_2021, code)
+                        if(f.exists()) {
+                            f.delete()
+                        }
+
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     i(TAG, "getHistoryData exception: ${e.message}, $code, $name")
+                    val f = File(fileNew_2021, code)
+                    if(f.exists()) {
+                        f.delete()
+                    }
                 }
             }
         })

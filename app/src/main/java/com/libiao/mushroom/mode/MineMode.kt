@@ -42,7 +42,7 @@ class MineMode : BaseMode {
             val one = shares[mDeviationValue + 1]
             if(poolMap.contains(one.code)) {
                 i(TAG, "contains: ${one.code}")
-                if(one.nowPrice < one.line_20) {
+                if(one.nowPrice < one.line_10) {
                     i(TAG, "delete: ${one.code}")
                     MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
                     poolMap.remove(one.code)
@@ -62,7 +62,7 @@ class MineMode : BaseMode {
                     }
                 }
             } else {
-                if(zhangTing(one) && one.nowPrice >= one.line_20) {
+                if(zhangTing(one) && one.nowPrice >= one.line_10) {
                     val info = MineShareInfo()
                     info.time = one.time
                     info.code = one.code

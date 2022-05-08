@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_bg"
+    android:layout_width="250dp"
+    android:paddingLeft="20dp"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:id="@+id/setting_view_time"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="30dp">
+        <CheckBox
+            android:paddingLeft="5dp"
+            android:scaleX="0.8"
+            android:scaleY="0.8"
+            android:textColor="@color/blank"
+            android:textSize="15dp"
+            android:id="@+id/dialog_cb_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="第3天红"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_below="@+id/setting_view_time"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <Button
+            android:id="@+id/setting_btn_cancel"
+            android:textSize="12dp"
+            android:layout_marginLeft="35dp"
+            android:layout_centerVertical="true"
+            android:text="取消"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"/>
+        <Button
+            android:id="@+id/setting_btn_sure"
+            android:textSize="12dp"
+            android:layout_marginRight="55dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:text="确定"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"/>
+    </RelativeLayout>
+
+</RelativeLayout>

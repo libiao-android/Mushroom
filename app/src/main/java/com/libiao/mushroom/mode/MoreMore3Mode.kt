@@ -78,24 +78,24 @@ class MoreMore3Mode : BaseMode {
             if(nine.totalPrice > max) max = nine.totalPrice
             if(ten.totalPrice > max) max = ten.totalPrice
 
-//            val preAvg = (one.totalPrice
-//                    + two.totalPrice
-//                    + three.totalPrice
-//                    + four.totalPrice
-//                    + five.totalPrice
-//                    + six.totalPrice
-//                    + seven.totalPrice
-//                    + eight.totalPrice
-//                    + nine.totalPrice
-//                    + ten.totalPrice
-//                    ) / 10
-            val preAvg = max
+            val preAvg = (one.totalPrice
+                    + two.totalPrice
+                    + three.totalPrice
+                    + four.totalPrice
+                    + five.totalPrice
+                    + six.totalPrice
+                    + seven.totalPrice
+                    + eight.totalPrice
+                    + nine.totalPrice
+                    + ten.totalPrice
+                    ) / 10
+            //val preAvg = max
 
-            val beiShu = 2.0
+            val beiShu = 2.9
 
             var moreAvg = preAvg * beiShu
-            if(moreAvg < 50000000.00) {
-                moreAvg = 50000000.00
+            if(moreAvg < 100000000.00) {
+                moreAvg = 100000000.00
             }
 
             if(moreAvg > 0
@@ -120,9 +120,11 @@ class MoreMore3Mode : BaseMode {
 
                 if((ten3.totalPrice > ten4.totalPrice && ten4.totalPrice > ten5.totalPrice)) {
                     info.label2 = FangLiangLabel.LESS_PRICE
+                    return
                 }
                 if(ten5.nowPrice < ten1.beginPrice ) {
                     info.label3 = FangLiangLabel.MORE_BELOW
+                    return
                 }
                 var redLine = 0
                 if(ten1.nowPrice >= ten1.beginPrice) redLine++
@@ -133,6 +135,7 @@ class MoreMore3Mode : BaseMode {
 
                 if(redLine < 3) {
                     info.label4 = FangLiangLabel.LESS_RED
+                    return
                 }
 
                 var max = ten1.totalPrice

@@ -57,8 +57,8 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
                             if(index == 14) {
                                 colorEntrys.add(Color.BLACK)
                             } else {
-                                var p = it.preAvg * 2
-                                if(p < 50000000.00) p = 50000000.00
+                                var p = it.preAvg * 2.9
+                                if(p < 100000000.00) p = 100000000.00
                                 val suoLiang = item.totalPrice < p
                                 val green = if(suoLiang && index > 14) "#6628FF28" else "#28FF28"
                                 val red = if(suoLiang && index > 14) "#66FF0000" else "#FF0000"

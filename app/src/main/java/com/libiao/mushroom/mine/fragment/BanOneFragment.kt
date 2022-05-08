@@ -15,6 +15,8 @@ import com.libiao.mushroom.mine.SelfSelectionActivity
 import com.libiao.mushroom.mine.ban.BanState
 import com.libiao.mushroom.mine.ban.BanViewModel
 import com.libiao.mushroom.mine.ban.banItemView
+import com.libiao.mushroom.mine.dialog.one.LianBan1SettingBean
+import com.libiao.mushroom.mine.dialog.one.LianBan1SettingDialog
 import com.libiao.mushroom.mine.tab.BanOneTab
 import com.libiao.mushroom.mine.timeItemView
 import com.libiao.mushroom.room.ban.BanShareDatabase
@@ -27,10 +29,13 @@ import java.util.*
 
 class BanOneFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView, ICommand {
 
+    private var settingDialog: LianBan1SettingDialog? = null
+    private var settingBean: LianBan1SettingBean? = null
+
     override fun order(type: Int, data: Any?) {
         when(type) {
             ICommand.SETTING -> {
-
+                settingDialog?.show()
             }
             ICommand.HEART -> {
                 heartChecked = data as Boolean
@@ -110,6 +115,14 @@ class BanOneFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView,
         oneBanViewModel.onEach(deliveryMode = UniqueOnly(UUID.randomUUID().toString())) {
             controller.setData(it)
         }
+
+
+        settingDialog = LianBan1SettingDialog(context!!) {
+            LogUtil.i(TAG, "$it")
+            settingBean = it
+
+        }
+
     }
 
     inner class BanOneController: TypedEpoxyController<BanState>() {
@@ -123,44 +136,46 @@ class BanOneFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView,
             }
             var time = ""
             data?.infoList?.forEach {
-                if(it.time != time) {
-                    time = it.time ?: ""
-                    timeItemView {
-                        id(time)
-                        time(it.time)
-                        expand(it.expand)
-                        click {v ->
-                            oneBanViewModel.expand(it.time!!)
-                        }
-                    }
-                }
-                if(it.expand) {
-                    banItemView {
-                        id(it.id)
-                        data(it)
-                        click {view ->
-                            val id = view.id
-                            when(id) {
-                                R.id.ban_item_code -> {
-                                    ClipboardUtil.clip(context!!, it.code)
-                                }
-                                else -> {
-                                    val intent = Intent(context, KLineActivity::class.java)
-                                    intent.putExtra("code", it.code)
-                                    intent.putExtra("info", it.toString())
-                                    context?.startActivity(intent)
-                                }
+                if(it.ext1 == "show") {
+                    if(it.time != time) {
+                        time = it.time ?: ""
+                        timeItemView {
+                            id(time)
+                            time(it.time)
+                            expand(it.expand)
+                            click {v ->
+                                oneBanViewModel.expand(it.time!!)
                             }
                         }
-                        longClick {view ->
-                            MoreDialog(context!!){view2 ->
-                                when(view2.id) {
-                                    R.id.btn_dialog_delete -> {
-                                        BanShareDatabase.getInstance()?.getBanOneShareDao()?.delete(it.code!!)
-                                        oneBanViewModel.deleteItem(it)
+                    }
+                    if(it.expand) {
+                        banItemView {
+                            id(it.id)
+                            data(it)
+                            click {view ->
+                                val id = view.id
+                                when(id) {
+                                    R.id.ban_item_code -> {
+                                        ClipboardUtil.clip(context!!, it.code)
+                                    }
+                                    else -> {
+                                        val intent = Intent(context, KLineActivity::class.java)
+                                        intent.putExtra("code", it.code)
+                                        intent.putExtra("info", it.toString())
+                                        context?.startActivity(intent)
                                     }
                                 }
-                            }.show()
+                            }
+                            longClick {view ->
+                                MoreDialog(context!!){view2 ->
+                                    when(view2.id) {
+                                        R.id.btn_dialog_delete -> {
+                                            BanShareDatabase.getInstance()?.getBanOneShareDao()?.delete(it.code!!)
+                                            oneBanViewModel.deleteItem(it)
+                                        }
+                                    }
+                                }.show()
+                            }
                         }
                     }
                 }

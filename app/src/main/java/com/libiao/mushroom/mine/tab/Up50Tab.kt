@@ -1,24 +1,23 @@
 package com.libiao.mushroom.mine.tab
 
 import androidx.fragment.app.Fragment
-import com.libiao.mushroom.R
-import com.libiao.mushroom.mine.fragment.Line20Fragment
+import com.libiao.mushroom.mine.fragment.Up50Fragment
 
-class Line20Tab: TabItem() {
+class Up50Tab: TabItem() {
 
     companion object {
-        const val TAG = "Line20Tab"
+        const val TAG = "Up50Tab"
     }
 
     override fun createFragment(): Fragment {
         if(fragment == null) {
-            fragment = Line20Fragment()
+            fragment = Up50Fragment()
         }
         return fragment!!
     }
 
     override fun name(): String {
-        return "10日线"
+        return "60"
     }
 
     override fun tag(): String {

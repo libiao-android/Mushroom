@@ -1,40 +1,39 @@
 package com.libiao.mushroom.mode
 
-import android.os.Environment
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.room.Up50ShareDatabase
+import com.libiao.mushroom.room.Up50ShareInfo
 import com.libiao.mushroom.utils.Constant
-import com.libiao.mushroom.utils.LogUtil
-import java.io.*
-import java.nio.charset.Charset
+import com.libiao.mushroom.utils.LogUtil.i
 import kotlin.math.max
 import kotlin.math.min
 
-class StrongStock50Mode() : BaseMode() {
+class StrongStock50Mode : BaseMode {
 
     companion object {
         const val KEY = "StrongStock50Mode"
     }
 
-
-    init {
-        poolFile = File(fileNew, "my_50_pool")
-        if(poolFile?.exists() == false) {
-            poolFile?.createNewFile()
-        } else {
-            val stream = FileInputStream(poolFile)
-            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
-            var str: String?
-            str = reader.readLine()
-            while (str != null) {
-                poolList.add(str)
-                str = reader.readLine()
-            }
-        }
+    constructor(): super() {
+    }
+    constructor(showTime: Boolean): super(showTime) {
     }
 
-    override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
-        val size = shares.size
-        mDeviationValue = size - 10 - Constant.PRE
+
+    private val poolMap = HashMap<String, Up50ShareInfo>()
+
+    init {
+        val allShares = Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.getShares()
+        allShares?.forEach {
+            //LogUtil.i(TAG, "getMineShares: ${it.code}")
+            poolMap[it.code!!] = it
+        }
+        i(TAG, "init: ${poolMap.size}")
+    }
+
+    override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
+
+        mDeviationValue = day - 10
 
         if(mDeviationValue >= 0) {
             val day1 = shares[mDeviationValue + 0]
@@ -48,6 +47,23 @@ class StrongStock50Mode() : BaseMode() {
             val day8 = shares[mDeviationValue + 7]
             val day9 = shares[mDeviationValue + 8]
             val day10 = shares[mDeviationValue + 9]
+
+            if(poolMap.contains(day1.code)) {
+                val info = poolMap[day1.code]
+                info?.also {
+
+                    if(info.updateTime == day10.time) {
+                        i(TAG, "重复记录")
+                    } else {
+                        i(TAG, "更新记录")
+                        it.updateTime = day10.time
+                        it.dayCount = it.dayCount + 1
+                        Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.update(it)
+                    }
+                }
+                return
+            }
+
             if(day1.huanShouLv > 0) {
                 var min = day1.beginPrice
                 var max = day1.nowPrice
@@ -90,32 +106,37 @@ class StrongStock50Mode() : BaseMode() {
 
                 if(day10.beginPrice > day1.beginPrice && min > 0) {
                     val range = (max - min) / min * 100
-                    if(range > 50) {
-                        val info = "${day10.time}, ${day10.code}, ${day10.name}, ${range.toInt()}"
-                        val result = contains(day10.code!!)
-                        if(result == null) {
-                            LogUtil.i(TAG, "${day10.brieflyInfo()}, $range")
-                            poolList.add(info)
-                            writeFileAppend(info)
-                            day10.post1 = range.toInt().toString()
-                            mFitModeList.add(Pair(range, day10))
-                        } else {
-//                            if(result.contains(day10.time!!)) {
-//                                day10.post1 = range.toInt().toString()
-//                                mFitModeList.add(Pair(range, day10))
-//                            }
-                        }
+                    if(range >= 60) {
+                        i(TAG, "${day10.brieflyInfo()}, $range")
+                        mFitModeList.add(Pair(day10.range, day10))
+
+                        val info = Up50ShareInfo()
+                        info.time = day10.time
+                        info.code = day10.code
+                        info.name = day10.name
+                        info.dayCount = 10
+                        info.updateTime = day10.time
+
+                        val id = Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.insert(info)
+                        info.id = id?.toInt() ?: 0
+                        poolMap[day10.code!!] = info
                     }
                 }
             }
         }
     }
 
-    private fun contains(code: String): String? {
-        poolList.reversed().forEach {
-            if(it.contains(code)) return it
+    override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
+        val size = shares.size
+        mDeviationValue = size - Constant.PRE
+
+        //analysis(mDeviationValue, shares)
+
+        if(Constant.PRE == 0) {
+            analysis(mDeviationValue, shares)
+        } else {
+            i(TAG, "只记录当天")
         }
-        return null
     }
 
     override fun des(): String {
