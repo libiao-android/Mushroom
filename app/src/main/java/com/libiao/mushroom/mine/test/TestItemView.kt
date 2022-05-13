@@ -191,7 +191,7 @@ class TestItemView @JvmOverloads constructor(
     private fun getWidth(size: Int): Int {
         var w:Int = size * 7
         if(w < 120) w = 120
-        if(w > 230) w = 230
+        if(w > 400) w = 400
         return w.dip.toInt()
     }
 

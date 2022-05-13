@@ -40,7 +40,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                     if(it.candleEntryList == null) {
 
-                        var c = it.dayCount + 10
+                        var c = it.dayCount + 40
                         if(lines.size < c) c = lines.size
                         val records = lines.subList(lines.size - c, lines.size)
                         val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -56,7 +56,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                             val p = item.totalPrice.toFloat() / 100000000
                             barEntrys.add(BarEntry(index.toFloat(), p))
-                            if(index == 14) {
+                            if(index == c - it.dayCount + 1) {
                                 colorEntrys.add(Color.BLACK)
                             } else {
 
@@ -103,6 +103,21 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
             setState {
                 it.copy(infoList = list)
             }
+        }
+    }
+
+    fun sortMaxPrice(callback: (s: String) -> Unit) {
+        withState {
+            val list = mutableListOf<TestShareInfo>()
+            list.addAll(it.infoList)
+            list.sortByDescending { info -> info.lastShareInfo?.totalPrice }
+            val s1 = "${list[0].lastShareInfo?.name}, ${String.format("%.1f",(list[0].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
+            val s2 = "${list[1].lastShareInfo?.name}, ${String.format("%.1f",(list[1].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
+            val s3 = "${list[2].lastShareInfo?.name}, ${String.format("%.1f",(list[2].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
+            val s4 = "${list[3].lastShareInfo?.name}, ${String.format("%.1f",(list[3].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
+            val s5 = "${list[4].lastShareInfo?.name}, ${String.format("%.1f",(list[4].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
+            val s = "$s1\n$s2\n$s3\n$s4\n$s5"
+            callback.invoke(s)
         }
     }
 

@@ -6,25 +6,28 @@ class Tabs {
 
     init {
 
-        tabInfos.add(Line20Tab())
-        tabInfos.add(Up50Tab())
-
         //tabInfos.add(TestTab())
 
-        tabInfos.add(FangLiangTab())
+        //tabInfos.add(Line20Tab())
+
+
+
+
+        //tabInfos.add(FangLiangTab())
 
         //tabInfos.add(BanOneTab())
 
         tabInfos.add(BanOneChuangTab())
-        tabInfos.add(BanTwoChuangTab())
+        //tabInfos.add(BanTwoChuangTab())
         tabInfos.add(BanTwoTab())
-        tabInfos.add(BanThreeTab())
-        tabInfos.add(BanFourTab())
-        tabInfos.add(BanFiveTab())
+        //tabInfos.add(BanThreeTab())
+        //tabInfos.add(BanFourTab())
+        //tabInfos.add(BanFiveTab())
+        tabInfos.add(Up50Tab())
         tabInfos.add(BanSixTab())
 
 
-        tabInfos.add(MineTab())
+        //tabInfos.add(MineTab())
     }
 
     fun position(item: TabItem?): Int {

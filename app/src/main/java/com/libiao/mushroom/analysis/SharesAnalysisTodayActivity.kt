@@ -149,8 +149,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 //        mModeList.add(UpLine10Mode())
 
 
-        mModeList.add(DuanCengMode())
-        mModeList.add(TestMode())
+        //mModeList.add(DuanCengMode())
+        //mModeList.add(TestMode())
 
         //mModeList.add(ChuangYeBanTouJiMode())
         //        mModeList.add(StrongStock10Mode())

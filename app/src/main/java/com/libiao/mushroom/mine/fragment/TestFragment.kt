@@ -2,7 +2,10 @@ package com.libiao.mushroom.mine.fragment
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
+import android.widget.Toast
 import com.airbnb.epoxy.TypedEpoxyController
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.UniqueOnly
@@ -25,10 +28,16 @@ import java.util.*
 
 class TestFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView, ICommand {
 
+    val handler = Handler(Looper.getMainLooper())
+
     override fun order(type: Int, data: Any?) {
         when(type) {
             ICommand.SETTING -> {
-
+                testViewModel.sortMaxPrice {
+                    handler.post {
+                        Toast.makeText(context, "${it}", Toast.LENGTH_LONG).show()
+                    }
+                }
             }
             ICommand.HEART -> {
                 heartChecked = data as Boolean

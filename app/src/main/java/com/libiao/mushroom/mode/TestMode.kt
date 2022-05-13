@@ -27,51 +27,46 @@ class TestMode : BaseMode {
 
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
-        mDeviationValue = day - 3
+        val size = shares.size
+        mDeviationValue = day - 2
         if(mDeviationValue >  0) {
 
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
-            val three = shares[mDeviationValue + 2]
 
-            if(poolMap.contains(one.code)) {
-                val info = poolMap[one.code]
+
+            if(poolMap.contains(two.code)) {
+                val info = poolMap[two.code]
                 info?.also {
 
-                    if(it.updateTime == three.time) {
+                    if(info.updateTime == two.time) {
                         i(TAG, "重复记录")
                     } else {
-                        if(three.nowPrice < it.beginPrice) {
-                            i(TAG, "更新记录")
-                            TestShareDatabase.getInstance()?.getTestShareDao()?.delete(three.code!!)
-                        } else {
-                            i(TAG, "更新记录")
-                            it.updateTime = three.time
-                            it.dayCount = it.dayCount + 1
-                            TestShareDatabase.getInstance()?.getTestShareDao()?.update(it)
-                        }
+                        i(TAG, "更新记录")
+                        it.updateTime = two.time
+                        it.dayCount = it.dayCount + 1
+                        TestShareDatabase.getInstance()?.getTestShareDao()?.update(it)
                     }
                 }
                 return
             }
 
-            if(two.range > 7 || three.range > 7 || two.range + three.range > 7) {
-                if(three.nowPrice > one.nowPrice) {
-                    i(TAG, "${three.brieflyInfo()}")
-                    mFitModeList.add(Pair(three.range, three))
+            if(one.totalPrice > 1000000000 && one.huanShouLv > 5.0 &&
+                two.totalPrice > 1000000000 && two.huanShouLv > 5.0) {
+                i(TAG, "${two.brieflyInfo()}")
+                mFitModeList.add(Pair(two.range, two))
 
-                    val info = TestShareInfo()
-                    info.time = three.time
-                    info.code = three.code
-                    info.name = three.name
-                    info.dayCount = 3
-                    info.updateTime = three.time
-                    info.beginPrice = one.nowPrice
 
-                    val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
-                    info.id = id?.toInt() ?: 0
-                    poolMap[one.code!!] = info
-                }
+                val info = TestShareInfo()
+                info.time = two.time
+                info.code = two.code
+                info.name = two.name
+                info.dayCount = 2
+                info.updateTime = two.time
+
+                val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
+                info.id = id?.toInt() ?: 0
+                poolMap[two.code!!] = info
             }
         }
     }
@@ -83,7 +78,7 @@ class TestMode : BaseMode {
     }
 
     override fun shouldAnalysis(context: Context): Boolean {
-        return false
+        return true
     }
 
     override fun des(): String {
