@@ -33,30 +33,26 @@ class StrongStock50Mode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
 
-        mDeviationValue = day - 10
+        mDeviationValue = day - 6
 
         if(mDeviationValue >= 0) {
             val day1 = shares[mDeviationValue + 0]
-            if(day1.name?.contains("ST") == true) return
+            //if(day1.name?.contains("ST") == true) return
             val day2 = shares[mDeviationValue + 1]
             val day3 = shares[mDeviationValue + 2]
             val day4 = shares[mDeviationValue + 3]
             val day5 = shares[mDeviationValue + 4]
             val day6 = shares[mDeviationValue + 5]
-            val day7 = shares[mDeviationValue + 6]
-            val day8 = shares[mDeviationValue + 7]
-            val day9 = shares[mDeviationValue + 8]
-            val day10 = shares[mDeviationValue + 9]
 
             if(poolMap.contains(day1.code)) {
                 val info = poolMap[day1.code]
                 info?.also {
 
-                    if(info.updateTime == day10.time) {
+                    if(info.updateTime == day6.time) {
                         i(TAG, "重复记录")
                     } else {
                         i(TAG, "更新记录")
-                        it.updateTime = day10.time
+                        it.updateTime = day6.time
                         it.dayCount = it.dayCount + 1
                         Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.update(it)
                     }
@@ -64,13 +60,15 @@ class StrongStock50Mode : BaseMode {
                 return
             }
 
-            if(day1.huanShouLv > 0) {
-                var min = day1.beginPrice
-                var max = day1.nowPrice
+            if(day6.huanShouLv > 0) {
+                var min = min(day1.beginPrice, day1.nowPrice)
+                var max = max(day1.beginPrice, day1.nowPrice)
 
                 var temp = day2
                 min = min(min, temp.beginPrice)
+                min = min(min, temp.nowPrice)
                 max = max(max, temp.nowPrice)
+                max = max(max, temp.beginPrice)
 
                 temp = day3
                 min = min(min, temp.beginPrice)
@@ -88,38 +86,23 @@ class StrongStock50Mode : BaseMode {
                 min = min(min, temp.beginPrice)
                 max = max(max, temp.nowPrice)
 
-                temp = day7
-                min = min(min, temp.beginPrice)
-                max = max(max, temp.nowPrice)
-
-                temp = day8
-                min = min(min, temp.beginPrice)
-                max = max(max, temp.nowPrice)
-
-                temp = day9
-                min = min(min, temp.beginPrice)
-                max = max(max, temp.nowPrice)
-
-                temp = day10
-                min = min(min, temp.beginPrice)
-                max = max(max, temp.nowPrice)
-
-                if(day10.beginPrice > day1.beginPrice && min > 0) {
+                if(day6.beginPrice > day1.beginPrice && min > 0) {
                     val range = (max - min) / min * 100
-                    if(range >= 60) {
-                        i(TAG, "${day10.brieflyInfo()}, $range")
-                        mFitModeList.add(Pair(day10.range, day10))
+                    val zT4 = zhangTing(day6) && zhangTing(day5) && zhangTing(day4) && zhangTing(day3)
+                    if( (zT4 || range >= 46) && day6.totalPrice > 500000000) {
+                        i(TAG, "${day6.brieflyInfo()}, $range")
+                        mFitModeList.add(Pair(day6.range, day6))
 
                         val info = Up50ShareInfo()
-                        info.time = day10.time
-                        info.code = day10.code
-                        info.name = day10.name
-                        info.dayCount = 10
-                        info.updateTime = day10.time
+                        info.time = day6.time
+                        info.code = day6.code
+                        info.name = day6.name
+                        info.dayCount = 6
+                        info.updateTime = day6.time
 
                         val id = Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.insert(info)
                         info.id = id?.toInt() ?: 0
-                        poolMap[day10.code!!] = info
+                        poolMap[day6.code!!] = info
                     }
                 }
             }

@@ -125,7 +125,7 @@ abstract class BaseMode {
         }
         var zhangTingPrice = info.yesterdayPrice * maxRange - 0.05
         zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
-        return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0
+        return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0 && info.range > 9
     }
 
     fun dieTing(info: SharesRecordActivity.ShareInfo): Boolean {

@@ -40,7 +40,7 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
 
                     if(it.candleEntryList == null) {
 
-                        var c = it.dayCount
+                        var c = it.dayCount + 5
                         if(lines.size < c) c = lines.size
                         val records = lines.subList(lines.size - c, lines.size)
                         val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -56,7 +56,7 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
 
                             val p = item.totalPrice.toFloat() / 100000000
                             barEntrys.add(BarEntry(index.toFloat(), p))
-                            if(index == 9) {
+                            if(index == 10) {
                                 colorEntrys.add(Color.BLACK)
                             } else {
 

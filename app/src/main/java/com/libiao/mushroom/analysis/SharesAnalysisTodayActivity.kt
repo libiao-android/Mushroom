@@ -377,7 +377,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     }
 
     private fun test() {
-        analysis("sz301180")
+        analysis("sz002618")
     }
 
     class SharesInfoAdater(val context: Context) : RecyclerView.Adapter<SharesInfoHolder>() {

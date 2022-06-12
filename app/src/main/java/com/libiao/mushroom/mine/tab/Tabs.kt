@@ -5,26 +5,25 @@ class Tabs {
     val tabInfos = mutableListOf<TabItem>()
 
     init {
+        tabInfos.add(Up50Tab())
 
         //tabInfos.add(TestTab())
 
         //tabInfos.add(Line20Tab())
 
-
-
-
         //tabInfos.add(FangLiangTab())
 
         //tabInfos.add(BanOneTab())
+        tabInfos.add(BanTwoTab())
 
         tabInfos.add(BanOneChuangTab())
         //tabInfos.add(BanTwoChuangTab())
-        tabInfos.add(BanTwoTab())
+
         //tabInfos.add(BanThreeTab())
         //tabInfos.add(BanFourTab())
         //tabInfos.add(BanFiveTab())
-        tabInfos.add(Up50Tab())
-        tabInfos.add(BanSixTab())
+
+        //tabInfos.add(BanSixTab())
 
 
         //tabInfos.add(MineTab())

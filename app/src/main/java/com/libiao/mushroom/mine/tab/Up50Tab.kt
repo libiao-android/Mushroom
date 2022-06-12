@@ -17,7 +17,7 @@ class Up50Tab: TabItem() {
     }
 
     override fun name(): String {
-        return "60"
+        return "50"
     }
 
     override fun tag(): String {
