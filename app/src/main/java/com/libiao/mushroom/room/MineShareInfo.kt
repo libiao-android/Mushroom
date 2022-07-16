@@ -71,6 +71,9 @@ class MineShareInfo {
     @Ignore
     var shareInfo: SharesRecordActivity.ShareInfo? = null
 
+    @Ignore
+    var avgP = 0.00
+
     override fun toString(): String {
         return "${time}, ${code}, $name"
     }

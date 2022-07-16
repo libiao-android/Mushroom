@@ -70,6 +70,9 @@ class MineMode : BaseMode {
                     info.price = one.nowPrice
                     info.nowPrice = one.nowPrice
                     info.updateTime = one.time
+                    if(one.minPrice > zero.maxPrice) {
+                        info.label1 = "断层"
+                    }
                     val id = MineShareDatabase.getInstance()?.getMineShareDao()?.insert(info)
                     info.id = id?.toInt() ?: 0
                     poolMap.put(one.code!!, info)

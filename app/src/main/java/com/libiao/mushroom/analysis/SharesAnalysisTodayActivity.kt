@@ -65,7 +65,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")// HH:mm:ss
         time = simpleDateFormat.format(Date())
-        //time = "2022-3-4-5"
+        //time = "2022-6-13-1"
 
         i(TAG, "t: $time")
 
@@ -150,7 +150,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
 
         //mModeList.add(DuanCengMode())
-        //mModeList.add(TestMode())
+        mModeList.add(TestMode())
 
         //mModeList.add(ChuangYeBanTouJiMode())
         //        mModeList.add(StrongStock10Mode())

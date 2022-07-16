@@ -2,14 +2,14 @@ package com.libiao.mushroom.mine
 
 class SelfSettingBean {
 
-    var timeChecked: Boolean = false
+    var timeChecked: Boolean = true
     var rangeLeftChecked: Boolean = false
     var rangeRightChecked: Boolean = false
     var liangLeftChecked: Boolean = false
     var liangRightChecked: Boolean = false
     var redLine: Boolean = false
 
-    var timeValue: Int = 0
+    var timeValue: Int = 2
     var rangeLeftValue: Double = 0.00
     var rangeRightValue: Double = 0.00
     var liangLeftValue: Double = 0.00
@@ -20,7 +20,7 @@ class SelfSettingBean {
     var maxRangValue: Double = 0.00
     var zhiDie: Boolean = false
 
-    var line_10_Checked: Boolean = false
+    var duan_ceng_Checked: Boolean = false
     var xin_gao: Boolean = false
 
     override fun toString(): String {

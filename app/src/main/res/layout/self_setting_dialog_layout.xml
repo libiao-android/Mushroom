@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="30dp">
         <CheckBox
+            android:checked="true"
             android:paddingLeft="5dp"
             android:scaleX="0.8"
             android:scaleY="0.8"
@@ -246,7 +247,7 @@
             android:id="@+id/dialog_cb_zhi_die"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="止跌"/>
+            android:text="放量"/>
 
     </LinearLayout>
 
@@ -266,7 +267,7 @@
             android:id="@+id/dialog_cb_line_10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10日线"/>
+            android:text="断层"/>
 
         <CheckBox
             android:scaleX="0.8"

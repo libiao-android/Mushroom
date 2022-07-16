@@ -111,7 +111,7 @@ class SharesRecordActivity : AppCompatActivity() {
         }
 
         val time = "$mYear-$mMonth-$mDay-$mWay"
-        //val time = "2022-4-8-5"
+        //val time = "2022-6-13-1"
         i(TAG, "time: $time")
         this.time = time
 
@@ -157,7 +157,7 @@ class SharesRecordActivity : AppCompatActivity() {
             val lines = reader.readLines()
             lines.last {
                 if(!it.startsWith(time!!)) {
-                    i(TAG, "$it")
+                    //i(TAG, "$it")
                     networkRequestForQt(code)
                     Thread.sleep(80)
                 }

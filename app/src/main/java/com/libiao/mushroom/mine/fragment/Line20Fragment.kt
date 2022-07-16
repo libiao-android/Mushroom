@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +29,6 @@ import com.libiao.mushroom.room.MineShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.line_20_fragment.*
-import okhttp3.*
 import java.io.*
 import java.nio.charset.Charset
 
@@ -115,7 +113,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     private var mTempData: List<MineShareInfo> = ArrayList()
 
     private var settingDialog: SelfSettingDialog? = null
-    private var settingBean: SelfSettingBean? = null
+    private var settingBean: SelfSettingBean? = SelfSettingBean()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -255,6 +253,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val lines = reader.readLines()
                     val one = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 2])
                     val two = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 1])
+                    var allPrice = 0.00
+                    var allDay = 0
                     if(it.candleEntryList == null || reload) {
                         var begin = lines.size - it.dayCount - 2
                         if(begin < 0) begin = 0
@@ -267,6 +267,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         var itemIn = 0
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
+
+                            if(index > 0) {
+                                if(item.totalPrice > 0) {
+                                    allPrice += item.totalPrice
+                                    allDay ++
+                                }
+                            }
+
                             if(item.totalPrice > totalP) {
                                 totalP = item.totalPrice
                                 itemIn = index
@@ -307,6 +315,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         it.candleEntryList = entrys
                         it.barEntryList = barEntrys
                         it.colorsList = colorEntrys
+                        if(allDay > 0) {
+                            it.avgP = allPrice / allDay
+                        }
                     }
                     it.price = one.nowPrice
                     val info = lines.get(lines.size - 1)
@@ -320,12 +331,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         val ten1 = share
                         val ten2 = share_pre
 
-                        if(ten1.maxPrice < ten2.maxPrice
-                            && ten1.minPrice > ten2.minPrice
-                            && !ShareParseUtil.dieTing(ten1)
-                            && ten1.beginPrice >= ten1.nowPrice
-                            && ten2.beginPrice >= ten2.nowPrice
-                        ) {
+                        if(ten1.totalPrice > ten2.totalPrice) {
                             it.zhiDie = true
                         }
 
@@ -431,7 +437,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
 
-            if(selfSettingBean?.line_10_Checked == true && !(info.shareInfo!!.nowPrice >= info.shareInfo!!.line_10)) {
+            if(selfSettingBean?.duan_ceng_Checked == true && info.label1 != "断层") {
                 continue
             }
 
@@ -551,6 +557,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         private var mTypeMaxRangeTv: TextView? = null
         private var mTypeZhiDieTv: TextView? = null
 
+        private var mAvgP: TextView? = null
+
 
         init {
             mIdTv = view.findViewById(R.id.self_item_id)
@@ -562,6 +570,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             mTypeXinGaoTv = view.findViewById(R.id.tv_type_xin_gao)
             mTypeMaxRangeTv = view.findViewById(R.id.tv_type_max_rang)
             mTypeZhiDieTv = view.findViewById(R.id.tv_type_zhi_die)
+            mAvgP = view.findViewById(R.id.tv_type_avg_p)
 
             moreInfoTv = view.findViewById(R.id.tv_more_info)
             heartIv = view.findViewById(R.id.iv_item_heart)
@@ -692,11 +701,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 heartIv?.setImageResource(R.mipmap.heart)
             }
 
-            if(info.zhiDie) {
-                mTypeZhiDieTv?.visibility = View.VISIBLE
-            } else {
-                mTypeZhiDieTv?.visibility = View.GONE
-            }
+//            if(info.zhiDie) {
+//                mTypeZhiDieTv?.visibility = View.VISIBLE
+//            } else {
+//                mTypeZhiDieTv?.visibility = View.GONE
+//            }
 
             if(info.maxRange == info.totalRange) {
                 mTypeXinGaoTv?.visibility = View.VISIBLE
@@ -705,6 +714,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
             mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.maxRange)
+
+            mAvgP?.text = "${String.format("%.2f",info.avgP / 100000000)}亿"
         }
 
         private fun getWidth(size: Int): Int {

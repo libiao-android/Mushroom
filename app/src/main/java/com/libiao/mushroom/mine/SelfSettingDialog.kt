@@ -43,7 +43,7 @@ class SelfSettingDialog : Dialog {
 
             bean.zhiDie = dialog_cb_zhi_die.isChecked
 
-            bean.line_10_Checked = dialog_cb_line_10.isChecked
+            bean.duan_ceng_Checked = dialog_cb_line_10.isChecked
 
             bean.xin_gao = dialog_cb_xin_gao.isChecked
 
