@@ -91,6 +91,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
     }
 
 
+    val newCodeList = HashMap<String, String>()
     fun updateStockPool(v: View) {
         btn?.isEnabled = false
         loadingPb?.visibility = View.VISIBLE
@@ -100,16 +101,30 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         startTime = System.currentTimeMillis()
 
         stockPoolFile = File(fileNew, "stock_pool")
-        stockPoolFile?.also {
-            it.delete()
-            it.createNewFile()
-        }
+//        stockPoolFile?.also {
+//            it.delete()
+//            it.createNewFile()
+//        }
 
         Thread {
-            Log.i("libiao", "开始查询")
+
+            val stream = FileInputStream(stockPoolFile)
+            val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+            var str: String?
+            str = reader.readLine()
+            val codeList = HashSet<String>()
+            while (str != null) {
+                val a = str.split(",")
+                val code  = a[0].trim()
+                codeList.add(code)
+                str = reader.readLine()
+            }
+
+            i(TAG, "开始查询: ${codeList.size}")
             //深圳股票sz000，sz001，sz002，sz003
-            for(i in 1 .. 3999) {
+            for(i in 1000 .. 3099) {
                 val code = CodeUtil.getSzCode(i)
+                if(codeList.contains(code)) continue
                 if(i % 100 == 0) {
                     i(TAG, "sz00, $i, $code")
                 }
@@ -118,8 +133,9 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             i(TAG, "进度：40%")
             mHandler.post { progressTv?.text = "40%, $count" }
             //上海股票 sh600，sh601，sh603，sh605
-            for(i in 0 .. 1999) {
+            for(i in 1000 .. 1999) {
                 val code = CodeUtil.getShCode(i)
+                if(codeList.contains(code)) continue
                 if(i % 100 == 0) {
                     i(TAG, "sh60, $i, $code")
                 }
@@ -129,6 +145,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             mHandler.post { progressTv?.text = "60%, $count" }
             for(i in 3000 .. 3999) {
                 val code = CodeUtil.getShCode(i)
+                if(codeList.contains(code)) continue
                 if(i % 100 == 0) {
                     i(TAG, "sh603, $i, $code")
                 }
@@ -138,6 +155,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             mHandler.post { progressTv?.text = "80%, $count" }
             for(i in 5001 .. 5999) {
                 val code = CodeUtil.getShCode(i)
+                if(codeList.contains(code)) continue
                 if(i % 100 == 0) {
                     i(TAG, "sh605, $i, $code")
                 }
@@ -146,8 +164,9 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             i(TAG, "进度：90%")
             mHandler.post { progressTv?.text = "90%, $count" }
             //创业板股票 sz300
-            for(i in 1 .. 1500) {
+            for(i in 1000 .. 1500) {
                 val code = CodeUtil.getCyCode(i)
+                if(codeList.contains(code)) continue
                 if(i % 100 == 0) {
                     i(TAG, "sz300, $i, $code")
                 }
@@ -163,23 +182,39 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 //            }
             val totalTime = System.currentTimeMillis() - startTime
             i(TAG, "结束查询: $count, totalTime: ${totalTime/(1000*60)}")
+            i(TAG, "新增个数：${newCodeList.size}")
 
-            val infos = sb.toString()
-            sb.clear()
-            writeFileAppend(infos)
+            newCodeList.forEach {
+                deleteTuiShiData(it.key, it.value)
+                Thread.sleep(100)
+            }
+            Thread.sleep(3000)
+            i(TAG, "清理退市数据后实际新增：${codes.size}")
 
-            mHandler.post{
+            val sb = StringBuilder()
+            codes.forEach {
+                sb.append("$it\n")
+            }
+            writeFileAppend(sb.toString())
+            i(TAG, "新增写入完成")
+
+            codes.forEach {
+                val a = it.split(",")
+                getHistoryData(a[0].trim(), a[1].trim())
+                Thread.sleep(500)
+            }
+            i(TAG, "补充历史数据完成")
+
+            mHandler.post {
                 loadingPb?.visibility = View.GONE
                 btn?.isEnabled = true
             }
-
-            i(TAG, "${set.size}, ${set.toString()}")
-
         }.start()
 
     }
 
     private fun queryInfo(code: String) {
+        //i(TAG, "queryInfo: $code")
         initData(code)
         Thread.sleep(100)
     }
@@ -194,12 +229,12 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
         call.enqueue(object : Callback {
             override fun onFailure(call: Call?, e: IOException?) {
-                Log.i("libiao", "onFailure: ${e}")
+                i(TAG, "onFailure: ${e}")
             }
 
             override fun onResponse(call: Call?, response: Response?) {
                 val value = response?.body()?.string()
-                Log.i("libiao", "response: ${value}")
+                //i(TAG, "response: ${value}")
                 mHandler.post {
                     try {
                         if (value != null && value.length > 50) {
@@ -207,66 +242,22 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        Log.i("libiao", "parseSharesInfo exception: ${e.message}")
+                        i(TAG, "parseSharesInfo exception: ${e.message}")
                     }
                 }
             }
         })
     }
 
-    val set = HashSet<String>()
     private fun parseSharesInfo(response: String?) {
         response?.also {
-
-
-
             val leftRight = it.split("~")
             if (leftRight.size > 2) {
                 val name = leftRight[1]
                 val code = leftRight[0].substring(2, 10)
                 //i(TAG, "$name, $code")
-                sb.append("$code, $name\n")
-                count++
-                if(count % 400 == 0) {
-                    val infos = sb.toString()
-                    sb.clear()
-                    writeFileAppend(infos)
-                }
+                newCodeList[code] = name
             }
-//            val info = leftRight[0].split("_")
-//            val code = info[info.size - 1]
-//            val params = leftRight[1].split(",")
-//            val name = params[0].substring(1)
-//            val time = params[30]
-//            val statusP = params[32]
-//            val status = statusP.substring(0, 2)
-//            set.add(status)
-            //i(TAG, "status: $status")
-//            if(status == "-3" || status == "-2" || status == "03") {
-//                i(TAG, "$it")
-//            }
-//            if(status.trim().isEmpty()) {
-//                i(TAG, "$it")
-//            }
-            //Log.i("libiao", "code: $code, name: $name, price: $price")
-//            if(code == "sz000001") {
-//                latelyTime = time
-//            }
-//            if(time == latelyTime && status != "-3" && status != "-2") {
-//                if(code.startsWith("sh") && status == "03") {
-//                    i(TAG, " 抛弃sh开头 code: $code, time: $time, status: $status")
-//                } else {
-//                    sb.append("$code, $name\n")
-//                    count++
-//                    if(count % 400 == 0) {
-//                        val infos = sb.toString()
-//                        sb.clear()
-//                        writeFileAppend(infos)
-//                    }
-//                }
-//            } else {
-//                i(TAG, " 抛弃 code: $code, time: $time, status: $status")
-//            }
         }
     }
 
@@ -377,7 +368,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         i(TAG, "deleteTuiShiData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20220508")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220508&end=20220715")
             .build()
 
         val call = client.newCall(request)
@@ -418,7 +409,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20220508")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20220715")
             .build()
 
         val call = client.newCall(request)
