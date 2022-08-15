@@ -15,7 +15,7 @@ class SelfSettingBean {
     var liangLeftValue: Double = 0.00
     var liangRightValue: Double = 0.00
 
-    var sanLianYin: Boolean = false
+    var youXuan: Boolean = false
     var maxRangChecked: Boolean = false
     var maxRangValue: Double = 0.00
     var zhiDie: Boolean = false

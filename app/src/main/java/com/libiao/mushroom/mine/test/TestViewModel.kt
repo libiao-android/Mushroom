@@ -40,9 +40,11 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                     if(it.candleEntryList == null) {
 
-                        var c = it.dayCount + 40
-                        if(lines.size < c) c = lines.size
-                        val records = lines.subList(lines.size - c, lines.size)
+                        var a = it.dayCount - 10
+                        if(a < 0) a = 0
+                        var b = it.dayCount + 10
+                        if(lines.size < b) b = lines.size
+                        val records = lines.subList(a, b)
                         val candleEntrys = java.util.ArrayList<CandleEntry>()
                         val barEntrys = java.util.ArrayList<BarEntry>()
                         val colorEntrys = java.util.ArrayList<Int>()
@@ -56,7 +58,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                             val p = item.totalPrice.toFloat() / 100000000
                             barEntrys.add(BarEntry(index.toFloat(), p))
-                            if(index == c - it.dayCount + 1) {
+                            if(index == 10) {
                                 colorEntrys.add(Color.BLACK)
                             } else {
 

@@ -1,6 +1,8 @@
 package com.libiao.mushroom.mode
 
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.room.TestShareDatabase
+import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import java.lang.StringBuilder
@@ -92,6 +94,13 @@ class UpLine10Mode : BaseMode() {
                                 day15
                             )
                         )
+
+                        val info = TestShareInfo()
+                        info.time = day15.time
+                        info.code = day15.code
+                        info.name = day15.name
+                        info.dayCount = mDeviationValue
+                        TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
                     }
                 }
             }

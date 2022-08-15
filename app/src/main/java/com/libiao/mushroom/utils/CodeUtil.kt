@@ -32,5 +32,14 @@ class CodeUtil {
             if(i < 1000) return "sh688$i"
             return "sh688001"
         }
+
+        fun getCode(code: String): String {
+            if(code.startsWith("00") || code.startsWith("30")) {
+                return "sz$code"
+            } else if(code.startsWith("60")) {
+                return "sh$code"
+            }
+            return code
+        }
     }
 }

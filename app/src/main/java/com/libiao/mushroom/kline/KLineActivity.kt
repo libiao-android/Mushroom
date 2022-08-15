@@ -66,8 +66,11 @@ class KLineActivity : AppCompatActivity() {
 
         code = intent.getStringExtra("code")
         Log.i("libiao", "code: $code")
-        initData()
-        initView()
+        val f = File(file_2021, code)
+        if(f.exists()) {
+            initData()
+            initView()
+        }
     }
 
     private fun initData() {
@@ -120,7 +123,11 @@ class KLineActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        info.text = intent.getStringExtra("info")
+        var str = intent.getStringExtra("info")
+        if(str.isEmpty()) {
+            str = name
+        }
+        info.text = str
         info.setOnClickListener {
             ClipboardUtil.clip(this, code)
         }

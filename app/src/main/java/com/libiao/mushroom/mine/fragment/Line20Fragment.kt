@@ -31,6 +31,8 @@ import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.line_20_fragment.*
 import java.io.*
 import java.nio.charset.Charset
+import kotlin.math.max
+import kotlin.math.min
 
 class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
@@ -265,6 +267,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         var maxPrice = one.nowPrice
                         var totalP = 0.00
                         var itemIn = 0
+                        var tempItem: SharesRecordActivity.ShareInfo? = null
+                        var greenLittle = true
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
@@ -273,6 +277,16 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                     allPrice += item.totalPrice
                                     allDay ++
                                 }
+                            }
+                            if(tempItem == null) {
+                                tempItem = item
+                            } else {
+                                if(greenLittle) {
+                                    if(item.beginPrice > item.nowPrice && tempItem!!.nowPrice >= tempItem!!.beginPrice && item.totalPrice > tempItem!!.totalPrice * 1.1) {
+                                        greenLittle = false
+                                    }
+                                }
+                                tempItem = item
                             }
 
                             if(item.totalPrice > totalP) {
@@ -303,10 +317,13 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             }
                         }
                         val tMaxItem = SharesRecordActivity.ShareInfo(records[itemIn])
-                        it.sanLianYin = false
-                        if(tMaxItem.nowPrice > tMaxItem.beginPrice) {
-                            it.sanLianYin = true
-                        }
+//                        it.sanLianYin = false
+//                        if(tMaxItem.nowPrice > tMaxItem.beginPrice && greenLittle) {
+//                            it.sanLianYin = true
+//                        }
+//                        if(greenLittle) {
+//                            it.youXuan = true
+//                        }
 
                         var minP = one.nowPrice
                         if(minP == 0.00) minP = two.yesterdayPrice
@@ -336,13 +353,13 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         }
 
                         //智能选择
-//                        it.sanLianYin = false
+//                        it.youXuan = false
 //                        it.tips = ""
 //                        if(ten1.nowPrice >= ten1.beginPrice && ten2.nowPrice >= ten2.beginPrice) {
 //                            //双阳
 //                            if(!ShareParseUtil.zhangTing(ten1) && !ShareParseUtil.zhangTing(ten2)) {
 //                                if(ten1.totalPrice >= ten2.totalPrice && ten1.range > 0 || ten1.totalPrice < ten2.totalPrice && ten1.range < 0) {
-//                                    it.sanLianYin = true
+//                                    it.youXuan = true
 //                                    it.tips += "双阳 "
 //                                }
 //                            }
@@ -356,7 +373,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                            if(ten1.nowPrice >= ten1.beginPrice && ten2.beginPrice >= ten2.nowPrice && ten1.totalPrice > ten2.totalPrice * 1.3) {
 //                                if(!ShareParseUtil.zhangTing(ten1) && !ShareParseUtil.zhangTing(ten2)) {
 //                                    if(ten3.beginPrice >= ten3.nowPrice) {
-//                                        it.sanLianYin = true
+//                                        it.youXuan = true
 //                                        it.tips += "放量止跌收阳 "
 //                                    }
 //                                }
@@ -368,7 +385,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                                // 缩量回调
 //                                if(ten4.nowPrice > ten4.beginPrice && ten3.nowPrice > ten3.beginPrice && ten2.beginPrice >= ten2.nowPrice && ten1.beginPrice >= ten1.nowPrice) {
 //                                    if(ten3.totalPrice > ten2.totalPrice && ten2.totalPrice > ten1.totalPrice) {
-//                                        it.sanLianYin = true
+//                                        it.youXuan = true
 //                                        it.tips += "缩量回调 "
 //                                    }
 //                                }
@@ -425,11 +442,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
 
-            if(selfSettingBean?.sanLianYin == true && !info.sanLianYin) {
+            if(selfSettingBean?.youXuan == true && !info.youXuan) {
                 continue
             }
 
-            if(selfSettingBean?.maxRangChecked == true && info.maxRange < selfSettingBean.maxRangValue) {
+            if(selfSettingBean?.maxRangChecked == true && info.yinXianLength < selfSettingBean.maxRangValue) {
                 continue
             }
 
@@ -437,7 +454,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
 
-            if(selfSettingBean?.duan_ceng_Checked == true && info.label1 != "断层") {
+            if(selfSettingBean?.duan_ceng_Checked == true && !info.duanCeng) {
                 continue
             }
 
@@ -468,28 +485,20 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         sharePre: SharesRecordActivity.ShareInfo
     ) {
         if(it.price > 0) {
+            val a = min(share.rangeBegin, share.range) - share.rangeMin
+            val b = share.rangeMax - max(share.rangeBegin, share.range)
+            if(share.totalPrice < sharePre.totalPrice * 1.3 && share.range < 3 &&  a > b + 1) {
+                it.yinXianLength = a
+            } else {
+                it.yinXianLength = 0.00
+            }
             it.totalRange = (share.nowPrice - it.price) / it.price * 100
             it.todayRange = share.range
             it.fangLiang = share.totalPrice > sharePre.totalPrice
             it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
-            if(share.nowPrice > share.beginPrice) {
-                it.redLine = true
-            } else if(share.nowPrice == share.beginPrice) {
-                it.redLine = share.range >= 0
-            } else {
-                it.redLine = false
-            }
-            if(it.redLine && it.fangLiang && it.todayRange > 0) {
-                if(it.todayRange <= 6) {
-                    it.priority = 4
-                } else {
-                    it.priority = 3
-                }
-            } else if(it.redLine) {
-                it.priority = 2
-            } else {
-                it.priority = 1
-            }
+
+            it.redLine = sharePre.beginPrice > sharePre.nowPrice && share.nowPrice > share.beginPrice
+
             var liangBi = "0"
             if(sharePre.totalPrice > 0) {
                 liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
@@ -665,10 +674,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
             mTodayTv?.text = info.todayRange.toString()
 
-            if(info.priority >= 3) {
+            if(info.todayRange >= 0) {
                 mTodayTv?.setTextColor(Color.parseColor("#ed1941"))
-            } else if(info.priority == 2) {
-                mTodayTv?.setTextColor(Color.parseColor("#80ed1941"))
             } else {
                 mTodayTv?.setTextColor(Color.parseColor("#7fb80e"))
             }
@@ -713,7 +720,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 mTypeXinGaoTv?.visibility = View.GONE
             }
 
-            mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.maxRange)
+            mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.yinXianLength)
 
             mAvgP?.text = "${String.format("%.2f",info.avgP / 100000000)}亿"
         }

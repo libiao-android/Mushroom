@@ -89,7 +89,7 @@ class StrongStock50Mode : BaseMode {
                 if(day6.beginPrice > day1.beginPrice && min > 0) {
                     val range = (max - min) / min * 100
                     val zT4 = zhangTing(day6) && zhangTing(day5) && zhangTing(day4) && zhangTing(day3)
-                    if( (zT4 || range >= 46) && day6.totalPrice > 500000000) {
+                    if( (zT4 || range >= 46)) {
                         i(TAG, "${day6.brieflyInfo()}, $range")
                         mFitModeList.add(Pair(day6.range, day6))
 

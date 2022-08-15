@@ -30,26 +30,29 @@ class LianBan4Mode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 6
+        mDeviationValue = day - 5
         if(mDeviationValue >=  0) {
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
             val four = shares[mDeviationValue + 3]
             val five = shares[mDeviationValue + 4]
-            val six = shares[mDeviationValue + 5]
 
             if(poolMap.contains(one.code)) {
                 val info = poolMap[one.code]
                 info?.also {
 
-                    if(info.updateTime == six.time) {
+                    if(info.updateTime == five.time) {
                         i(TAG, "重复记录")
                     } else {
-                        i(TAG, "更新记录")
-                        it.updateTime = six.time
-                        it.dayCount = it.dayCount + 1
-                        BanShareDatabase.getInstance()?.getBanFourShareDao()?.update(it)
+                        if(it.dayCount > 30) {
+                            BanShareDatabase.getInstance()?.getBanFourShareDao()?.delete(it.code!!)
+                        } else {
+                            i(TAG, "更新记录")
+                            it.updateTime = five.time
+                            it.dayCount = it.dayCount + 1
+                            BanShareDatabase.getInstance()?.getBanFourShareDao()?.update(it)
+                        }
                     }
                 }
                 return
@@ -61,17 +64,16 @@ class LianBan4Mode : BaseMode {
                 && zhangTing(three)
                 && zhangTing(four)
                 && zhangTing(five)
-                && !zhangTing(six)
             ) {
-                i(TAG, "${six.brieflyInfo()}")
-                mFitModeList.add(Pair(six.range, six))
+                i(TAG, "${five.brieflyInfo()}")
+                mFitModeList.add(Pair(five.range, five))
 
                 val info = BanFourShareInfo()
-                info.time = six.time
-                info.code = six.code
-                info.name = six.name
-                info.dayCount = 6
-                info.updateTime = six.time
+                info.time = five.time
+                info.code = five.code
+                info.name = five.name
+                info.dayCount = 5
+                info.updateTime = five.time
 
                 val id = BanShareDatabase.getInstance()?.getBanFourShareDao()?.insert(info)
                 info.id = id?.toInt() ?: 0

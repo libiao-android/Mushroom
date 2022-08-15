@@ -133,7 +133,8 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
                     } else {
                         fangInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
                     }
-                    fangInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi"
+                    val adP= baoLiuXiaoShu(share.yesterdayPrice * (1 + (share.rangeBegin - 1)/100)) //建议挂单价格
+                    fangInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi, $adP"
                     val p = share.totalPrice.toFloat() / 100000000
                     fangInfo.barEntryList?.add(BarEntry(candleSize.toFloat(), p))
                     fangInfo.colorsList?.add(Color.GRAY)

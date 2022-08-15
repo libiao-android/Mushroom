@@ -15,7 +15,7 @@ class ClipboardUtil {
             if(cm == null) {
                 cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
             }
-            val clipData = ClipData.newPlainText("Label", content)
+            val clipData = ClipData.newPlainText("Label", content?.substring(2))
             cm?.primaryClip = clipData
             Toast.makeText(context, "复制成功", Toast.LENGTH_SHORT).show()
         }

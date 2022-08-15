@@ -49,10 +49,14 @@ class LianBan6Mode : BaseMode {
                     if(info.updateTime == seven.time) {
                         i(TAG, "重复记录")
                     } else {
-                        i(TAG, "更新记录")
-                        it.updateTime = seven.time
-                        it.dayCount = it.dayCount + 1
-                        BanShareDatabase.getInstance()?.getBanSixShareDao()?.update(it)
+                        if(it.dayCount > 30) {
+                            BanShareDatabase.getInstance()?.getBanSixShareDao()?.delete(it.code!!)
+                        } else {
+                            i(TAG, "更新记录")
+                            it.updateTime = seven.time
+                            it.dayCount = it.dayCount + 1
+                            BanShareDatabase.getInstance()?.getBanSixShareDao()?.update(it)
+                        }
                     }
                 }
                 return

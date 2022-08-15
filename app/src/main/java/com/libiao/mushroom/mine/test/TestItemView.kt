@@ -125,6 +125,9 @@ class TestItemView @JvmOverloads constructor(
             test_item_more_info.text = info.moreInfo
         }
 
+        test_item_more_info.visibility = View.VISIBLE
+        test_item_more_info.text = "${info.ext1}, ${info.ext2}"
+
         test_item_label_view.removeAllViews()
         if(info.label1 != null) {
             val tv = TextView(context)

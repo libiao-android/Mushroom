@@ -36,7 +36,7 @@ class SelfSettingDialog : Dialog {
 
             bean.redLine = dialog_cb_line.isChecked
 
-            bean.sanLianYin = dialog_cb_san_lian_yin.isChecked
+            bean.youXuan = dialog_cb_you_xuan.isChecked
 
             bean.maxRangChecked = dialog_cb_max_rang.isChecked
             bean.maxRangValue = setting_et_max_rang.text.toString().toDouble()

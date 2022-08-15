@@ -12,7 +12,10 @@ import com.libiao.mushroom.analysis.SharesAnalysisActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.CollectActivity
 import com.libiao.mushroom.mine.SelfSelectionActivity
+import com.libiao.mushroom.utils.CodeUtil
+import com.libiao.mushroom.utils.LogUtil
 import com.permissionx.guolindev.PermissionX
+import kotlinx.android.synthetic.main.home_activity.*
 import okhttp3.*
 import java.io.*
 import java.nio.charset.Charset
@@ -96,6 +99,17 @@ class HomeActivity : AppCompatActivity() {
     fun myCollect(v: View) {
         val intent = Intent(this, CollectActivity::class.java)
         startActivity(intent)
+    }
+
+    fun search(v: View) {
+        val code = et_search.text.trim().toString()
+        LogUtil.i("HomeActivity", "search: $code")
+        if(code.length == 6) {
+            val intent = Intent(this, KLineActivity::class.java)
+            intent.putExtra("code", CodeUtil.getCode(code))
+            intent.putExtra("info", "")
+            this.startActivity(intent)
+        }
     }
 
     private fun supplyInfo() {

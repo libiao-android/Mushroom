@@ -6,32 +6,25 @@ class Tabs {
 
     init {
 
+        //tabInfos.add(TestTab())
         tabInfos.add(Line20Tab())
-
         tabInfos.add(Up50Tab())
         tabInfos.add(BanOneChuangTab())
 
 
         //tabInfos.add(FangLiangTab())
 
-
+        tabInfos.add(BanTwoChuangTab())
+        tabInfos.add(BanSixTab())
+        tabInfos.add(BanFiveTab())
+        tabInfos.add(BanFourTab())
+        tabInfos.add(BanThreeTab())
         tabInfos.add(BanTwoTab())
-
-
-        //tabInfos.add(BanTwoChuangTab())
-
-        //tabInfos.add(BanThreeTab())
-        //tabInfos.add(BanFourTab())
-        //tabInfos.add(BanFiveTab())
-
-        //tabInfos.add(BanSixTab())
-
+        tabInfos.add(BanOneTab())
 
         //tabInfos.add(MineTab())
 
-        //tabInfos.add(TestTab())
 
-        tabInfos.add(BanOneTab())
 
 
     }

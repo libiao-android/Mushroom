@@ -30,24 +30,27 @@ class LianBanChuang2Mode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 4
+        mDeviationValue = day - 3
         if(mDeviationValue >=  0) {
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
-            val four = shares[mDeviationValue + 3]
 
             if(poolMap.contains(one.code)) {
                 val info = poolMap[one.code]
                 info?.also {
 
-                    if(info.updateTime == four.time) {
+                    if(info.updateTime == three.time) {
                         i(TAG, "重复记录")
                     } else {
-                        i(TAG, "更新记录")
-                        it.updateTime = four.time
-                        it.dayCount = it.dayCount + 1
-                        BanShareDatabase.getInstance()?.getBanTwoChuangShareDao()?.update(it)
+                        if(it.dayCount > 30) {
+                            BanShareDatabase.getInstance()?.getBanTwoChuangShareDao()?.delete(it.code!!)
+                        } else {
+                            i(TAG, "更新记录")
+                            it.updateTime = three.time
+                            it.dayCount = it.dayCount + 1
+                            BanShareDatabase.getInstance()?.getBanTwoChuangShareDao()?.update(it)
+                        }
                     }
                 }
                 return
@@ -57,17 +60,16 @@ class LianBanChuang2Mode : BaseMode {
                 && !zhangTing(one)
                 && zhangTing(two)
                 && zhangTing(three)
-                && !zhangTing(four)
             ) {
-                i(TAG, "${four.brieflyInfo()}")
-                mFitModeList.add(Pair(four.range, four))
+                i(TAG, "${three.brieflyInfo()}")
+                mFitModeList.add(Pair(three.range, three))
 
                 val info = BanTwoChuangShareInfo()
-                info.time = four.time
-                info.code = four.code
-                info.name = four.name
-                info.dayCount = 4
-                info.updateTime = four.time
+                info.time = three.time
+                info.code = three.code
+                info.name = three.name
+                info.dayCount = 3
+                info.updateTime = three.time
 
                 val id = BanShareDatabase.getInstance()?.getBanTwoChuangShareDao()?.insert(info)
                 info.id = id?.toInt() ?: 0

@@ -142,7 +142,10 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
                     } else {
                         oneInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
                     }
-                    oneInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi"
+
+                    val adP= baoLiuXiaoShu(share.yesterdayPrice * (1 + (share.rangeBegin - 1)/100)) //建议挂单价格
+
+                    oneInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi, $adP"
                     val p = share.totalPrice.toFloat() / 100000000
                     oneInfo.barEntryList?.add(BarEntry(candleSize.toFloat(), p))
                     oneInfo.colorsList?.add(Color.GRAY)

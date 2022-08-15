@@ -39,6 +39,14 @@ class MineShareInfo {
     var ext4: String? = null
     var ext5: String? = null
 
+    var duanCeng = false
+    var duanCengPrice: Double = 0.00
+    var delete = false // 允许一次跌破20日线
+    var youXuan = false // 涨放量，跌缩量
+
+    @Ignore
+    var yinXianLength: Double = 0.00
+
     @Ignore
     var totalRange: Double = 0.00 //记录后至今日涨幅
     @Ignore

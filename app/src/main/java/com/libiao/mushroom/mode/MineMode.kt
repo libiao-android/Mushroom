@@ -42,27 +42,52 @@ class MineMode : BaseMode {
             val one = shares[mDeviationValue + 1]
             if(poolMap.contains(one.code)) {
                 i(TAG, "contains: ${one.code}")
-                if(one.nowPrice < one.line_10) {
+                val info = poolMap[one.code]
+                if(one.nowPrice < one.line_20) {
                     i(TAG, "delete: ${one.code}")
-                    MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
-                    poolMap.remove(one.code)
-                    mFitModeList.add(Pair(one.range, one))
+                    info?.also {
+                        if(it.delete) {
+                            MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
+                            poolMap.remove(one.code)
+                            mFitModeList.add(Pair(one.range, one))
+                        } else {
+                            it.updateTime = one.time
+                            it.dayCount = it.dayCount + 1
+                            it.nowPrice = one.nowPrice
+                            it.delete = true
+                            if(one.minPrice <= it.duanCengPrice) {
+                                it.duanCeng = false
+                            }
+                            MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+                        }
+                    }
                 } else {
-                    val info = poolMap[one.code]
                     info?.also {
                         if(info.updateTime == one.time) {
                             i(TAG, "重复记录")
                         } else {
+                            if(one.beginPrice > one.nowPrice && zero.nowPrice > zero.beginPrice && one.totalPrice > zero.totalPrice) {
+                                it.youXuan = false
+                            }
                             i(TAG, "更新记录")
                             it.updateTime = one.time
                             it.dayCount = it.dayCount + 1
                             it.nowPrice = one.nowPrice
+                            it.delete = false
+                            if(one.minPrice <= it.duanCengPrice) {
+                                it.duanCeng = false
+                            }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+//                            if(!zhangTing(one) && one.totalPrice < 100000000) {
+//                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
+//                            } else {
+//
+//                            }
                         }
                     }
                 }
             } else {
-                if(zhangTing(one) && one.nowPrice >= one.line_10) {
+                if(one.range >= 9) {
                     val info = MineShareInfo()
                     info.time = one.time
                     info.code = one.code
@@ -70,8 +95,12 @@ class MineMode : BaseMode {
                     info.price = one.nowPrice
                     info.nowPrice = one.nowPrice
                     info.updateTime = one.time
+                    info.youXuan = true
+                    info.duanCeng = false
+                    info.delete = false
                     if(one.minPrice > zero.maxPrice) {
-                        info.label1 = "断层"
+                        info.duanCeng = true
+                        info.duanCengPrice = zero.maxPrice
                     }
                     val id = MineShareDatabase.getInstance()?.getMineShareDao()?.insert(info)
                     info.id = id?.toInt() ?: 0
@@ -86,7 +115,7 @@ class MineMode : BaseMode {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
 
-  //      analysis(mDeviationValue, shares)
+      //  analysis(mDeviationValue, shares)
 
         if(Constant.PRE == 0) {
             analysis(mDeviationValue, shares)

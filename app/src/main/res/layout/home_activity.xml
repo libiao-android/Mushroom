@@ -3,6 +3,25 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="搜索"
+            android:onClick="search"/>
+        <EditText
+            android:inputType="number"
+            android:maxLength="6"
+            android:id="@+id/et_search"
+            android:layout_marginTop="10dp"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
     <Button
         android:enabled="true"
         android:layout_width="wrap_content"
@@ -38,5 +57,6 @@
         android:layout_height="wrap_content"
         android:text="我的--池"
         android:onClick="myPool"/>
+
 
 </LinearLayout>

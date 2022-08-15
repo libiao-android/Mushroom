@@ -57,7 +57,7 @@ class SharesRecordActivity : AppCompatActivity() {
     fun startRecord(v: View) {
         if(isRecord()) {
             Toast.makeText(this, "已经记录过", Toast.LENGTH_LONG).show()
-            return
+            //return
         }
         btn?.isEnabled = false
         loadingPb?.visibility = View.VISIBLE
@@ -71,7 +71,7 @@ class SharesRecordActivity : AppCompatActivity() {
             while (str != null) {
                 count++
                 if(count % 100 == 0) {
-                    val p = (count / 4223F * 100).toInt()
+                    val p = (count / 4333F * 100).toInt()
                     mHandler.post { progressTv?.text = "$p%, $count" }
                 }
                 //Log.i("libiao_A", "str: $str, $count")
