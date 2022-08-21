@@ -66,14 +66,23 @@
         android:layout_height="wrap_content"/>
 
     <com.github.mikephil.charting.charts.CandleStickChart
+        android:visibility="gone"
         android:layout_below="@+id/test_item_info_view"
         android:id="@+id/test_item_candler_chart"
         android:layout_width="300dp"
         android:layout_height="90dp"/>
 
+
+    <com.github.mikephil.charting.charts.CombinedChart
+        android:layout_below="@+id/test_item_info_view"
+        android:id="@+id/combined_chart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
     <com.github.mikephil.charting.charts.BarChart
         android:layout_marginTop="-30dp"
-        android:layout_below="@+id/test_item_candler_chart"
+        android:layout_below="@+id/combined_chart"
         android:id="@+id/test_item_bar_chart"
         android:layout_width="300dp"
         android:layout_height="70dp"/>

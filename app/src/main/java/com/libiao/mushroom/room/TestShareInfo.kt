@@ -5,6 +5,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import java.util.ArrayList
 
@@ -19,6 +20,7 @@ data class TestShareInfo(
     var beginPrice: Double = 0.00,
     var preAvg: Double = 0.00, //平均量能
     var dayCount: Int = 0,
+    var startIndex: Int = 0,
     var updateTime: String? = null,
     var result: Int = 0, // 0 初始  1 成功  2失败
     var collect: Int = 0, // 0 未收藏  1 收藏
@@ -49,6 +51,12 @@ data class TestShareInfo(
     var barEntryList: ArrayList<BarEntry>? = null,
     @Ignore
     var colorsList: ArrayList<Int>? = null,
+    @Ignore
+    var values_5: ArrayList<Entry>? = null,
+    @Ignore
+    var values_10: ArrayList<Entry>? = null,
+    @Ignore
+    var values_20: ArrayList<Entry>? = null,
     @Ignore
     var lastShareInfo: SharesRecordActivity.ShareInfo? = null
 ) {

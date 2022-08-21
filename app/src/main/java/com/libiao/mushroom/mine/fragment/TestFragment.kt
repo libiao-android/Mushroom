@@ -24,9 +24,10 @@ import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.fang_liang_fragment.*
+import kotlinx.android.synthetic.main.test_fragment.*
 import java.util.*
 
-class TestFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView, ICommand {
+class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, ICommand {
 
     val handler = Handler(Looper.getMainLooper())
 
@@ -96,15 +97,57 @@ class TestFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView, I
     }
 
     private fun initData() {
-        loadingStatus = 1
-
-        testViewModel.fetchInfo()
+//        loadingStatus = 1
+//
+//        testViewModel.fetchInfo()
     }
 
+
     private fun initView() {
-        epoxy_view_fang_liang.setController(controller)
+        epoxy_view_test.setController(controller)
         testViewModel.onEach(deliveryMode = UniqueOnly(UUID.randomUUID().toString())) {
             controller.setData(it)
+        }
+
+        one_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(1)
+            tv_month.text = "1"
+        }
+        two_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(2)
+            tv_month.text = "2"
+        }
+        three_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(3)
+            tv_month.text = "3"
+        }
+        four_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(4)
+            tv_month.text = "4"
+        }
+        five_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(5)
+            tv_month.text = "5"
+        }
+        six_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(6)
+            tv_month.text = "6"
+        }
+        seven_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(7)
+            tv_month.text = "7"
+        }
+        eight_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(8)
+            tv_month.text = "8"
         }
     }
 

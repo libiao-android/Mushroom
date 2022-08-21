@@ -2,9 +2,11 @@ package com.libiao.mushroom.mine.test
 
 import android.graphics.Color
 import android.os.Environment
+import androidx.room.Ignore
 import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.TestShareDatabase
@@ -27,74 +29,131 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     var localList = mutableListOf<TestShareInfo>()
 
-    fun fetchInfo() {
+    fun fetchInfo(month: Int) {
         withState {
             LogUtil.i(TAG, "fetchInfo")
             val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
+            val dataT = ArrayList<TestShareInfo>()
             data?.forEach {
-                val f = File(file_2021, it.code)
-                if(f.exists()) {
-                    val stream = FileInputStream(f)
-                    val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
-                    val lines = reader.readLines()
+                if(it.dayCount > 5 && isFit(month, it.time!!)) {
+                    val f = File(file_2021, it.code)
+                    if(f.exists()) {
+                        val stream = FileInputStream(f)
+                        val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+                        val lines = reader.readLines()
 
-                    if(it.candleEntryList == null) {
+                        if(it.candleEntryList == null) {
 
-                        var a = it.dayCount - 10
-                        if(a < 0) a = 0
-                        var b = it.dayCount + 10
-                        if(lines.size < b) b = lines.size
-                        val records = lines.subList(a, b)
-                        val candleEntrys = java.util.ArrayList<CandleEntry>()
-                        val barEntrys = java.util.ArrayList<BarEntry>()
-                        val colorEntrys = java.util.ArrayList<Int>()
-                        records.forEachIndexed { index, s ->
-                            val item = SharesRecordActivity.ShareInfo(s)
-                            if(item.beginPrice == 0.00) {
-                                candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
-                            } else {
-                                candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
-                            }
-
-                            val p = item.totalPrice.toFloat() / 100000000
-                            barEntrys.add(BarEntry(index.toFloat(), p))
-                            if(index == 10) {
-                                colorEntrys.add(Color.BLACK)
-                            } else {
-
-                                val green = "#28FF28"
-                                val red = "#FF0000"
-                                if(item.beginPrice > item.nowPrice) {
-                                    colorEntrys.add(Color.parseColor(green))
-                                } else if(item.beginPrice < item.nowPrice) {
-                                    colorEntrys.add(Color.parseColor(red))
+                            var a = it.startIndex - it.dayCount
+                            if(a < 0) a = 0
+                            var b = it.startIndex + 5
+                            if(lines.size < b) b = lines.size
+                            val records = lines.subList(a, b)
+                            val candleEntrys = java.util.ArrayList<CandleEntry>()
+                            val barEntrys = java.util.ArrayList<BarEntry>()
+                            val colorEntrys = java.util.ArrayList<Int>()
+                            val values_5 = java.util.ArrayList<Entry>()
+                            val values_10 = java.util.ArrayList<Entry>()
+                            val values_20 = java.util.ArrayList<Entry>()
+                            records.forEachIndexed { index, s ->
+                                val item = SharesRecordActivity.ShareInfo(s)
+                                if(item.beginPrice == 0.00) {
+                                    candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
                                 } else {
-                                    if(item.range >= 0) {
+                                    candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                }
+
+                                var line5 = item.line_5
+                                if(line5 == 0.00) { line5 = item.beginPrice }
+
+                                var line10 = item.line_10
+                                if(line10 == 0.00) { line10 = item.beginPrice }
+
+                                var line20 = item.line_20
+                                if(line20 == 0.00) { line20 = item.beginPrice }
+
+                                values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                                values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                                values_20.add(Entry(index.toFloat(), line20.toFloat()))
+
+                                val p = item.totalPrice.toFloat() / 100000000
+                                barEntrys.add(BarEntry(index.toFloat(), p))
+                                if(index == it.dayCount) {
+                                    colorEntrys.add(Color.BLACK)
+                                    it.ext1 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
+                                } else {
+
+                                    val green = "#28FF28"
+                                    val red = "#FF0000"
+                                    if(item.beginPrice > item.nowPrice) {
+                                        colorEntrys.add(Color.parseColor(green))
+                                    } else if(item.beginPrice < item.nowPrice) {
                                         colorEntrys.add(Color.parseColor(red))
                                     } else {
-                                        colorEntrys.add(Color.parseColor(green))
+                                        if(item.range >= 0) {
+                                            colorEntrys.add(Color.parseColor(red))
+                                        } else {
+                                            colorEntrys.add(Color.parseColor(green))
+                                        }
                                     }
                                 }
-                            }
 
-                            if(index == records.size - 1) {
-                                it.lastShareInfo = item
+                                if(index == it.dayCount + 1) {
+                                    it.lastShareInfo = item
+                                    it.ext2 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
+                                }
                             }
+                            it.candleEntryList = candleEntrys
+                            it.barEntryList = barEntrys
+                            it.colorsList = colorEntrys
+                            it.values_5 = values_5
+                            it.values_10 = values_10
+                            it.values_20 = values_20
+
+                            dataT.add(it)
                         }
-                        it.candleEntryList = candleEntrys
-                        it.barEntryList = barEntrys
-                        it.colorsList = colorEntrys
                     }
                 }
+
             }
-            data?.sortBy { it.dayCount }
-            data?.also {
+            //data?.sortBy { it.dayCount }
+            dataT.also {
                 localList = it
                 setState {
                     copy(infoList = it)
                 }
             }
         }
+    }
+
+    private fun isFit(month: Int, time: String): Boolean {
+        when(month) {
+            1 -> {
+                return time.startsWith("2022-1") || time.startsWith("2022-01")
+            }
+            2 -> {
+                return time.startsWith("2022-2") || time.startsWith("2022-02")
+            }
+            3 -> {
+                return time.startsWith("2022-3") || time.startsWith("2022-03")
+            }
+            4 -> {
+                return time.startsWith("2022-4") || time.startsWith("2022-04")
+            }
+            5 -> {
+                return time.startsWith("2022-5") || time.startsWith("2022-05")
+            }
+            6 -> {
+                return time.startsWith("2022-6") || time.startsWith("2022-06")
+            }
+            7 -> {
+                return time.startsWith("2022-7") || time.startsWith("2022-07")
+            }
+            8 -> {
+                return time.startsWith("2022-8") || time.startsWith("2022-08")
+            }
+        }
+        return false
     }
 
     fun deleteItem(item: TestShareInfo) {

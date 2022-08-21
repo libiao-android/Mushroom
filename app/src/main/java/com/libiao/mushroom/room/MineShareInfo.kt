@@ -5,6 +5,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import java.util.ArrayList
 
@@ -67,6 +68,14 @@ class MineShareInfo {
     var barEntryList: ArrayList<BarEntry>? = null
     @Ignore
     var colorsList: ArrayList<Int>? = null
+    @Ignore
+    val values_5 = ArrayList<Entry>()
+    @Ignore
+    val values_10 = ArrayList<Entry>()
+    @Ignore
+    val values_20 = ArrayList<Entry>()
+
+
     @Ignore
     var sanLianYin: Boolean = false //三连阴
     @Ignore

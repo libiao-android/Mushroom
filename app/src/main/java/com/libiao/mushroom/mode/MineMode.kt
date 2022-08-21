@@ -3,6 +3,8 @@ package com.libiao.mushroom.mode
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.MineShareInfo
+import com.libiao.mushroom.room.TestShareDatabase
+import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
@@ -11,6 +13,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
+import kotlin.math.max
+import kotlin.math.min
 
 class MineMode : BaseMode {
 
@@ -37,7 +41,7 @@ class MineMode : BaseMode {
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         mDeviationValue = day - 2
-        if(mDeviationValue >=  0) {
+        if(mDeviationValue >= 20) {
             val zero = shares[mDeviationValue]
             val one = shares[mDeviationValue + 1]
             if(poolMap.contains(one.code)) {
@@ -78,6 +82,20 @@ class MineMode : BaseMode {
                                 it.duanCeng = false
                             }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+
+
+                            val a = min(one.rangeBegin, one.range) - one.rangeMin
+                            val b = one.rangeMax - max(one.rangeBegin, one.range)
+                            if(one.totalPrice < zero.totalPrice * 1.5 && one.range < 5 &&  a > b + 1 && one.range > -5 && a > 3) {
+                                val f = TestShareInfo()
+                                f.time = one.time
+                                f.code = one.code
+                                f.name = one.name
+                                f.dayCount = it.dayCount
+                                f.startIndex = mDeviationValue + 1
+                                TestShareDatabase.getInstance()?.getTestShareDao()?.insert(f)
+                            }
+
 //                            if(!zhangTing(one) && one.totalPrice < 100000000) {
 //                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
 //                            } else {
@@ -87,7 +105,7 @@ class MineMode : BaseMode {
                     }
                 }
             } else {
-                if(one.range >= 9) {
+                if(one.range >= 8) {
                     val info = MineShareInfo()
                     info.time = one.time
                     info.code = one.code
@@ -115,7 +133,7 @@ class MineMode : BaseMode {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
 
-      //  analysis(mDeviationValue, shares)
+   //     analysis(mDeviationValue, shares)
 
         if(Constant.PRE == 0) {
             analysis(mDeviationValue, shares)

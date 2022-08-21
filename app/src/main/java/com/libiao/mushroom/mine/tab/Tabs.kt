@@ -6,13 +6,13 @@ class Tabs {
 
     init {
 
-        //tabInfos.add(TestTab())
         tabInfos.add(Line20Tab())
         tabInfos.add(Up50Tab())
         tabInfos.add(BanOneChuangTab())
 
 
         //tabInfos.add(FangLiangTab())
+        tabInfos.add(TestTab())
 
         tabInfos.add(BanTwoChuangTab())
         tabInfos.add(BanSixTab())

@@ -97,6 +97,12 @@
         </LinearLayout>
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btn_start"
+        android:text="start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/self_selection_rv"
         android:layout_width="match_parent"
