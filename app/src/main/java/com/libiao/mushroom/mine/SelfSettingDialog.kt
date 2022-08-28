@@ -47,6 +47,10 @@ class SelfSettingDialog : Dialog {
 
             bean.xin_gao = dialog_cb_xin_gao.isChecked
 
+            bean.you_one = dialog_cb_you_xuan_1.isChecked
+            bean.you_two = dialog_cb_you_xuan_2.isChecked
+            bean.you_three = dialog_cb_you_xuan_3.isChecked
+
             callback(bean)
 
             dismiss()

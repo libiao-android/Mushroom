@@ -38,6 +38,8 @@
             android:theme="@style/CommonTheme"/>
         <activity android:name=".mine.CollectActivity"
             android:theme="@style/CommonTheme"/>
+        <activity android:name=".mine.jigou.JiGouInfoRecordActivity"
+            android:theme="@style/CommonTheme"/>
     </application>
 
 </manifest>

@@ -23,6 +23,10 @@ class SelfSettingBean {
     var duan_ceng_Checked: Boolean = false
     var xin_gao: Boolean = false
 
+    var you_one: Boolean = false
+    var you_two: Boolean = false
+    var you_three: Boolean = false
+
     override fun toString(): String {
         return "[$timeChecked, $timeValue], [$rangeLeftChecked, $rangeLeftValue], [$rangeRightChecked, $rangeRightValue]" +
                 ", [$liangLeftChecked, $liangLeftValue], [$liangRightChecked, $liangRightValue], [$redLine]"

@@ -6,6 +6,9 @@ class Tabs {
 
     init {
 
+        tabInfos.add(JiGouTab())
+
+        tabInfos.add(BanThreeTab())
         tabInfos.add(Line20Tab())
         tabInfos.add(Up50Tab())
         tabInfos.add(BanOneChuangTab())

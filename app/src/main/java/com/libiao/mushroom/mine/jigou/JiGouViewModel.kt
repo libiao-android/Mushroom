@@ -1,16 +1,15 @@
-package com.libiao.mushroom.mine.test
+package com.libiao.mushroom.mine.jigou
 
 import android.graphics.Color
 import android.os.Environment
-import androidx.room.Ignore
 import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
-import com.libiao.mushroom.room.TestShareDatabase
-import com.libiao.mushroom.room.TestShareInfo
+import com.libiao.mushroom.room.jigou.JiGouShareDatabase
+import com.libiao.mushroom.room.jigou.JiGouShareInfo
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
 import java.io.BufferedReader
@@ -19,107 +18,114 @@ import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
-class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) {
+class JiGouViewModel(initial: JiGouState): MavericksViewModel<JiGouState>(initial) {
 
     companion object {
-        private const val TAG = "TestViewModel"
+        private const val TAG = "JiGouViewModel"
     }
 
     private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
 
-    var localList = mutableListOf<TestShareInfo>()
+    var localList = mutableListOf<JiGouShareInfo>()
 
-    fun fetchInfo(month: Int) {
+    fun fetchInfo() {
         withState {
             LogUtil.i(TAG, "fetchInfo")
-            val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
-            val dataT = ArrayList<TestShareInfo>()
+            val data = JiGouShareDatabase.getInstance()?.getJiGouShareDao()?.getShares()
+            val dataT = ArrayList<JiGouShareInfo>()
             data?.forEach {
-                if(it.dayCount > 5 && isFit(month, it.time!!)) {
-                    val f = File(file_2021, it.code)
-                    if(f.exists()) {
-                        val stream = FileInputStream(f)
-                        val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
-                        val lines = reader.readLines()
+                val f = File(file_2021, it.code)
+                if(f.exists()) {
+                    val stream = FileInputStream(f)
+                    val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+                    val lines = reader.readLines()
 
-                        if(it.candleEntryList == null) {
+                    val info = it.jiGouInfo
+                    it.moreInfo = info
+                    val map = HashMap<String, String>()
+                    val times = arrayListOf<String>()
+                    info?.also { i ->
+                        val vs = i.split(",")
+                        vs.forEach { j ->
+                            val v = j.split("#")
+                            map[v[0]] = v[1]
+                            times.add(v[0])
+                        }
+                    }
+                    var ind = 0
+                    lines.forEachIndexed { index, s1 ->
+                        val si = SharesRecordActivity.ShareInfo(s1)
+                        if(si.time == times[0]) {
+                            ind = index
+                            return@forEachIndexed
+                        }
+                    }
+                    if(it.candleEntryList == null) {
+                        it.map = map
+                        var a = ind - 10
+                        if(a < 0) a = 0
+                        var b = lines.size
+                        val records = lines.subList(a, b)
+                        val candleEntrys = java.util.ArrayList<CandleEntry>()
+                        val barEntrys = java.util.ArrayList<BarEntry>()
+                        val colorEntrys = java.util.ArrayList<Int>()
+                        val values_5 = java.util.ArrayList<Entry>()
+                        val values_10 = java.util.ArrayList<Entry>()
+                        val values_20 = java.util.ArrayList<Entry>()
+                        records.forEachIndexed { index, s ->
+                            val item = SharesRecordActivity.ShareInfo(s)
+                            if(item.beginPrice == 0.00) {
+                                candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+                            } else {
+                                candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                            }
 
-                            var a = it.startIndex - it.dayCount
-                            if(a < 0) a = 0
-                            var b = it.startIndex + 5
-                            if(lines.size < b) b = lines.size
-                            val records = lines.subList(a, b)
-                            val candleEntrys = java.util.ArrayList<CandleEntry>()
-                            val barEntrys = java.util.ArrayList<BarEntry>()
-                            val colorEntrys = java.util.ArrayList<Int>()
-                            val values_5 = java.util.ArrayList<Entry>()
-                            val values_10 = java.util.ArrayList<Entry>()
-                            val values_20 = java.util.ArrayList<Entry>()
-                            var one: SharesRecordActivity.ShareInfo? = null
-                            var two: SharesRecordActivity.ShareInfo? = null
-                            records.forEachIndexed { index, s ->
-                                val item = SharesRecordActivity.ShareInfo(s)
-                                if(item.beginPrice == 0.00) {
-                                    candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+                            var line5 = item.line_5
+                            if(line5 == 0.00) { line5 = item.beginPrice }
+
+                            var line10 = item.line_10
+                            if(line10 == 0.00) { line10 = item.beginPrice }
+
+                            var line20 = item.line_20
+                            if(line20 == 0.00) { line20 = item.beginPrice }
+
+                            values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                            values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                            values_20.add(Entry(index.toFloat(), line20.toFloat()))
+
+                            val p = item.totalPrice.toFloat() / 100000000
+                            barEntrys.add(BarEntry(index.toFloat(), p))
+                            if(times.contains(item.time)) {
+                                colorEntrys.add(Color.BLACK)
+                            } else {
+
+                                val green = "#28FF28"
+                                val red = "#FF0000"
+                                if(item.beginPrice > item.nowPrice) {
+                                    colorEntrys.add(Color.parseColor(green))
+                                } else if(item.beginPrice < item.nowPrice) {
+                                    colorEntrys.add(Color.parseColor(red))
                                 } else {
-                                    candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
-                                }
-
-                                var line5 = item.line_5
-                                if(line5 == 0.00) { line5 = item.beginPrice }
-
-                                var line10 = item.line_10
-                                if(line10 == 0.00) { line10 = item.beginPrice }
-
-                                var line20 = item.line_20
-                                if(line20 == 0.00) { line20 = item.beginPrice }
-
-                                values_5.add(Entry(index.toFloat(), line5.toFloat()))
-                                values_10.add(Entry(index.toFloat(), line10.toFloat()))
-                                values_20.add(Entry(index.toFloat(), line20.toFloat()))
-
-                                val p = item.totalPrice.toFloat() / 100000000
-                                barEntrys.add(BarEntry(index.toFloat(), p))
-                                if(index == it.dayCount) {
-                                    colorEntrys.add(Color.BLACK)
-                                    it.ext1 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
-                                    one = item
-                                } else {
-
-                                    val green = "#28FF28"
-                                    val red = "#FF0000"
-                                    if(item.beginPrice > item.nowPrice) {
-                                        colorEntrys.add(Color.parseColor(green))
-                                    } else if(item.beginPrice < item.nowPrice) {
+                                    if(item.range >= 0) {
                                         colorEntrys.add(Color.parseColor(red))
                                     } else {
-                                        if(item.range >= 0) {
-                                            colorEntrys.add(Color.parseColor(red))
-                                        } else {
-                                            colorEntrys.add(Color.parseColor(green))
-                                        }
+                                        colorEntrys.add(Color.parseColor(green))
                                     }
                                 }
-
-                                if(index == it.dayCount + 1) {
-                                    it.lastShareInfo = item
-                                    it.ext2 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
-                                    two = item
-                                }
                             }
-                            it.candleEntryList = candleEntrys
-                            it.barEntryList = barEntrys
-                            it.colorsList = colorEntrys
-                            it.values_5 = values_5
-                            it.values_10 = values_10
-                            it.values_20 = values_20
-//                            if(one != null && two != null) {
-//                                if(two!!.minPrice > one!!.minPrice && two!!.maxPrice < one!!.maxPrice && one!!.totalPrice > two!!.totalPrice) {
-//
-//                                }
-//                            }
-                            dataT.add(it)
+
+                            if(index == records.size - 1) {
+                                it.lastShareInfo = item
+                                it.name = item.name
+                            }
                         }
+                        it.candleEntryList = candleEntrys
+                        it.barEntryList = barEntrys
+                        it.colorsList = colorEntrys
+                        it.values_5 = values_5
+                        it.values_10 = values_10
+                        it.values_20 = values_20
+                        dataT.add(it)
                     }
                 }
 
@@ -164,9 +170,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         return false
     }
 
-    fun deleteItem(item: TestShareInfo) {
+    fun deleteItem(item: JiGouShareInfo) {
         withState {
-            val list = mutableListOf<TestShareInfo>()
+            val list = mutableListOf<JiGouShareInfo>()
             list.addAll(it.infoList)
             list.remove(item)
             setState {
@@ -177,7 +183,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun sortMaxPrice(callback: (s: String) -> Unit) {
         withState {
-            val list = mutableListOf<TestShareInfo>()
+            val list = mutableListOf<JiGouShareInfo>()
             list.addAll(it.infoList)
             list.sortByDescending { info -> info.lastShareInfo?.totalPrice }
             val s1 = "${list[0].lastShareInfo?.name}, ${String.format("%.1f",(list[0].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
@@ -192,7 +198,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun updateNetWork(baseFragment: BaseFragment) {
         withState {s ->
-            val temp = mutableListOf<TestShareInfo>()
+            val temp = mutableListOf<JiGouShareInfo>()
             temp.addAll(s.infoList)
             var count = 0
             temp.forEachIndexed { index, fangLiangShareInfo ->
@@ -244,7 +250,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun expand(time: String) {
         withState {
-            val list = mutableListOf<TestShareInfo>()
+            val list = mutableListOf<JiGouShareInfo>()
             list.addAll(it.infoList)
             list.forEachIndexed {index, info ->
                 val temp = info.copy()

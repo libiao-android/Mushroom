@@ -1,4 +1,4 @@
-package com.libiao.mushroom.room
+package com.libiao.mushroom.room.jigou
 
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -10,20 +10,14 @@ import com.libiao.mushroom.SharesRecordActivity
 import java.util.ArrayList
 
 @Entity
-data class TestShareInfo(
+data class JiGouShareInfo(
     @PrimaryKey(autoGenerate = true)//主键是否自动增长，默认为false
     var id: Int = 0,
 
     var time: String? = null,
     var code: String? = null,
     var name: String? = null,
-    var beginPrice: Double = 0.00,
-    var preAvg: Double = 0.00, //平均量能
-    var dayCount: Int = 0,
-    var startIndex: Int = 0,
-    var updateTime: String? = null,
-    var result: Int = 0, // 0 初始  1 成功  2失败
-    var collect: Int = 0, // 0 未收藏  1 收藏
+    var jiGouInfo: String? = null,
     var label1: String? = null,
     var label2: String? = null,
     var label3: String? = null,
@@ -58,7 +52,9 @@ data class TestShareInfo(
     @Ignore
     var values_20: ArrayList<Entry>? = null,
     @Ignore
-    var lastShareInfo: SharesRecordActivity.ShareInfo? = null
+    var lastShareInfo: SharesRecordActivity.ShareInfo? = null,
+    @Ignore
+    var map: HashMap<String, String>? = null
 ) {
 
 
@@ -67,18 +63,13 @@ data class TestShareInfo(
         return "${time}, ${code}, $name"
     }
 
-    fun copy(): TestShareInfo {
-        val info = TestShareInfo()
+    fun copy(): JiGouShareInfo {
+        val info = JiGouShareInfo()
         info.id = this.id
         info.time = this.time
         info.code = this.code
         info.name = this.name
-        info.beginPrice = this.beginPrice
-        info.preAvg = this.preAvg
-        info.dayCount = this.dayCount
-        info.updateTime = this.updateTime
-        info.result = this.result
-        info.collect = this.collect
+        info.jiGouInfo = this.jiGouInfo
         info.label1 = this.label1
         info.label2 = this.label2
         info.label3 = this.label3

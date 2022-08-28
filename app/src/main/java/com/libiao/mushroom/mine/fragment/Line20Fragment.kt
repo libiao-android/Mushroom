@@ -148,21 +148,21 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     mRangeStatus = 1
                     //高-低
                     //为什么不用temp， 主要考虑删除时要保持顺序
-                    mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
                     mAdapter?.setData(mTempData)
                 }
                 1 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_ascending)
                     mRangeStatus = 2
                     //低-高
-                    mTempData = ArrayList(mTempData.sortedBy { it.totalRange })
+                    mTempData = ArrayList(mTempData.sortedBy { it.yinXianLength })
                     mAdapter?.setData(mTempData)
                 }
                 2 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_descending)
                     mRangeStatus = 1
                     //高-低
-                    mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
+                    mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
                     mAdapter?.setData(mTempData)
                 }
             }
@@ -484,6 +484,18 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
 
+            if(selfSettingBean?.you_one == true && !info.youOne) {
+                continue
+            }
+
+            if(selfSettingBean?.you_two == true && !info.youTwo) {
+                continue
+            }
+
+            if(selfSettingBean?.you_three == true && !info.youThree) {
+                continue
+            }
+
             temp.add(info)
         }
         mTempData = temp
@@ -519,7 +531,16 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             it.fangLiang = share.totalPrice > sharePre.totalPrice
             it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
 
-            it.redLine = sharePre.beginPrice > sharePre.nowPrice && share.nowPrice > share.beginPrice
+            it.redLine = share.nowPrice > share.beginPrice
+
+            it.youOne = false
+            if(share.totalPrice > sharePre.totalPrice * 0.95 && share.range > 1 && share.nowPrice > share.beginPrice) {
+                if(!ShareParseUtil.zhangTing(share) && sharePre.range < 3 && share.totalPrice > 100000000.00) {
+                    if(share.rangeMax - share.range < share.range - share.rangeMin && it.avgP > 150000000) {
+                        it.youOne = true
+                    }
+                }
+            }
 
             var liangBi = "0"
             if(sharePre.totalPrice > 0) {

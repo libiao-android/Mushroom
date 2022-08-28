@@ -12,6 +12,7 @@ import com.libiao.mushroom.analysis.SharesAnalysisActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.CollectActivity
 import com.libiao.mushroom.mine.SelfSelectionActivity
+import com.libiao.mushroom.mine.jigou.JiGouInfoRecordActivity
 import com.libiao.mushroom.utils.CodeUtil
 import com.libiao.mushroom.utils.LogUtil
 import com.permissionx.guolindev.PermissionX
@@ -110,6 +111,11 @@ class HomeActivity : AppCompatActivity() {
             intent.putExtra("info", "")
             this.startActivity(intent)
         }
+    }
+
+    fun jiGou(v: View) {
+        val intent = Intent(this, JiGouInfoRecordActivity::class.java)
+        startActivity(intent)
     }
 
     private fun supplyInfo() {

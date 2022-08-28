@@ -58,5 +58,12 @@
         android:text="我的--池"
         android:onClick="myPool"/>
 
+    <Button
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="机构"
+        android:onClick="jiGou"/>
+
 
 </LinearLayout>

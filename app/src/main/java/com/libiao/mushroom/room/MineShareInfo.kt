@@ -86,6 +86,15 @@ class MineShareInfo {
     var zhiDie: Boolean = false
 
     @Ignore
+    var youOne: Boolean = false
+
+    @Ignore
+    var youTwo: Boolean = false
+
+    @Ignore
+    var youThree: Boolean = false
+
+    @Ignore
     var shareInfo: SharesRecordActivity.ShareInfo? = null
 
     @Ignore
