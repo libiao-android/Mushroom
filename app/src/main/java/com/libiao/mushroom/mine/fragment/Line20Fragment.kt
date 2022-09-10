@@ -365,10 +365,28 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val share = SharesRecordActivity.ShareInfo(info)
                     it.shareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
-                    if(it.dayCount >= 2) {
+                    it.youTwo = false
+                    it.youThree = false
+                    if(it.dayCount >= 3) {
 
                         val ten1 = share
                         val ten2 = share_pre
+
+                        val info_pre2 = lines.get(lines.size - 3)
+                        val ten3 = SharesRecordActivity.ShareInfo(info_pre2)
+
+                        if(ten3.beginPrice > ten3.nowPrice && ten2.beginPrice > ten2.nowPrice && ten1.nowPrice >= ten1.beginPrice) {
+                            if(ten2.totalPrice < ten3.totalPrice * 0.9 && ten1.totalPrice < ten2.totalPrice * 0.9) {
+                                if(ten1.totalPrice > 50000000) {
+                                    it.youTwo = true
+                                }
+                            }
+                        }
+
+                        if(ten2.nowPrice > ten2.beginPrice && ten1.maxPrice < ten2.maxPrice
+                            && ten1.minPrice > ten2.minPrice && ten1.totalPrice < ten2.totalPrice * 0.8) {
+                            it.youThree = true
+                        }
 
                         if(ten1.totalPrice > ten2.totalPrice) {
                             it.zhiDie = true

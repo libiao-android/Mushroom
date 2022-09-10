@@ -6,6 +6,27 @@
 
     <LinearLayout
         android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_more_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="只看放量"/>
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_less_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="只看缩量"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="50dp">
         <Button
@@ -56,6 +77,11 @@
         <Button
             android:id="@+id/eight_test"
             android:text="8月"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/nine_test"
+            android:text="9月"
             android:layout_width="60dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>

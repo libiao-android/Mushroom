@@ -97,7 +97,7 @@ class BanOneFragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView,
         loadingStatus = 1
         val data = BanShareDatabase.getInstance()?.getBanOneShareDao()?.getAllShares()
 
-        oneBanViewModel.fetchInfo(toBanShareInfo(data))
+        oneBanViewModel.fetchInfo(toBanShareInfo(data), 1)
     }
 
     private fun toBanShareInfo(data: MutableList<BanOneShareInfo>?): MutableList<BanShareInfo>? {

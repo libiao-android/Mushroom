@@ -149,6 +149,18 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
             testViewModel.fetchInfo(8)
             tv_month.text = "8"
         }
+        nine_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(9)
+            tv_month.text = "9"
+        }
+
+        cb_more_price.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setMorePriceChecked(isChecked)
+        }
+        cb_less_price.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setLessPricechecked(isChecked)
+        }
     }
 
     inner class TestController: TypedEpoxyController<TestState>() {

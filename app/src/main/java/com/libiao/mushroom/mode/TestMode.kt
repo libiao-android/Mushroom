@@ -6,6 +6,7 @@ import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
+import com.libiao.mushroom.utils.ShareParseUtil
 
 class TestMode : BaseMode {
 
@@ -28,45 +29,35 @@ class TestMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 2
+        mDeviationValue = day - 5
         if(mDeviationValue >  0) {
 
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
+            val three = shares[mDeviationValue + 2]
+            val four = shares[mDeviationValue + 3]
+            val five = shares[mDeviationValue + 4]
 
+            if(!isChuang(one.code) && !zhangTing(one) && zhangTing(two) && !zhangTing(three)) {
 
-            if(poolMap.contains(two.code)) {
-                val info = poolMap[two.code]
-                info?.also {
+                if(yin(three) && yang(four) && yang(five) && !zhangTing(four) && !zhangTing(five)) {
+                    if(four.maxPrice < five.maxPrice) {
+                        i(TAG, "${five.brieflyInfo()}")
+                        mFitModeList.add(Pair(five.range, five))
 
-                    if(info.updateTime == two.time) {
-                        i(TAG, "重复记录")
-                    } else {
-                        i(TAG, "更新记录")
-                        it.updateTime = two.time
-                        it.dayCount = it.dayCount + 1
-                        TestShareDatabase.getInstance()?.getTestShareDao()?.update(it)
+                        val info = TestShareInfo()
+                        info.time = two.time
+                        info.code = two.code
+                        info.name = two.name
+                        info.dayCount = 3
+                        info.updateTime = two.time
+                        info.startIndex = mDeviationValue + 1
+
+                        val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
+                        info.id = id?.toInt() ?: 0
+                        poolMap[two.code!!] = info
                     }
                 }
-                return
-            }
-
-            if(one.totalPrice > 1000000000 && one.huanShouLv > 5.0 &&
-                two.totalPrice > 1000000000 && two.huanShouLv > 5.0) {
-                i(TAG, "${two.brieflyInfo()}")
-                mFitModeList.add(Pair(two.range, two))
-
-
-                val info = TestShareInfo()
-                info.time = two.time
-                info.code = two.code
-                info.name = two.name
-                info.dayCount = 2
-                info.updateTime = two.time
-
-                val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
-                info.id = id?.toInt() ?: 0
-                poolMap[two.code!!] = info
             }
         }
     }
@@ -78,10 +69,19 @@ class TestMode : BaseMode {
     }
 
     override fun shouldAnalysis(context: Context): Boolean {
-        return false
+        return true
     }
 
     override fun des(): String {
         return "test"
     }
+
+    private fun yin(two: SharesRecordActivity.ShareInfo): Boolean {
+        return two.beginPrice > two.nowPrice
+    }
+
+    private fun yang(two: SharesRecordActivity.ShareInfo): Boolean {
+        return two.nowPrice > two.beginPrice
+    }
+
 }

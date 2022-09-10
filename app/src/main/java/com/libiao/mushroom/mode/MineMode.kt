@@ -83,19 +83,6 @@ class MineMode : BaseMode {
                             }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
 
-
-                            val a = min(one.rangeBegin, one.range) - one.rangeMin
-                            val b = one.rangeMax - max(one.rangeBegin, one.range)
-                            if(one.totalPrice < zero.totalPrice * 1.5 && one.range < 5 &&  a > b + 1 && one.range > -5 && a > 3) {
-                                val f = TestShareInfo()
-                                f.time = one.time
-                                f.code = one.code
-                                f.name = one.name
-                                f.dayCount = it.dayCount
-                                f.startIndex = mDeviationValue + 1
-                                TestShareDatabase.getInstance()?.getTestShareDao()?.insert(f)
-                            }
-
 //                            if(!zhangTing(one) && one.totalPrice < 100000000) {
 //                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
 //                            } else {

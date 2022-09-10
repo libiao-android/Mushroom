@@ -9,6 +9,7 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.ban.BanShareInfo
 import com.libiao.mushroom.utils.LogUtil
+import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
 import java.io.BufferedReader
 import java.io.File
@@ -26,9 +27,10 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
 
     var localList = mutableListOf<BanShareInfo>()
 
-    fun fetchInfo(data: MutableList<BanShareInfo>?) {
+    fun fetchInfo(data: MutableList<BanShareInfo>?, type: Int = 0) {
         withState {
             LogUtil.i(TAG, "fetchInfo")
+            val dataT = ArrayList<BanShareInfo>()
             data?.forEach {
                 val f = File(file_2021, it.code)
                 if(f.exists()) {
@@ -56,6 +58,11 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
                         val candleEntrys = java.util.ArrayList<CandleEntry>()
                         val barEntrys = java.util.ArrayList<BarEntry>()
                         val colorEntrys = java.util.ArrayList<Int>()
+                        var two: SharesRecordActivity.ShareInfo? = null
+                        var three: SharesRecordActivity.ShareInfo? = null
+                        var four: SharesRecordActivity.ShareInfo? = null
+                        var five: SharesRecordActivity.ShareInfo? = null
+                        var six: SharesRecordActivity.ShareInfo? = null
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
                             if(item.beginPrice == 0.00) {
@@ -69,6 +76,21 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
                             if(index == c - it.dayCount + it.ban) {
                                 colorEntrys.add(Color.BLACK)
                             } else {
+                                if(index == c - it.dayCount + it.ban + 1) {
+                                    two = item
+                                }
+                                if(index == c - it.dayCount + it.ban + 2) {
+                                    three = item
+                                }
+                                if(index == c - it.dayCount + it.ban + 3) {
+                                    four = item
+                                }
+                                if(index == c - it.dayCount + it.ban + 4) {
+                                    five = item
+                                }
+                                if(index == c - it.dayCount + it.ban + 5) {
+                                    six = item
+                                }
                                 val green = "#28FF28"
                                 val red = "#FF0000"
                                 if(item.beginPrice > item.nowPrice) {
@@ -91,17 +113,37 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
                         it.candleEntryList = candleEntrys
                         it.barEntryList = barEntrys
                         it.colorsList = colorEntrys
+
+                        if(type == 1) {
+                            if(four != null && !ShareParseUtil.zhangTing(two!!)) {
+                                if(yin(two!!) && yang(three!!) && yang(four!!) && !ShareParseUtil.zhangTing(three!!) && !ShareParseUtil.zhangTing(four!!)) {
+                                    if(three!!.maxPrice < two!!.maxPrice) {
+                                        dataT.add(it)
+                                    }
+                                }
+                            }
+                        } else {
+                            dataT.add(it)
+                        }
                     }
                 }
             }
-            data?.sortBy { it.dayCount }
-            data?.also {
+            dataT.sortBy { it.dayCount }
+            dataT.also {
                 localList = it
                 setState {
                     copy(infoList = it)
                 }
             }
         }
+    }
+
+    private fun yin(two: SharesRecordActivity.ShareInfo): Boolean {
+        return two.beginPrice > two.nowPrice
+    }
+
+    private fun yang(two: SharesRecordActivity.ShareInfo): Boolean {
+        return two.nowPrice > two.beginPrice
     }
 
     fun deleteItem(item: BanShareInfo) {

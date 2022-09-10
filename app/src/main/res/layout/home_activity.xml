@@ -33,6 +33,13 @@
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="机构信息记录"
+        android:onClick="jiGou"/>
+
+    <Button
+        android:layout_marginTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="当天--信息记录"
         android:onClick="record"/>
 
@@ -57,13 +64,5 @@
         android:layout_height="wrap_content"
         android:text="我的--池"
         android:onClick="myPool"/>
-
-    <Button
-        android:layout_marginTop="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="机构"
-        android:onClick="jiGou"/>
-
 
 </LinearLayout>

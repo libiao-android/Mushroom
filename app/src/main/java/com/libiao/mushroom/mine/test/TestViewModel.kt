@@ -18,6 +18,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
+import kotlin.math.min
 
 class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) {
 
@@ -29,13 +30,16 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     var localList = mutableListOf<TestShareInfo>()
 
+    var isMorePrice = false
+    var isLessPrice = false
+
     fun fetchInfo(month: Int) {
         withState {
             LogUtil.i(TAG, "fetchInfo")
             val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
             val dataT = ArrayList<TestShareInfo>()
             data?.forEach {
-                if(it.dayCount > 5 && isFit(month, it.time!!)) {
+                if(it.dayCount > 0 && isFit(month, it.time!!)) {
                     val f = File(file_2021, it.code)
                     if(f.exists()) {
                         val stream = FileInputStream(f)
@@ -44,9 +48,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                         if(it.candleEntryList == null) {
 
-                            var a = it.startIndex - it.dayCount
+                            var a = it.startIndex - 20
                             if(a < 0) a = 0
-                            var b = it.startIndex + 5
+                            var b = it.startIndex + 20
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(a, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -57,6 +61,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             val values_20 = java.util.ArrayList<Entry>()
                             var one: SharesRecordActivity.ShareInfo? = null
                             var two: SharesRecordActivity.ShareInfo? = null
+                            var three: SharesRecordActivity.ShareInfo? = null
+                            var minPrice = 99999.00
+                            var zhangFu = 0.00
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
                                 if(item.beginPrice == 0.00) {
@@ -80,12 +87,28 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
-                                if(index == it.dayCount) {
+                                if(index in 10..19) {
+                                    val tempM = min(item.beginPrice, item.nowPrice)
+                                    if(tempM != 0.00 && tempM < minPrice) {
+                                        minPrice = tempM
+                                    }
+                                }
+                                if(index == 20) {
                                     colorEntrys.add(Color.BLACK)
-                                    it.ext1 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
-                                    one = item
                                 } else {
+                                    if(index == 21) {
+                                        one = item
+                                    }
+                                    if(index == 22) {
+                                        two = item
+                                    }
+                                    if(index == 23) {
+                                        three = item
+                                        if(minPrice != 0.00) {
+                                            zhangFu = (item.nowPrice - minPrice) / minPrice * 100
+                                        }
 
+                                    }
                                     val green = "#28FF28"
                                     val red = "#FF0000"
                                     if(item.beginPrice > item.nowPrice) {
@@ -101,10 +124,8 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                     }
                                 }
 
-                                if(index == it.dayCount + 1) {
+                                if(index == records.size - 1) {
                                     it.lastShareInfo = item
-                                    it.ext2 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
-                                    two = item
                                 }
                             }
                             it.candleEntryList = candleEntrys
@@ -118,7 +139,25 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 //
 //                                }
 //                            }
-                            dataT.add(it)
+                            it.moreInfo = String.format("%.1f", zhangFu)
+                            if(three != null && two!!.maxPrice < one!!.maxPrice && zhangFu < 20) {
+                                val liangBi = baoLiuXiaoShu(three!!.totalPrice / two!!.totalPrice)
+                                val f = "${three!!.rangeBegin},  ${three!!.rangeMin},  ${three!!.rangeMax},  $liangBi"
+                                if(isMorePrice) {
+                                    if(three!!.totalPrice >= two!!.totalPrice * 0.95) {
+                                        dataT.add(it)
+                                        it.label1 = f
+                                    }
+
+                                } else if(isLessPrice) {
+                                    if(three!!.totalPrice < two!!.totalPrice * 0.95) {
+                                        dataT.add(it)
+                                        it.label1 = f
+                                    }
+                                } else {
+                                    dataT.add(it)
+                                }
+                            }
                         }
                     }
                 }
@@ -159,6 +198,18 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
             }
             8 -> {
                 return time.startsWith("2022-8") || time.startsWith("2022-08")
+            }
+            9 -> {
+                return time.startsWith("2022-9") || time.startsWith("2022-09")
+            }
+            10 -> {
+                return time.startsWith("2022-10")
+            }
+            11 -> {
+                return time.startsWith("2022-11")
+            }
+            12 -> {
+                return time.startsWith("2022-12")
             }
         }
         return false
@@ -257,5 +308,13 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 it.copy(infoList = list)
             }
         }
+    }
+
+    fun setMorePriceChecked(checked: Boolean) {
+        isMorePrice = checked
+    }
+
+    fun setLessPricechecked(checked: Boolean) {
+        isLessPrice = checked
     }
 }
