@@ -23,6 +23,8 @@ class MineShareInfo {
     var dayCount: Int = 0
     var updateTime: String? = null
     var heart: Boolean = false
+    var maxPrice: Double = 0.00
+    var maxCount = 0
 
     var label1: String? = null
     var label2: String? = null
@@ -74,6 +76,9 @@ class MineShareInfo {
     val values_10 = ArrayList<Entry>()
     @Ignore
     val values_20 = ArrayList<Entry>()
+
+    @Ignore
+    var showFenShi = false
 
 
     @Ignore

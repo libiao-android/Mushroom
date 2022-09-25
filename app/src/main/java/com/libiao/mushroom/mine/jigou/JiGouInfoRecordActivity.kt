@@ -60,7 +60,7 @@ class JiGouInfoRecordActivity: BaseActivity() {
 
             if(data != null && data!!.size > 0) {
                 data!!.forEach {
-                    if(it.code == code) {
+                    if(it.code == CodeUtil.getCode(code)) {
                         shareInfo = it
                         return@forEach
                     }
@@ -78,6 +78,7 @@ class JiGouInfoRecordActivity: BaseActivity() {
                 JiGouShareDatabase.getInstance()?.getJiGouShareDao()?.update(shareInfo!!)
                 tv_result.text = "更新成功"
             }
+            et_code.setText("")
             et_info.setText("")
         } else {
             tv_result.text = "不能为空"

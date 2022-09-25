@@ -113,18 +113,7 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
                         it.candleEntryList = candleEntrys
                         it.barEntryList = barEntrys
                         it.colorsList = colorEntrys
-
-                        if(type == 1) {
-                            if(four != null && !ShareParseUtil.zhangTing(two!!)) {
-                                if(yin(two!!) && yang(three!!) && yang(four!!) && !ShareParseUtil.zhangTing(three!!) && !ShareParseUtil.zhangTing(four!!)) {
-                                    if(three!!.maxPrice < two!!.maxPrice) {
-                                        dataT.add(it)
-                                    }
-                                }
-                            }
-                        } else {
-                            dataT.add(it)
-                        }
+                        dataT.add(it)
                     }
                 }
             }

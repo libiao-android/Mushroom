@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="35dp">
         <TextView
+            android:id="@+id/tv_id"
             android:textColor="@color/blank"
             android:textSize="16dp"
             android:gravity="center"

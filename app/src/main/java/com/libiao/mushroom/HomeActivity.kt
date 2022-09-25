@@ -13,6 +13,7 @@ import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.CollectActivity
 import com.libiao.mushroom.mine.SelfSelectionActivity
 import com.libiao.mushroom.mine.jigou.JiGouInfoRecordActivity
+import com.libiao.mushroom.report.MyReportActivity
 import com.libiao.mushroom.utils.CodeUtil
 import com.libiao.mushroom.utils.LogUtil
 import com.permissionx.guolindev.PermissionX
@@ -95,6 +96,8 @@ class HomeActivity : AppCompatActivity() {
 //        startActivity(intent)
         val intent = Intent(this, SelfSelectionActivity::class.java)
         startActivity(intent)
+
+
     }
 
     fun myCollect(v: View) {
@@ -146,6 +149,11 @@ class HomeActivity : AppCompatActivity() {
                 //if(count == 10) {break}
             }
         }
+    }
+
+    fun myReport(v: View) {
+        val intent = Intent(this, MyReportActivity::class.java)
+        startActivity(intent)
     }
 
     private fun writeFileAppend(recordFile: File, info: String) {

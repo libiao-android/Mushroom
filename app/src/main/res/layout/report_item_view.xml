@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.libiao.mushroom.report.ReportItemView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/test_item_info_view"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_marginLeft="6dp"
+            android:textColor="@color/blank_60"
+            android:textSize="15dp"
+            android:id="@+id/test_item_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:textColor="@color/blank_60"
+            android:layout_marginLeft="10dp"
+            android:textSize="15dp"
+            android:id="@+id/test_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:textColor="@color/blank_60"
+            android:layout_marginLeft="10dp"
+            android:textSize="15dp"
+            android:id="@+id/test_item_total_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textColor="@color/blank_60"
+            android:layout_marginLeft="10dp"
+            android:textSize="15dp"
+            android:id="@+id/test_item_range"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:visibility="visible"
+        android:id="@+id/test_item_heart"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="5dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@mipmap/heart"/>
+
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:visibility="gone"
+        android:layout_below="@+id/test_item_info_view"
+        android:id="@+id/test_item_candler_chart"
+        android:layout_width="300dp"
+        android:layout_height="90dp"/>
+
+
+    <com.github.mikephil.charting.charts.CombinedChart
+        android:layout_below="@+id/test_item_info_view"
+        android:id="@+id/combined_chart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:layout_marginTop="-30dp"
+        android:layout_below="@+id/combined_chart"
+        android:id="@+id/test_item_bar_chart"
+        android:layout_width="300dp"
+        android:layout_height="70dp"/>
+
+    <TextView
+        android:layout_alignParentRight="true"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:textSize="11dp"
+        android:id="@+id/test_item_more_info"
+        android:background="@drawable/type_fang_liang_bg"
+        android:layout_marginTop="6dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/test_item_info_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:textSize="11dp"
+        android:background="@drawable/type_more_info_bg"
+        android:layout_below="@+id/test_item_info_view"
+        android:id="@+id/report_item_yin_xian_length"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_marginTop="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/test_item_info_view"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/test_item_candler_chart"
+        android:orientation="vertical"
+        android:id="@+id/test_item_label_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+    <ImageView
+        android:layout_marginTop="-30dp"
+        android:layout_below="@+id/test_item_bar_chart"
+        android:id="@+id/iv_report_item_fen_shi"
+        android:layout_width="300dp"
+        android:layout_height="200dp"/>
+
+    <View
+        android:layout_marginTop="-15dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_below="@+id/iv_report_item_fen_shi"
+        android:background="#e5e5e5"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+</com.libiao.mushroom.report.ReportItemView>

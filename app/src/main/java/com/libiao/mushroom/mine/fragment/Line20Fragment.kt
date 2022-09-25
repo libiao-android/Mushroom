@@ -12,6 +12,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.charts.CombinedChart
@@ -135,6 +137,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun initView() {
+
+        tv_id?.setOnClickListener {
+            mAdapter?.changeShiTu()
+        }
+
         self_selection_rv?.layoutManager = LinearLayoutManager(context)
         mAdapter = MyPoolInfoAdater(context!!)
         self_selection_rv?.adapter = mAdapter
@@ -263,6 +270,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val two = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 1])
                     var allPrice = 0.00
                     var allDay = 0
+                    var itemIn = 0
                     if(it.candleEntryList == null || reload) {
                         var begin = lines.size - it.dayCount - 2
                         if(begin < 0) begin = 0
@@ -272,7 +280,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         val colorEntrys = java.util.ArrayList<Int>()
                         var maxPrice = one.nowPrice
                         var totalP = 0.00
-                        var itemIn = 0
+
                         var tempItem: SharesRecordActivity.ShareInfo? = null
                         var greenLittle = true
                         it.values_5.clear()
@@ -302,7 +310,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 totalP = item.totalPrice
                                 itemIn = index
                             }
-                            if(item.nowPrice > maxPrice) maxPrice = item.nowPrice
+                            if(item.nowPrice > maxPrice) {
+                                maxPrice = item.nowPrice
+                            }
                             if(item.beginPrice == 0.00) {
                                 entrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
                             } else {
@@ -383,8 +393,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             }
                         }
 
-                        if(ten2.nowPrice > ten2.beginPrice && ten1.maxPrice < ten2.maxPrice
-                            && ten1.minPrice > ten2.minPrice && ten1.totalPrice < ten2.totalPrice * 0.8) {
+                        if(itemIn > 3) {
                             it.youThree = true
                         }
 
@@ -539,7 +548,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         if(it.price > 0) {
             val a = min(share.rangeBegin, share.range) - share.rangeMin
             val b = share.rangeMax - max(share.rangeBegin, share.range)
-            if(share.totalPrice < sharePre.totalPrice * 1.5 && share.range < 5 &&  a > b + 1 && share.range > -5) {
+
+            if(share.range < 5 && share.range > -5) {
                 it.yinXianLength = a
             } else {
                 it.yinXianLength = 0.00
@@ -581,6 +591,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
         private var mSharesInfoList: List<MineShareInfo> = ArrayList()
 
+        private var showFenShi = false
+
 
         fun setData(sharesInfoList: List<MineShareInfo>) {
             mSharesInfoList = sharesInfoList
@@ -603,6 +615,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         override fun onBindViewHolder(holder: MyPoolHolder, position: Int) {
             holder.bindData(position, mSharesInfoList[position])
         }
+
+        fun changeShiTu() {
+            showFenShi = !showFenShi
+            mSharesInfoList.forEach {
+                it.showFenShi = showFenShi
+            }
+            notifyDataSetChanged()
+        }
     }
 
     inner class MyPoolHolder(context: Context, view: View) : RecyclerView.ViewHolder(view) {
@@ -621,6 +641,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         private var chart: CandleStickChart? = null
         private var combinedChart: CombinedChart? = null
         private var bar: BarChart? = null
+        private var divideView: View? = null
 
         private var heart: Boolean = false
 
@@ -629,6 +650,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         private var mTypeZhiDieTv: TextView? = null
 
         private var mAvgP: TextView? = null
+
+        private var mFenShiIv: ImageView? = null
 
 
         init {
@@ -642,6 +665,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             mTypeMaxRangeTv = view.findViewById(R.id.tv_type_max_rang)
             mTypeZhiDieTv = view.findViewById(R.id.tv_type_zhi_die)
             mAvgP = view.findViewById(R.id.tv_type_avg_p)
+
+            mFenShiIv = view.findViewById(R.id.iv_fen_shi)
+
+            divideView = view.findViewById(R.id.divide)
 
             moreInfoTv = view.findViewById(R.id.tv_more_info)
             heartIv = view.findViewById(R.id.iv_item_heart)
@@ -675,6 +702,25 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
             mIdTv?.setOnClickListener {
+                mineShareInfo!!.showFenShi = !mineShareInfo!!.showFenShi
+                if(mineShareInfo!!.showFenShi) {
+                    mFenShiIv?.visibility = View.VISIBLE
+                    combinedChart?.visibility = View.GONE
+                    bar?.visibility = View.GONE
+                    divideView?.visibility = View.GONE
+                    Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${mineShareInfo!!.code}.gif")
+                        .asGif()
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .into(mFenShiIv)
+                } else {
+                    mFenShiIv?.visibility = View.GONE
+                    combinedChart?.visibility = View.VISIBLE
+                    bar?.visibility = View.VISIBLE
+                    divideView?.visibility = View.VISIBLE
+                }
+            }
+            mCodeTv?.setOnClickListener {
                 ClipboardUtil.clip(context, mineShareInfo?.code)
             }
 
@@ -834,6 +880,23 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.yinXianLength)
 
             mAvgP?.text = "${String.format("%.2f",info.avgP / 100000000)}亿"
+
+            if(info.showFenShi) {
+                mFenShiIv?.visibility = View.VISIBLE
+                combinedChart?.visibility = View.GONE
+                bar?.visibility = View.GONE
+                divideView?.visibility = View.GONE
+                Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${info.code}.gif")
+                    .asGif()
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(mFenShiIv)
+            } else {
+                mFenShiIv?.visibility = View.GONE
+                combinedChart?.visibility = View.VISIBLE
+                bar?.visibility = View.VISIBLE
+                divideView?.visibility = View.VISIBLE
+            }
         }
 
         private fun getWidth(size: Int): Int {

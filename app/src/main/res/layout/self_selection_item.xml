@@ -158,6 +158,14 @@
         android:layout_height="70dp"/>
 
     <ImageView
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="40dp"
+        android:id="@+id/iv_fen_shi"
+        android:layout_below="@+id/item_view"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"/>
+
+    <ImageView
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:id="@+id/iv_item_heart"
@@ -168,6 +176,7 @@
         android:layout_height="25dp"/>
 
     <View
+        android:id="@+id/divide"
         android:layout_marginRight="5dp"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="-10dp"

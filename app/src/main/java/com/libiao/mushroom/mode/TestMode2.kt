@@ -2,13 +2,12 @@ package com.libiao.mushroom.mode
 
 import android.content.Context
 import com.libiao.mushroom.SharesRecordActivity
-import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
+import com.libiao.mushroom.room.test.TestShareDatabase2
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
-import com.libiao.mushroom.utils.ShareParseUtil
 
-class TestMode : BaseMode {
+class TestMode2 : BaseMode {
 
     constructor(): super() {
     }
@@ -18,7 +17,7 @@ class TestMode : BaseMode {
     private val poolMap = HashMap<String, TestShareInfo>()
 
     init {
-        val fangLiangShares = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
+        val fangLiangShares = TestShareDatabase2.getInstance()?.getTestShareDao()?.getShares()
         fangLiangShares?.forEach {
             //LogUtil.i(TAG, "getMineShares: ${it.code}")
             poolMap[it.code!!] = it
@@ -38,25 +37,27 @@ class TestMode : BaseMode {
             val four = shares[mDeviationValue + 3]
             val five = shares[mDeviationValue + 4]
 
-            if(!isChuang(one.code) && !zhangTing(one) && zhangTing(two) && !zhangTing(three)) {
+            if(zhangTing(two) && !zhangTing(three)) {
+                var a = 0
+                if (yang(three)) a++
+                if (yang(four)) a++
+                if (yang(five)) a++
 
-                if(yin(three) && yang(four) && yang(five) && !zhangTing(four) && !zhangTing(five)) {
-                    if(four.maxPrice < five.maxPrice) {
-                        i(TAG, "${five.brieflyInfo()}")
-                        mFitModeList.add(Pair(five.range, five))
+                if(a >= 2 && !zhangTing(five)) {
+                    i(TAG, "${five.brieflyInfo()}")
+                    mFitModeList.add(Pair(five.range, five))
 
-                        val info = TestShareInfo()
-                        info.time = two.time
-                        info.code = two.code
-                        info.name = two.name
-                        info.dayCount = 3
-                        info.updateTime = two.time
-                        info.startIndex = mDeviationValue + 1
+                    val info = TestShareInfo()
+                    info.time = two.time
+                    info.code = two.code
+                    info.name = two.name
+                    info.dayCount = 3
+                    info.updateTime = two.time
+                    info.startIndex = mDeviationValue + 1
 
-                        val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
-                        info.id = id?.toInt() ?: 0
-                        poolMap[two.code!!] = info
-                    }
+                    val id = TestShareDatabase2.getInstance()?.getTestShareDao()?.insert(info)
+                    info.id = id?.toInt() ?: 0
+                    poolMap[two.code!!] = info
                 }
             }
         }
@@ -73,7 +74,7 @@ class TestMode : BaseMode {
     }
 
     override fun des(): String {
-        return "test"
+        return "test2"
     }
 
     private fun yin(two: SharesRecordActivity.ShareInfo): Boolean {
@@ -81,7 +82,7 @@ class TestMode : BaseMode {
     }
 
     private fun yang(two: SharesRecordActivity.ShareInfo): Boolean {
-        return two.nowPrice > two.beginPrice
+        return two.nowPrice > two.beginPrice && two.range > 0
     }
 
 }

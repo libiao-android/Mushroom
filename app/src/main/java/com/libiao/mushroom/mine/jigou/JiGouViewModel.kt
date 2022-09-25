@@ -41,17 +41,20 @@ class JiGouViewModel(initial: JiGouState): MavericksViewModel<JiGouState>(initia
                     val lines = reader.readLines()
 
                     val info = it.jiGouInfo
-                    it.moreInfo = info
+                    var moreInfo = ""
+
                     val map = HashMap<String, String>()
                     val times = arrayListOf<String>()
                     info?.also { i ->
                         val vs = i.split(",")
                         vs.forEach { j ->
                             val v = j.split("#")
-                            map[v[0]] = v[1]
-                            times.add(v[0])
+                            map[v[0].trim()] = v[1].trim()
+                            times.add(v[0].trim())
+                            moreInfo += "${v[1].trim()} "
                         }
                     }
+                    it.moreInfo = moreInfo
                     var ind = 0
                     lines.forEachIndexed { index, s1 ->
                         val si = SharesRecordActivity.ShareInfo(s1)
@@ -130,7 +133,23 @@ class JiGouViewModel(initial: JiGouState): MavericksViewModel<JiGouState>(initia
                 }
 
             }
-            //data?.sortBy { it.dayCount }
+            dataT.sortByDescending { it.time }
+
+//            dataT.sortedWith(Comparator<JiGouShareInfo> { o1, o2 ->
+//                val time1 = o1.time!!.split("-")
+//                val time2 = o2.time!!.split("-")
+//                time1[2].toInt().compareTo(time2[2].toInt())
+//
+////                if(time1[0].toInt() == time2[0].toInt()) {
+////                    if(time1[1].toInt() == time2[1].toInt()) {
+////                        time1[2].toInt().compareTo(time2[2].toInt())
+////                    } else {
+////                        time1[1].toInt().compareTo(time2[1].toInt())
+////                    }
+////                } else {
+////                    time1[0].toInt().compareTo(time2[0].toInt())
+////                }
+//            })
             dataT.also {
                 localList = it
                 setState {

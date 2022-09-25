@@ -20,7 +20,7 @@ import com.libiao.mushroom.mine.jigou.JiGouViewModel
 import com.libiao.mushroom.mine.jigou.jiGouItemView
 import com.libiao.mushroom.mine.tab.JiGouTab
 import com.libiao.mushroom.mine.timeItemView
-import com.libiao.mushroom.room.TestShareDatabase
+import com.libiao.mushroom.room.jigou.JiGouShareDatabase
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.ji_gou_fragment.*
@@ -153,7 +153,7 @@ class JiGouFragment: BaseFragment(R.layout.ji_gou_fragment), MavericksView, ICom
                             MoreDialog(context!!){view2 ->
                                 when(view2.id) {
                                     R.id.btn_dialog_delete -> {
-                                        TestShareDatabase.getInstance()?.getTestShareDao()?.delete(it.code!!)
+                                        JiGouShareDatabase.getInstance()?.getJiGouShareDao()?.delete(it.code!!)
                                         testViewModel.deleteItem(it)
                                     }
                                 }

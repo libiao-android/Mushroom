@@ -1,4 +1,4 @@
-package com.libiao.mushroom.room
+package com.libiao.mushroom.room.report
 
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -10,13 +10,15 @@ import com.libiao.mushroom.SharesRecordActivity
 import java.util.ArrayList
 
 @Entity
-data class TestShareInfo(
+data class ReportShareInfo(
     @PrimaryKey(autoGenerate = true)//主键是否自动增长，默认为false
     var id: Int = 0,
 
     var time: String? = null,
     var code: String? = null,
     var name: String? = null,
+    var yinXianLength: Double = 0.00,
+
     var beginPrice: Double = 0.00,
     var preAvg: Double = 0.00, //平均量能
     var dayCount: Int = 0,
@@ -60,17 +62,16 @@ data class TestShareInfo(
     @Ignore
     var values_20: ArrayList<Entry>? = null,
     @Ignore
-    var lastShareInfo: SharesRecordActivity.ShareInfo? = null
+    var lastShareInfo: SharesRecordActivity.ShareInfo? = null,
+    @Ignore
+    var fenShiPath: String? = null
 ) {
-
-
-
     override fun toString(): String {
         return "${time}, ${code}, $name"
     }
 
-    fun copy(): TestShareInfo {
-        val info = TestShareInfo()
+    fun copy(): ReportShareInfo {
+        val info = ReportShareInfo()
         info.id = this.id
         info.time = this.time
         info.code = this.code
@@ -138,6 +139,8 @@ data class TestShareInfo(
         }
 
         info.lastShareInfo = this.lastShareInfo
+
+        info.fenShiPath = this.fenShiPath
 
         return info
     }

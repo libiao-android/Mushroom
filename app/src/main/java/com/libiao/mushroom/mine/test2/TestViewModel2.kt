@@ -1,4 +1,4 @@
-package com.libiao.mushroom.mine.test
+package com.libiao.mushroom.mine.test2
 
 import android.graphics.Color
 import android.os.Environment
@@ -9,7 +9,8 @@ import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
-import com.libiao.mushroom.room.TestShareDatabase
+import com.libiao.mushroom.mine.test.TestState
+import com.libiao.mushroom.room.test.TestShareDatabase2
 import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
@@ -20,7 +21,7 @@ import java.io.InputStreamReader
 import java.nio.charset.Charset
 import kotlin.math.min
 
-class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) {
+class TestViewModel2(initial: TestState): MavericksViewModel<TestState>(initial) {
 
     companion object {
         private const val TAG = "TestViewModel"
@@ -36,7 +37,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     fun fetchInfo(month: Int) {
         withState {
             LogUtil.i(TAG, "fetchInfo")
-            val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
+            val data = TestShareDatabase2.getInstance()?.getTestShareDao()?.getShares()
             val dataT = ArrayList<TestShareInfo>()
             data?.forEach {
                 if(it.dayCount > 0 && isFit(month, it.time!!)) {
@@ -48,7 +49,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                         if(it.candleEntryList == null) {
 
-                            var a = it.startIndex - it.dayCount
+                            var a = it.startIndex - 20
                             if(a < 0) a = 0
                             var b = it.startIndex + 20
                             if(lines.size < b) b = lines.size
@@ -59,9 +60,12 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             val values_5 = java.util.ArrayList<Entry>()
                             val values_10 = java.util.ArrayList<Entry>()
                             val values_20 = java.util.ArrayList<Entry>()
-
-                            var range = 0.00
-
+                            var one: SharesRecordActivity.ShareInfo? = null
+                            var two: SharesRecordActivity.ShareInfo? = null
+                            var three: SharesRecordActivity.ShareInfo? = null
+                            var four: SharesRecordActivity.ShareInfo? = null
+                            var minPrice = 99999.00
+                            var zhangFu = 0.00
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
                                 if(item.beginPrice == 0.00) {
@@ -85,15 +89,31 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
-
-                                if(index < it.dayCount) {
-                                    range += item.range
+                                if(index in 10..19) {
+                                    val tempM = min(item.beginPrice, item.nowPrice)
+                                    if(tempM != 0.00 && tempM < minPrice) {
+                                        minPrice = tempM
+                                    }
                                 }
-
-                                if(index == it.dayCount) {
+                                if(index == 20) {
                                     colorEntrys.add(Color.BLACK)
                                 } else {
+                                    if(index == 21) {
+                                        one = item
+                                    }
+                                    if(index == 22) {
+                                        two = item
+                                    }
+                                    if(index == 23) {
+                                        three = item
+                                        if(minPrice != 0.00) {
+                                            zhangFu = (item.nowPrice - minPrice) / minPrice * 100
+                                        }
 
+                                    }
+                                    if(index == 24) {
+                                        four = item
+                                    }
                                     val green = "#28FF28"
                                     val red = "#FF0000"
                                     if(item.beginPrice > item.nowPrice) {
@@ -124,10 +144,42 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 //
 //                                }
 //                            }
-                            it.moreInfo = String.format("%.2f", range) + ", ${it.maxCount}"
-                            if(it.maxCount == 1) {
-                                dataT.add(it)
-                            }
+                            it.moreInfo = String.format("%.1f", zhangFu)
+
+//                            if(three != null && yin(two!!) && three!!.totalPrice > two!!.totalPrice && three!!.maxPrice < one!!.maxPrice && two!!.maxPrice < one!!.maxPrice) {
+//                                val m = (two!!.minPrice + two!!.maxPrice) / 2
+//                                val n = (three!!.minPrice + three!!.maxPrice) / 2
+//                                val p = (n - m) / m * 100
+//                                it.label1 = String.format("%.2f", p)
+//
+//                            }
+
+                            dataT.add(it)
+
+//                            if(three != null && yang(one!!) && yang(two!!) && yang(three!!)) {
+//
+//                            }
+
+                            //dataT.add(it)
+
+//                            if(three != null && two!!.maxPrice < one!!.maxPrice && zhangFu < 20) {
+//                                val liangBi = baoLiuXiaoShu(three!!.totalPrice / two!!.totalPrice)
+//                                val f = "${three!!.rangeBegin},  ${three!!.rangeMin},  ${three!!.rangeMax},  $liangBi"
+//                                if(isMorePrice) {
+//                                    if(three!!.totalPrice >= two!!.totalPrice * 0.95) {
+//                                        dataT.add(it)
+//                                        it.label1 = f
+//                                    }
+//
+//                                } else if(isLessPrice) {
+//                                    if(three!!.totalPrice < two!!.totalPrice * 0.95) {
+//                                        dataT.add(it)
+//                                        it.label1 = f
+//                                    }
+//                                } else {
+//                                    dataT.add(it)
+//                                }
+//                            }
                         }
                     }
                 }
@@ -286,5 +338,13 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun setLessPricechecked(checked: Boolean) {
         isLessPrice = checked
+    }
+
+    private fun yin(two: SharesRecordActivity.ShareInfo): Boolean {
+        return two.beginPrice > two.nowPrice
+    }
+
+    private fun yang(two: SharesRecordActivity.ShareInfo): Boolean {
+        return two.nowPrice > two.beginPrice
     }
 }

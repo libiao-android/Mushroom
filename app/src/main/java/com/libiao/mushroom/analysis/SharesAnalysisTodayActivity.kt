@@ -151,6 +151,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
         //mModeList.add(DuanCengMode())
         mModeList.add(TestMode())
+        mModeList.add(TestMode2())
         mModeList.add(FiveRedMode())
 
         //mModeList.add(ChuangYeBanTouJiMode())

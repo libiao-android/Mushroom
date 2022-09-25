@@ -1,16 +1,14 @@
-package com.libiao.mushroom.mine.test
+package com.libiao.mushroom.report
 
 import android.graphics.Color
 import android.os.Environment
-import androidx.room.Ignore
 import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
-import com.libiao.mushroom.mine.fragment.BaseFragment
-import com.libiao.mushroom.room.TestShareDatabase
-import com.libiao.mushroom.room.TestShareInfo
+import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
 import java.io.BufferedReader
@@ -18,39 +16,53 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
-import kotlin.math.min
 
-class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) {
+class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(initial) {
 
     companion object {
-        private const val TAG = "TestViewModel"
+        private const val TAG = "ReportViewModel"
     }
 
     private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
 
-    var localList = mutableListOf<TestShareInfo>()
+    var localList = mutableListOf<ReportShareInfo>()
 
-    var isMorePrice = false
-    var isLessPrice = false
 
     fun fetchInfo(month: Int) {
         withState {
-            LogUtil.i(TAG, "fetchInfo")
-            val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
-            val dataT = ArrayList<TestShareInfo>()
+            val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getShares()
+            LogUtil.i(TAG, "fetchInfo: ${data?.size}")
+            val dataT = ArrayList<ReportShareInfo>()
+            val dataTime = ArrayList<ReportShareInfo>()
+
+            var time = ""
             data?.forEach {
-                if(it.dayCount > 0 && isFit(month, it.time!!)) {
+                if(isFit(month, it.time!!)) {
+                    if(it.time == time) {
+
+                    } else {
+                        time = it.time!!
+                        dataTime.sortByDescending { it.yinXianLength }
+                        dataT.addAll(dataTime)
+                        dataTime.clear()
+                    }
                     val f = File(file_2021, it.code)
                     if(f.exists()) {
                         val stream = FileInputStream(f)
                         val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                         val lines = reader.readLines()
-
+                        var startIndex = 0
+                        lines.forEachIndexed{ind, line ->
+                            if(line.startsWith(it.time!!)) {
+                                startIndex = ind
+                                return@forEachIndexed
+                            }
+                        }
                         if(it.candleEntryList == null) {
 
-                            var a = it.startIndex - it.dayCount
+                            var a = startIndex - 10
                             if(a < 0) a = 0
-                            var b = it.startIndex + 20
+                            var b = startIndex + 10
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(a, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -61,6 +73,8 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             val values_20 = java.util.ArrayList<Entry>()
 
                             var range = 0.00
+
+                            var pre: SharesRecordActivity.ShareInfo? = null
 
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
@@ -90,10 +104,13 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                     range += item.range
                                 }
 
-                                if(index == it.dayCount) {
+                                if(index == 9) {
+                                    pre = item
+                                }
+                                if(index == 10) {
                                     colorEntrys.add(Color.BLACK)
+                                    it.lastShareInfo = item
                                 } else {
-
                                     val green = "#28FF28"
                                     val red = "#FF0000"
                                     if(item.beginPrice > item.nowPrice) {
@@ -108,10 +125,6 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                         }
                                     }
                                 }
-
-                                if(index == records.size - 1) {
-                                    it.lastShareInfo = item
-                                }
                             }
                             it.candleEntryList = candleEntrys
                             it.barEntryList = barEntrys
@@ -119,21 +132,26 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             it.values_5 = values_5
                             it.values_10 = values_10
                             it.values_20 = values_20
-//                            if(one != null && two != null) {
-//                                if(two!!.minPrice > one!!.minPrice && two!!.maxPrice < one!!.maxPrice && one!!.totalPrice > two!!.totalPrice) {
-//
-//                                }
-//                            }
-                            it.moreInfo = String.format("%.2f", range) + ", ${it.maxCount}"
-                            if(it.maxCount == 1) {
-                                dataT.add(it)
+
+                            var liangBi = "0"
+                            if(it.lastShareInfo!!.totalPrice > 0) {
+                                liangBi = baoLiuXiaoShu(it.lastShareInfo!!.totalPrice / pre!!.totalPrice)
                             }
+                            it.moreInfo = "${it.lastShareInfo?.rangeBegin},  ${it.lastShareInfo?.rangeMin},  ${it.lastShareInfo?.rangeMax},  ${String.format("%.2f",it.lastShareInfo!!.totalPrice / 100000000)}亿,  ${liangBi}"
+
+                            it.fenShiPath = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi/${it.code}-${it.time}.jpg").absolutePath
+                            dataTime.add(it)
                         }
                     }
                 }
 
             }
-            dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
+
+            dataTime.sortByDescending { it.yinXianLength }
+            dataT.addAll(dataTime)
+            dataTime.clear()
+
+            dataT.sortBy { it.time!!.split("-")[2].toInt() }
             dataT.also {
                 localList = it
                 setState {
@@ -185,9 +203,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         return false
     }
 
-    fun deleteItem(item: TestShareInfo) {
+    fun deleteItem(item: ReportShareInfo) {
         withState {
-            val list = mutableListOf<TestShareInfo>()
+            val list = mutableListOf<ReportShareInfo>()
             list.addAll(it.infoList)
             list.remove(item)
             setState {
@@ -196,76 +214,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         }
     }
 
-    fun sortMaxPrice(callback: (s: String) -> Unit) {
-        withState {
-            val list = mutableListOf<TestShareInfo>()
-            list.addAll(it.infoList)
-            list.sortByDescending { info -> info.lastShareInfo?.totalPrice }
-            val s1 = "${list[0].lastShareInfo?.name}, ${String.format("%.1f",(list[0].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
-            val s2 = "${list[1].lastShareInfo?.name}, ${String.format("%.1f",(list[1].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
-            val s3 = "${list[2].lastShareInfo?.name}, ${String.format("%.1f",(list[2].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
-            val s4 = "${list[3].lastShareInfo?.name}, ${String.format("%.1f",(list[3].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
-            val s5 = "${list[4].lastShareInfo?.name}, ${String.format("%.1f",(list[4].lastShareInfo?.totalPrice ?: 0.00) / 100000000)}亿"
-            val s = "$s1\n$s2\n$s3\n$s4\n$s5"
-            callback.invoke(s)
-        }
-    }
-
-    fun updateNetWork(baseFragment: BaseFragment) {
-        withState {s ->
-            val temp = mutableListOf<TestShareInfo>()
-            temp.addAll(s.infoList)
-            var count = 0
-            temp.forEachIndexed { index, fangLiangShareInfo ->
-                baseFragment.shiShiQuery(fangLiangShareInfo.code!!) {share ->
-                    LogUtil.i(TAG, "share: ${share}")
-                    count ++
-
-                    val fangInfo = fangLiangShareInfo.copy()
-
-                    val candleSize = fangInfo.candleEntryList?.size ?: 0
-                    val lastShare = fangInfo.lastShareInfo
-
-                    var liangBi = "0"
-                    if(share.totalPrice > 0) {
-                        liangBi = baoLiuXiaoShu(share.totalPrice / lastShare!!.totalPrice)
-                    }
-
-                    fangInfo.lastShareInfo = share
-
-                    if(share.beginPrice == 0.00) {
-                        fangInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat()))
-                    } else {
-                        fangInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
-                    }
-                    fangInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi"
-                    val p = share.totalPrice.toFloat() / 100000000
-                    fangInfo.barEntryList?.add(BarEntry(candleSize.toFloat(), p))
-                    fangInfo.colorsList?.add(Color.GRAY)
-                    temp[index] = fangInfo
-
-                    if(count == temp.size) {
-                        LogUtil.i(TAG, "setState.......................")
-                        setState {
-                            copy(infoList = temp)
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    fun updateLocal() {
-        withState {s ->
-            setState {
-                copy(infoList = localList)
-            }
-        }
-    }
-
     fun expand(time: String) {
         withState {
-            val list = mutableListOf<TestShareInfo>()
+            val list = mutableListOf<ReportShareInfo>()
             list.addAll(it.infoList)
             list.forEachIndexed {index, info ->
                 val temp = info.copy()
@@ -278,13 +229,5 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 it.copy(infoList = list)
             }
         }
-    }
-
-    fun setMorePriceChecked(checked: Boolean) {
-        isMorePrice = checked
-    }
-
-    fun setLessPricechecked(checked: Boolean) {
-        isLessPrice = checked
     }
 }
