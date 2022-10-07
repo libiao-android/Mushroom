@@ -9,12 +9,14 @@ import com.airbnb.mvrx.viewModel
 import com.libiao.mushroom.R
 import com.libiao.mushroom.base.BaseActivity
 import com.libiao.mushroom.kline.KLineActivity
+import com.libiao.mushroom.mine.FenShiDialog
 import com.libiao.mushroom.mine.MoreDialog
 import com.libiao.mushroom.mine.timeItemView
 import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.report_activity.*
+import kotlinx.android.synthetic.main.report_item_view.view.*
 import java.util.*
 
 class MyReportActivity: BaseActivity(), MavericksView {
@@ -33,6 +35,9 @@ class MyReportActivity: BaseActivity(), MavericksView {
     private val reportViewModel: ReportViewModel by viewModel()
 
     private fun initView() {
+        cb_heart.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setOnlySeeHeart(isChecked)
+        }
         epoxy_view_report.setController(controller)
 
         reportViewModel.onEach(deliveryMode = UniqueOnly(UUID.randomUUID().toString())) {
@@ -86,12 +91,15 @@ class MyReportActivity: BaseActivity(), MavericksView {
         override fun buildModels(data: ReportState?) {
             LogUtil.i(TAG, "buildModels: ${data?.infoList?.size}")
             var time = ""
+            var index = 0
             data?.infoList?.forEach {
                 if (it.time != time) {
                     time = it.time ?: ""
+                    index = 0
                     timeItemView {
                         id(time)
                         time(it.time)
+                        count(it.ext1)
                         expand(it.expand)
                         click { v ->
                             reportViewModel.expand(it.time!!)
@@ -99,14 +107,22 @@ class MyReportActivity: BaseActivity(), MavericksView {
                     }
                 }
                 if (it.expand) {
+                    index ++
                     reportItemView {
                         id(it.id)
+                        index(index)
                         data(it)
                         click { view ->
                             val id = view.id
                             when (id) {
                                 R.id.test_item_code -> {
                                     ClipboardUtil.clip(this@MyReportActivity, it.code)
+                                }
+                                R.id.test_item_name -> {
+                                    FenShiDialog(this@MyReportActivity, it.code!!, it.time).show()
+                                }
+                                R.id.test_item_heart -> {
+                                    reportViewModel.shouCang(it)
                                 }
                                 else -> {
                                     val intent = Intent(this@MyReportActivity, KLineActivity::class.java)

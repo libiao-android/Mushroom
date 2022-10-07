@@ -20,10 +20,12 @@ import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import com.libiao.mushroom.R
 import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.huanSuanYi
 import kotlinx.android.synthetic.main.report_item_view.view.*
+import java.io.File
 
 @ModelView
 class ReportItemView @JvmOverloads constructor(
@@ -111,6 +113,11 @@ class ReportItemView @JvmOverloads constructor(
     }
 
     @ModelProp
+    fun setIndex(index: Int) {
+        test_item_id.text = "$index"
+    }
+
+    @ModelProp
     fun setData(info: ReportShareInfo) {
         test_item_code.text = info.code?.substring(2)
         test_item_name.text = info.name
@@ -123,6 +130,12 @@ class ReportItemView @JvmOverloads constructor(
             } else {
                 test_item_range.setTextColor(Color.GREEN)
             }
+        }
+
+        if(info.collect == 1) {
+            test_item_heart.setImageResource(R.mipmap.heart_selected)
+        } else {
+            test_item_heart.setImageResource(R.mipmap.heart)
         }
 
         info.candleEntryList?.also {
@@ -175,6 +188,13 @@ class ReportItemView @JvmOverloads constructor(
             test_item_more_info.text = info.moreInfo
         }
 
+        if(info.moreInfo2 == null) {
+            test_item_more_info2.visibility = View.GONE
+        } else {
+            test_item_more_info2.visibility = View.VISIBLE
+            test_item_more_info2.text = info.moreInfo2
+        }
+
         report_item_yin_xian_length.text = String.format("%.2f", info.yinXianLength)
 
         test_item_label_view.removeAllViews()
@@ -214,6 +234,17 @@ class ReportItemView @JvmOverloads constructor(
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .into(iv_report_item_fen_shi)
+        val file2 = File(info.fenShiPath2)
+        if(file2.exists()) {
+            iv_report_item_fen_shi_2.visibility = View.VISIBLE
+            Glide.with(context).load(info.fenShiPath2)
+                .asGif()
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(iv_report_item_fen_shi_2)
+        } else {
+            iv_report_item_fen_shi_2.visibility = View.GONE
+        }
     }
 
     private fun getLineDataSet(values: ArrayList<Entry>, color: Int, lable: String): ILineDataSet {
@@ -290,6 +321,12 @@ class ReportItemView @JvmOverloads constructor(
             callback?.invoke(it)
         }
         test_item_code.setOnClickListener {
+            callback?.invoke(it)
+        }
+        test_item_name.setOnClickListener {
+            callback?.invoke(it)
+        }
+        test_item_heart.setOnClickListener {
             callback?.invoke(it)
         }
     }

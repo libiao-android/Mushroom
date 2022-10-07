@@ -7,6 +7,30 @@
     android:layout_width="280dp"
     android:layout_height="200dp">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:textSize="15dp"
+            android:id="@+id/btn_download"
+            android:text="更新"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"/>
+
+        <Button
+            android:layout_marginLeft="20dp"
+            android:textSize="15dp"
+            android:id="@+id/btn_download2"
+            android:text="添加"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"/>
+
+    </LinearLayout>
+
+
+
     <ImageView
         android:id="@+id/iv_fenshi"
         android:layout_width="match_parent"

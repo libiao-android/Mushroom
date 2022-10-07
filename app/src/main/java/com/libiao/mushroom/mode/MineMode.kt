@@ -13,6 +13,7 @@ import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.Constant
+import com.libiao.mushroom.utils.FileUtil
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
 import java.io.File
@@ -192,7 +193,7 @@ class MineMode : BaseMode {
                 }
                 val fileName = "${one.code}-${one.time}.jpg"
                 val destFile = File(appDir, fileName)
-                copy(sourceFile, destFile)
+                FileUtil.copy(sourceFile, destFile)
             }
         }
     }
@@ -212,27 +213,5 @@ class MineMode : BaseMode {
 
     override fun des(): String {
         return "我的"
-    }
-
-    private fun copy(source: File, target: File) {
-        var fileInputStream: FileInputStream?  = null
-        var fileOutputStream: FileOutputStream? = null
-        try {
-            fileInputStream = FileInputStream(source);
-            fileOutputStream = FileOutputStream(target);
-            val buffer = ByteArray(1024)
-            while (fileInputStream.read(buffer) > 0) {
-                fileOutputStream.write(buffer);
-            }
-        } catch (e: Exception) {
-            e.printStackTrace();
-        } finally {
-            try {
-                fileInputStream?.close();
-                fileOutputStream?.close();
-            } catch (e: IOException) {
-                e.printStackTrace();
-            }
-        }
     }
 }

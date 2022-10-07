@@ -45,6 +45,8 @@ data class ReportShareInfo(
     var ext5: String? = null,
     @Ignore
     var moreInfo: String? = null,
+    @Ignore
+    var moreInfo2: String? = null,
 
     @Ignore
     var expand: Boolean = true,
@@ -64,7 +66,9 @@ data class ReportShareInfo(
     @Ignore
     var lastShareInfo: SharesRecordActivity.ShareInfo? = null,
     @Ignore
-    var fenShiPath: String? = null
+    var fenShiPath: String? = null,
+    @Ignore
+    var fenShiPath2: String? = null
 ) {
     override fun toString(): String {
         return "${time}, ${code}, $name"
@@ -78,10 +82,13 @@ data class ReportShareInfo(
         info.name = this.name
         info.beginPrice = this.beginPrice
         info.preAvg = this.preAvg
+        info.startIndex = this.startIndex
         info.dayCount = this.dayCount
         info.updateTime = this.updateTime
         info.result = this.result
         info.collect = this.collect
+        info.maxCount = this.maxCount
+        info.maxPrice = this.maxPrice
         info.label1 = this.label1
         info.label2 = this.label2
         info.label3 = this.label3
@@ -100,6 +107,7 @@ data class ReportShareInfo(
 
         info.expand = this.expand
         info.moreInfo = this.moreInfo
+        info.moreInfo2 = this.moreInfo2
 
 
         candleEntryList?.also {
@@ -141,6 +149,8 @@ data class ReportShareInfo(
         info.lastShareInfo = this.lastShareInfo
 
         info.fenShiPath = this.fenShiPath
+        info.fenShiPath2 = this.fenShiPath2
+        info.yinXianLength = this.yinXianLength
 
         return info
     }

@@ -27,6 +27,8 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
     var localList = mutableListOf<ReportShareInfo>()
 
+    var onlyHeart: Boolean = false
+
 
     fun fetchInfo(month: Int) {
         withState {
@@ -37,12 +39,15 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
             var time = ""
             data?.forEach {
-                if(isFit(month, it.time!!)) {
+                if(isFit(month, it.time!!) && !isOnlyHeart(it)) {
                     if(it.time == time) {
 
                     } else {
                         time = it.time!!
                         dataTime.sortByDescending { it.yinXianLength }
+                        if(dataTime.size > 0) {
+                            dataTime[0].ext1 = "${dataTime.size}"
+                        }
                         dataT.addAll(dataTime)
                         dataTime.clear()
                     }
@@ -75,6 +80,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             var range = 0.00
 
                             var pre: SharesRecordActivity.ShareInfo? = null
+                            var post: SharesRecordActivity.ShareInfo? = null
 
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
@@ -111,6 +117,9 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                     colorEntrys.add(Color.BLACK)
                                     it.lastShareInfo = item
                                 } else {
+                                    if(index == 11) {
+                                        post = item
+                                    }
                                     val green = "#28FF28"
                                     val red = "#FF0000"
                                     if(item.beginPrice > item.nowPrice) {
@@ -137,9 +146,14 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             if(it.lastShareInfo!!.totalPrice > 0) {
                                 liangBi = baoLiuXiaoShu(it.lastShareInfo!!.totalPrice / pre!!.totalPrice)
                             }
+                            if(post != null && post!!.totalPrice > 0) {
+                                it.moreInfo2 = "${post?.rangeBegin},  ${post?.rangeMin},  ${post?.rangeMax},  ${post?.range}"
+
+                            }
                             it.moreInfo = "${it.lastShareInfo?.rangeBegin},  ${it.lastShareInfo?.rangeMin},  ${it.lastShareInfo?.rangeMax},  ${String.format("%.2f",it.lastShareInfo!!.totalPrice / 100000000)}亿,  ${liangBi}"
 
                             it.fenShiPath = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi/${it.code}-${it.time}.jpg").absolutePath
+                            it.fenShiPath2 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi/${it.code}-${it.time}-2.jpg").absolutePath
                             dataTime.add(it)
                         }
                     }
@@ -148,10 +162,13 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             }
 
             dataTime.sortByDescending { it.yinXianLength }
+            if(dataTime.size > 0) {
+                dataTime[0].ext1 = "${dataTime.size}"
+            }
             dataT.addAll(dataTime)
             dataTime.clear()
 
-            dataT.sortBy { it.time!!.split("-")[2].toInt() }
+            dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
             dataT.also {
                 localList = it
                 setState {
@@ -159,6 +176,13 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 }
             }
         }
+    }
+
+    private fun isOnlyHeart(it: ReportShareInfo): Boolean {
+        if(onlyHeart) {
+            return it.collect == 0
+        }
+        return false
     }
 
     private fun isFit(month: Int, time: String): Boolean {
@@ -229,5 +253,33 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 it.copy(infoList = list)
             }
         }
+    }
+
+    fun shouCang(info: ReportShareInfo) {
+        withState {
+            val list = mutableListOf<ReportShareInfo>()
+            list.addAll(it.infoList)
+            list.forEachIndexed {index, item ->
+                val temp = item.copy()
+                if(temp.time == info.time && temp.code == info.code) {
+
+                    if(temp.collect == 0) {
+                        temp.collect = 1
+                    } else {
+                        temp.collect = 0
+                    }
+                    ReportShareDatabase.getInstance()?.getReportShareDao()?.update(temp)
+                    list[index] = temp
+                    return@forEachIndexed
+                }
+            }
+            setState {
+                it.copy(infoList = list)
+            }
+        }
+    }
+
+    fun setOnlySeeHeart(checked: Boolean) {
+        onlyHeart = checked
     }
 }

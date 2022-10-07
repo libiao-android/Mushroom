@@ -20,6 +20,12 @@ class TimeItemView @JvmOverloads constructor(
         time_item.text = time
     }
     @ModelProp
+    fun setCount(count: String?) {
+        count?.also {
+            time_count.text = "($count)"
+        }
+    }
+    @ModelProp
     fun expand(expand: Boolean) {
         if(expand) {
             iv_time_expand.setImageResource(R.mipmap.icon_green_arrow_up)
