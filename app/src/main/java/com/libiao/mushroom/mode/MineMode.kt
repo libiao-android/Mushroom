@@ -94,9 +94,8 @@ class MineMode : BaseMode {
                                 it.duanCeng = false
                             }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
-
-                            reportXiaYinXian(one)
                         }
+                        reportXiaYinXian(one)
                     }
                 } else {
                     info?.also {

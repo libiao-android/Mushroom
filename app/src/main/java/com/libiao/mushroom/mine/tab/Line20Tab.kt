@@ -18,7 +18,7 @@ class Line20Tab: TabItem() {
     }
 
     override fun name(): String {
-        return "10日线"
+        return "20日线"
     }
 
     override fun tag(): String {

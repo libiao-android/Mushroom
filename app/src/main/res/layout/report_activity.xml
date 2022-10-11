@@ -28,59 +28,28 @@
         android:layout_width="match_parent"
         android:layout_height="50dp">
         <Button
-            android:id="@+id/one_test"
-            android:text="1月"
+            android:id="@+id/nine_test"
+            android:text="9月"
             android:layout_width="60dp"
             android:layout_height="wrap_content"/>
         <Button
-            android:id="@+id/two_test"
-            android:text="2月"
+            android:id="@+id/ten_test"
+            android:text="10月"
             android:layout_width="60dp"
             android:layout_height="wrap_content"/>
         <Button
-            android:id="@+id/three_test"
-            android:text="3月"
+            android:id="@+id/eleven_test"
+            android:text="11月"
             android:layout_width="60dp"
             android:layout_height="wrap_content"/>
         <Button
-            android:id="@+id/four_test"
-            android:text="4月"
+            android:id="@+id/twelve_test"
+            android:text="12月"
             android:layout_width="60dp"
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_month"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="50dp">
-        <Button
-            android:id="@+id/five_test"
-            android:text="5月"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/six_test"
-            android:text="6月"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/seven_test"
-            android:text="7月"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/eight_test"
-            android:text="8月"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/nine_test"
-            android:text="9月"
-            android:layout_width="60dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
 

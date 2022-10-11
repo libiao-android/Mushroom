@@ -158,10 +158,10 @@
         android:layout_height="70dp"/>
 
     <ImageView
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="-15dp"
         android:layout_marginRight="40dp"
         android:id="@+id/iv_fen_shi"
-        android:layout_below="@+id/item_view"
+        android:layout_below="@+id/item_bar_chart"
         android:layout_width="match_parent"
         android:layout_height="180dp"/>
 
@@ -179,8 +179,8 @@
         android:id="@+id/divide"
         android:layout_marginRight="5dp"
         android:layout_marginLeft="5dp"
-        android:layout_marginTop="-10dp"
-        android:layout_below="@+id/item_bar_chart"
+        android:layout_marginTop="-5dp"
+        android:layout_below="@+id/iv_fen_shi"
         android:background="#e5e5e5"
         android:layout_width="match_parent"
         android:layout_height="1dp"/>

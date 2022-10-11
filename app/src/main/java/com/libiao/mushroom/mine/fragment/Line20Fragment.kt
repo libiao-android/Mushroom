@@ -701,25 +701,25 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 true
             }
 
-            mIdTv?.setOnClickListener {
-                mineShareInfo!!.showFenShi = !mineShareInfo!!.showFenShi
-                if(mineShareInfo!!.showFenShi) {
-                    mFenShiIv?.visibility = View.VISIBLE
-                    combinedChart?.visibility = View.GONE
-                    bar?.visibility = View.GONE
-                    divideView?.visibility = View.GONE
-                    Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${mineShareInfo!!.code}.gif")
-                        .asGif()
-                        .skipMemoryCache(true)
-                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-                        .into(mFenShiIv)
-                } else {
-                    mFenShiIv?.visibility = View.GONE
-                    combinedChart?.visibility = View.VISIBLE
-                    bar?.visibility = View.VISIBLE
-                    divideView?.visibility = View.VISIBLE
-                }
-            }
+//            mIdTv?.setOnClickListener {
+//                mineShareInfo!!.showFenShi = !mineShareInfo!!.showFenShi
+//                if(mineShareInfo!!.showFenShi) {
+//                    mFenShiIv?.visibility = View.VISIBLE
+//                    combinedChart?.visibility = View.GONE
+//                    bar?.visibility = View.GONE
+//                    divideView?.visibility = View.GONE
+//                    Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${mineShareInfo!!.code}.gif")
+//                        .asGif()
+//                        .skipMemoryCache(true)
+//                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                        .into(mFenShiIv)
+//                } else {
+//                    mFenShiIv?.visibility = View.GONE
+//                    combinedChart?.visibility = View.VISIBLE
+//                    bar?.visibility = View.VISIBLE
+//                    divideView?.visibility = View.VISIBLE
+//                }
+//            }
             mCodeTv?.setOnClickListener {
                 ClipboardUtil.clip(context, mineShareInfo?.code)
             }
@@ -883,9 +883,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
             if(info.showFenShi) {
                 mFenShiIv?.visibility = View.VISIBLE
-                combinedChart?.visibility = View.GONE
-                bar?.visibility = View.GONE
-                divideView?.visibility = View.GONE
                 Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${info.code}.gif")
                     .asGif()
                     .skipMemoryCache(true)
@@ -893,9 +890,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     .into(mFenShiIv)
             } else {
                 mFenShiIv?.visibility = View.GONE
-                combinedChart?.visibility = View.VISIBLE
-                bar?.visibility = View.VISIBLE
-                divideView?.visibility = View.VISIBLE
             }
         }
 

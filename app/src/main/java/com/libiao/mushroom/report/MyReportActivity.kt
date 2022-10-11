@@ -44,42 +44,21 @@ class MyReportActivity: BaseActivity(), MavericksView {
             controller.setData(it)
         }
 
-
-        one_test.setOnClickListener {
-            reportViewModel.fetchInfo(1)
-            tv_month.text = "1"
-        }
-        two_test.setOnClickListener {
-            reportViewModel.fetchInfo(2)
-            tv_month.text = "2"
-        }
-        three_test.setOnClickListener {
-            reportViewModel.fetchInfo(3)
-            tv_month.text = "3"
-        }
-        four_test.setOnClickListener {
-            reportViewModel.fetchInfo(4)
-            tv_month.text = "4"
-        }
-        five_test.setOnClickListener {
-            reportViewModel.fetchInfo(5)
-            tv_month.text = "5"
-        }
-        six_test.setOnClickListener {
-            reportViewModel.fetchInfo(6)
-            tv_month.text = "6"
-        }
-        seven_test.setOnClickListener {
-            reportViewModel.fetchInfo(7)
-            tv_month.text = "7"
-        }
-        eight_test.setOnClickListener {
-            reportViewModel.fetchInfo(8)
-            tv_month.text = "8"
-        }
         nine_test.setOnClickListener {
             reportViewModel.fetchInfo(9)
             tv_month.text = "9"
+        }
+        ten_test.setOnClickListener {
+            reportViewModel.fetchInfo(10)
+            tv_month.text = "10"
+        }
+        eleven_test.setOnClickListener {
+            reportViewModel.fetchInfo(11)
+            tv_month.text = "11"
+        }
+        twelve_test.setOnClickListener {
+            reportViewModel.fetchInfo(12)
+            tv_month.text = "12"
         }
     }
 
