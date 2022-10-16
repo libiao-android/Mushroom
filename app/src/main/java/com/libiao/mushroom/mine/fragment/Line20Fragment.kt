@@ -33,6 +33,7 @@ import com.libiao.mushroom.room.MineShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.line_20_fragment.*
+import kotlinx.android.synthetic.main.shares_real_time_info_item.view.*
 import java.io.*
 import java.nio.charset.Charset
 import kotlin.math.max
@@ -121,6 +122,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     private var settingDialog: SelfSettingDialog? = null
     private var settingBean: SelfSettingBean? = SelfSettingBean()
 
+    private var currentCb = 1
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         LogUtil.i(TAG, "onViewCreated")
@@ -137,6 +140,36 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun initView() {
+        cb_zhang_fu.isChecked = true
+        cb_zhang_fu.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                currentCb = 1
+                tv_ke_xuan.text = "收藏"
+                mAdapter?.changeCurrentCb(currentCb)
+            }
+
+        }
+        cb_yin_xian.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                currentCb = 2
+                tv_ke_xuan.text = "引线"
+                mAdapter?.changeCurrentCb(currentCb)
+            }
+        }
+        cb_fang_liang.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                currentCb = 3
+                tv_ke_xuan.text = "放量"
+                mAdapter?.changeCurrentCb(currentCb)
+            }
+        }
+        cb_yang_yin.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                currentCb = 4
+                tv_ke_xuan.text = "阳阴"
+                mAdapter?.changeCurrentCb(currentCb)
+            }
+        }
 
         tv_id?.setOnClickListener {
             mAdapter?.changeShiTu()
@@ -149,27 +182,43 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         view_share_bar.visibility = View.GONE
 
         view_self_range.setOnClickListener {
+            LogUtil.i(TAG, "currentCb: $currentCb, mRangeStatus: $mRangeStatus")
             when(mRangeStatus) {
                 0 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_descending)
                     mRangeStatus = 1
                     //高-低
                     //为什么不用temp， 主要考虑删除时要保持顺序
-                    mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
+                    when(currentCb) {
+                        1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
+                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
+                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
+                    }
                     mAdapter?.setData(mTempData)
                 }
                 1 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_ascending)
                     mRangeStatus = 2
                     //低-高
-                    mTempData = ArrayList(mTempData.sortedBy { it.yinXianLength })
+                    when(currentCb) {
+                        1 -> mTempData = ArrayList(mTempData.sortedBy { it.totalRange })
+                        2 -> mTempData = ArrayList(mTempData.sortedBy { it.yinXianLength })
+                        3 -> mTempData = ArrayList(mTempData.sortedBy { it.liangBi })
+                        4 -> mTempData = ArrayList(mTempData.sortedBy { it.yangYin })
+                    }
                     mAdapter?.setData(mTempData)
                 }
                 2 -> {
                     iv_self_range.setImageResource(R.mipmap.sort_descending)
                     mRangeStatus = 1
                     //高-低
-                    mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
+                    when(currentCb) {
+                        1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
+                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
+                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
+                    }
                     mAdapter?.setData(mTempData)
                 }
             }
@@ -286,6 +335,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         it.values_5.clear()
                         it.values_10.clear()
                         it.values_20.clear()
+                        var yang = 0
+                        var yin = 0
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
@@ -293,6 +344,17 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 if(item.totalPrice > 0) {
                                     allPrice += item.totalPrice
                                     allDay ++
+                                }
+                                if(item.nowPrice > item.beginPrice) {
+                                    yang++
+                                } else if(item.nowPrice == item.beginPrice) {
+                                    if(item.range > 0) {
+                                        yang++
+                                    } else {
+                                        yin++
+                                    }
+                                } else {
+                                    yin++
                                 }
                             }
                             if(tempItem == null) {
@@ -348,6 +410,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 }
                             }
                         }
+                        it.yangYin = yang - yin
                         val tMaxItem = SharesRecordActivity.ShareInfo(records[itemIn])
 //                        it.sanLianYin = false
 //                        if(tMaxItem.nowPrice > tMaxItem.beginPrice && greenLittle) {
@@ -558,6 +621,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             it.todayRange = share.range
             it.fangLiang = share.totalPrice > sharePre.totalPrice
             it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
+            if(sharePre.totalPrice > 0) {
+                it.liangBi = share.totalPrice / sharePre.totalPrice
+            }
 
             it.redLine = share.nowPrice > share.beginPrice
 
@@ -620,6 +686,13 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             showFenShi = !showFenShi
             mSharesInfoList.forEach {
                 it.showFenShi = showFenShi
+            }
+            notifyDataSetChanged()
+        }
+
+        fun changeCurrentCb(currentCb: Int) {
+            mSharesInfoList.forEach {
+                it.currentCb = currentCb
             }
             notifyDataSetChanged()
         }
@@ -800,12 +873,45 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             mNameTv?.text = info.name
             mCodeTv?.text = info.code?.substring(2)
 
-            mRangeTv?.text = baoLiuXiaoShu(info.totalRange)
-            if(info.totalRange >= 0) {
-                mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-            } else {
-                mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+
+
+            if(info.currentCb == 1) {
+                mRangeTv?.text = baoLiuXiaoShu(info.totalRange)
+                if(info.totalRange >= 0) {
+                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+                } else {
+                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+                }
             }
+            if(info.currentCb == 2) {
+                mRangeTv?.text = baoLiuXiaoShu(info.yinXianLength)
+                if(info.yinXianLength >= 0) {
+                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+                } else {
+                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+                }
+            }
+
+            if(info.currentCb == 3) {
+                mRangeTv?.text = baoLiuXiaoShu(info.liangBi)
+                if(info.liangBi >= 0) {
+                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+                } else {
+                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+                }
+            }
+
+            if(info.currentCb == 4) {
+                mRangeTv?.text = "${info.yangYin}"
+                if(info.yangYin >= 0) {
+                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+                } else {
+                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+                }
+            }
+
+
+
             mTodayTv?.text = info.todayRange.toString()
 
             if(info.todayRange >= 0) {

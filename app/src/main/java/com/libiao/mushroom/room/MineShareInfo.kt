@@ -80,6 +80,14 @@ class MineShareInfo {
     @Ignore
     var showFenShi = false
 
+    @Ignore
+    var liangBi = 0.00
+    @Ignore
+    var yangYin = 0
+
+    @Ignore
+    var currentCb = 1
+
 
     @Ignore
     var sanLianYin: Boolean = false //三连阴
