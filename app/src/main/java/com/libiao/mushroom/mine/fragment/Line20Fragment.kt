@@ -116,6 +116,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     private var mTodayStatus = 0
     private var mTimeStatus = 0
 
+    private var isYinXianOne = false
+
     private var mData: List<MineShareInfo> = ArrayList()
     private var mTempData: List<MineShareInfo> = ArrayList()
 
@@ -146,6 +148,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 currentCb = 1
                 tv_ke_xuan.text = "收藏"
                 mAdapter?.changeCurrentCb(currentCb)
+                yin_xian_child_view.visibility = View.GONE
             }
 
         }
@@ -154,13 +157,21 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 currentCb = 2
                 tv_ke_xuan.text = "引线"
                 mAdapter?.changeCurrentCb(currentCb)
+                yin_xian_child_view.visibility = View.VISIBLE
             }
+        }
+        cb_yin_xian_one.setOnCheckedChangeListener { buttonView, isChecked ->
+            isYinXianOne = isChecked
+            refreshTempData()
+            resetSortUI()
+            refreshCount()
         }
         cb_fang_liang.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 3
                 tv_ke_xuan.text = "放量"
                 mAdapter?.changeCurrentCb(currentCb)
+                yin_xian_child_view.visibility = View.GONE
             }
         }
         cb_yang_yin.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -168,6 +179,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 currentCb = 4
                 tv_ke_xuan.text = "阳阴"
                 mAdapter?.changeCurrentCb(currentCb)
+                yin_xian_child_view.visibility = View.GONE
             }
         }
 
@@ -529,6 +541,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             if(heartChecked && !info.heart) {
                 continue
             }
+            if(isYinXianOne && info.todayMaxRange > 3) {
+                continue
+            }
             val selfSettingBean = settingBean
             if(selfSettingBean?.timeChecked == true && info.dayCount < selfSettingBean.timeValue) {
                 continue
@@ -619,6 +634,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
             it.totalRange = (share.nowPrice - it.price) / it.price * 100
             it.todayRange = share.range
+            it.todayMaxRange = share.rangeMax
             it.fangLiang = share.totalPrice > sharePre.totalPrice
             it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
             if(sharePre.totalPrice > 0) {
@@ -720,6 +736,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
         private var mTypeXinGaoTv: TextView? = null
         private var mTypeMaxRangeTv: TextView? = null
+        private var mTypeYinYangTv: TextView? = null
+        private var mTypeFangLiangTv: TextView? = null
+        private var mTypeYinXianTv: TextView? = null
         private var mTypeZhiDieTv: TextView? = null
 
         private var mAvgP: TextView? = null
@@ -736,6 +755,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             mTodayTv = view.findViewById(R.id.self_item_today)
             mTypeXinGaoTv = view.findViewById(R.id.tv_type_xin_gao)
             mTypeMaxRangeTv = view.findViewById(R.id.tv_type_max_rang)
+            mTypeYinYangTv = view.findViewById(R.id.tv_type_yin_yang)
+            mTypeFangLiangTv = view.findViewById(R.id.tv_type_fang_liang)
+            mTypeYinXianTv = view.findViewById(R.id.tv_type_yin_xian)
             mTypeZhiDieTv = view.findViewById(R.id.tv_type_zhi_die)
             mAvgP = view.findViewById(R.id.tv_type_avg_p)
 
@@ -983,7 +1005,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 mTypeXinGaoTv?.visibility = View.GONE
             }
 
-            mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.yinXianLength)
+            mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.totalRange)
+            mTypeYinYangTv?.text = "${info.yangYin}"
+            mTypeFangLiangTv?.text = baoLiuXiaoShu(info.liangBi)
+            mTypeYinXianTv?.text = baoLiuXiaoShu(info.yinXianLength)
 
             mAvgP?.text = "${String.format("%.2f",info.avgP / 100000000)}亿"
 

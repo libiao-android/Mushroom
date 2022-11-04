@@ -28,6 +28,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     var localList = mutableListOf<ReportShareInfo>()
 
     var onlyHeart: Boolean = false
+    var conOne: Boolean = false
 
 
     fun fetchInfo(month: Int) {
@@ -80,6 +81,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             var range = 0.00
 
                             var pre: SharesRecordActivity.ShareInfo? = null
+                            var current: SharesRecordActivity.ShareInfo? = null
                             var post: SharesRecordActivity.ShareInfo? = null
 
                             records.forEachIndexed { index, s ->
@@ -116,6 +118,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 if(index == 10) {
                                     colorEntrys.add(Color.BLACK)
                                     it.lastShareInfo = item
+                                    current = item
                                 } else {
                                     if(index == 11) {
                                         post = item
@@ -154,7 +157,13 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                             it.fenShiPath = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi/${it.code}-${it.time}.jpg").absolutePath
                             it.fenShiPath2 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi/${it.code}-${it.time}-2.jpg").absolutePath
-                            dataTime.add(it)
+                            if(conOne) {
+                                if (current!!.rangeMax <= 3) {
+                                    dataTime.add(it)
+                                }
+                            } else {
+                                dataTime.add(it)
+                            }
                         }
                     }
                 }
@@ -281,5 +290,9 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
     fun setOnlySeeHeart(checked: Boolean) {
         onlyHeart = checked
+    }
+
+    fun setConditionOne(checked: Boolean) {
+        conOne = checked
     }
 }

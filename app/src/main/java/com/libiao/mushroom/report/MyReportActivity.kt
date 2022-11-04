@@ -38,6 +38,9 @@ class MyReportActivity: BaseActivity(), MavericksView {
         cb_heart.setOnCheckedChangeListener { buttonView, isChecked ->
             reportViewModel.setOnlySeeHeart(isChecked)
         }
+        cb_one.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setConditionOne(isChecked)
+        }
         epoxy_view_report.setController(controller)
 
         reportViewModel.onEach(deliveryMode = UniqueOnly(UUID.randomUUID().toString())) {

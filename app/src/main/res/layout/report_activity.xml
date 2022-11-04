@@ -21,6 +21,14 @@
             android:layout_height="wrap_content"
             android:text="只看收藏"/>
 
+        <CheckBox
+            android:layout_marginLeft="5dp"
+            android:textSize="13dp"
+            android:id="@+id/cb_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="过滤涨幅>3"/>
+
     </LinearLayout>
 
     <LinearLayout
