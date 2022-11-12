@@ -51,6 +51,19 @@
             android:layout_height="wrap_content"
             android:text="过滤涨幅>3"/>
     </LinearLayout>
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/yang_yin_child_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <CheckBox
+            android:textSize="11dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/cb_yang_yin_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="阳阴>=3"/>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/view_share_bar"

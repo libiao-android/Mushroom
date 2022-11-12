@@ -16,7 +16,6 @@ import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.report_activity.*
-import kotlinx.android.synthetic.main.report_item_view.view.*
 import java.util.*
 
 class MyReportActivity: BaseActivity(), MavericksView {

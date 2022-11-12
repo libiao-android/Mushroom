@@ -117,6 +117,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     private var mTimeStatus = 0
 
     private var isYinXianOne = false
+    private var isYangYinOne = false
 
     private var mData: List<MineShareInfo> = ArrayList()
     private var mTempData: List<MineShareInfo> = ArrayList()
@@ -149,6 +150,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 tv_ke_xuan.text = "收藏"
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.GONE
+                yang_yin_child_view.visibility = View.GONE
             }
 
         }
@@ -158,6 +160,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 tv_ke_xuan.text = "引线"
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.VISIBLE
+                yang_yin_child_view.visibility = View.GONE
             }
         }
         cb_yin_xian_one.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -172,6 +175,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 tv_ke_xuan.text = "放量"
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.GONE
+                yang_yin_child_view.visibility = View.GONE
             }
         }
         cb_yang_yin.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -180,7 +184,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 tv_ke_xuan.text = "阳阴"
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.GONE
+                yang_yin_child_view.visibility = View.VISIBLE
             }
+        }
+        cb_yang_yin_one.setOnCheckedChangeListener { buttonView, isChecked ->
+            isYangYinOne = isChecked
+            refreshTempData()
+            resetSortUI()
+            refreshCount()
         }
 
         tv_id?.setOnClickListener {
@@ -357,16 +368,18 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                     allPrice += item.totalPrice
                                     allDay ++
                                 }
-                                if(item.nowPrice > item.beginPrice) {
-                                    yang++
-                                } else if(item.nowPrice == item.beginPrice) {
-                                    if(item.range > 0) {
+                                if(item.beginPrice > 0.00) {
+                                    if(item.nowPrice > item.beginPrice) {
                                         yang++
+                                    } else if(item.nowPrice == item.beginPrice) {
+                                        if(item.range > 0) {
+                                            yang++
+                                        } else {
+                                            yin++
+                                        }
                                     } else {
                                         yin++
                                     }
-                                } else {
-                                    yin++
                                 }
                             }
                             if(tempItem == null) {
@@ -542,6 +555,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
             if(isYinXianOne && info.todayMaxRange > 3) {
+                continue
+            }
+            if(isYangYinOne && info.yangYin < 3) {
                 continue
             }
             val selfSettingBean = settingBean
