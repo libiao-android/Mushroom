@@ -147,7 +147,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         cb_zhang_fu.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 1
-                tv_ke_xuan.text = "收藏"
+                tv_ke_xuan.text = "涨幅"
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.GONE
                 yang_yin_child_view.visibility = View.GONE
@@ -193,6 +193,15 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             resetSortUI()
             refreshCount()
         }
+        cb_line_20.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                currentCb = 5
+                tv_ke_xuan.text = "线差"
+                mAdapter?.changeCurrentCb(currentCb)
+                yin_xian_child_view.visibility = View.GONE
+                yang_yin_child_view.visibility = View.GONE
+            }
+        }
 
         tv_id?.setOnClickListener {
             mAdapter?.changeShiTu()
@@ -217,6 +226,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
                         3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
                         4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
+                        5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.cha_20 })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -229,6 +239,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         2 -> mTempData = ArrayList(mTempData.sortedBy { it.yinXianLength })
                         3 -> mTempData = ArrayList(mTempData.sortedBy { it.liangBi })
                         4 -> mTempData = ArrayList(mTempData.sortedBy { it.yangYin })
+                        5 -> mTempData = ArrayList(mTempData.sortedBy { it.cha_20 })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -241,6 +252,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
                         3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
                         4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
+                        5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.cha_20 })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -360,8 +372,25 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         it.values_20.clear()
                         var yang = 0
                         var yin = 0
+                        var tempMaxP = 0.00
+                        var xinGao = false
+                        var xinGaoCount = 0
+                        var noXinGao = false
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
+
+                            if(index > 3 && item.minPrice < item.line_20 && !xinGao) {
+                                noXinGao = true
+                            }
+
+
+                            if(!noXinGao && item.maxPrice > tempMaxP * 1.01) {
+                                tempMaxP = item.maxPrice
+                                if(index > 3) {
+                                    xinGao = true
+                                    xinGaoCount ++
+                                }
+                            }
 
                             if(index > 0) {
                                 if(item.totalPrice > 0) {
@@ -455,12 +484,19 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         if(allDay > 0) {
                             it.avgP = allPrice / allDay
                         }
+                        if(xinGao) {
+                            it.label2 = "新高"
+                            it.maxCount = xinGaoCount
+                        }
                     }
                     it.price = one.nowPrice
                     val info = lines.get(lines.size - 1)
                     val info_pre = lines.get(lines.size - 2)
 
                     val share = SharesRecordActivity.ShareInfo(info)
+                    if(share.minPrice > 0) {
+                        it.cha_20 =  (share.minPrice - share.line_20) / share.line_20
+                    }
                     it.shareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
                     it.youTwo = false
@@ -942,6 +978,15 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             if(info.currentCb == 4) {
                 mRangeTv?.text = "${info.yangYin}"
                 if(info.yangYin >= 0) {
+                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+                } else {
+                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+                }
+            }
+
+            if(info.currentCb == 5) {
+                mRangeTv?.text = baoLiuXiaoShu(info.cha_20 * 100)
+                if(info.cha_20 >= 0) {
                     mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
                 } else {
                     mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))

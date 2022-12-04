@@ -74,7 +74,7 @@ class MineMode : BaseMode {
                                     it.maxPrice = one.maxPrice
                                 }
                             } else {
-                                if(one.maxPrice > it.maxPrice) {
+                                if(one.maxPrice > it.maxPrice * 1.01) {
                                     it.maxPrice = one.maxPrice
                                     if(it.label2 == null) {
                                         it.label2 = "新高"
@@ -109,7 +109,7 @@ class MineMode : BaseMode {
                                     it.maxPrice = one.maxPrice
                                 }
                             } else {
-                                if(one.maxPrice > it.maxPrice) {
+                                if(one.maxPrice > it.maxPrice * 1.01) {
                                     it.maxPrice = one.maxPrice
                                     if(it.label2 == null) {
                                         it.label2 = "新高"

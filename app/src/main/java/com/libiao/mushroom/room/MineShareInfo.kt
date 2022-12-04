@@ -88,6 +88,9 @@ class MineShareInfo {
     var yangYin = 0
 
     @Ignore
+    var cha_20 = 0.00
+
+    @Ignore
     var currentCb = 1
 
 
