@@ -9,7 +9,8 @@ class SelfSettingBean {
     var liangRightChecked: Boolean = false
     var redLine: Boolean = false
 
-    var timeValue: Int = 2
+    var timeValue: Int = 0
+    var timeValue2: Int = 99
     var rangeLeftValue: Double = 0.00
     var rangeRightValue: Double = 0.00
     var liangLeftValue: Double = 0.00

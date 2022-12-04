@@ -557,11 +557,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             if(isYinXianOne && info.todayMaxRange > 3) {
                 continue
             }
-            if(isYangYinOne && info.yangYin < 3) {
+            if(isYangYinOne && info.yangYin < yang_yin_et_count.text.toString().toInt()) {
                 continue
             }
             val selfSettingBean = settingBean
-            if(selfSettingBean?.timeChecked == true && info.dayCount < selfSettingBean.timeValue) {
+            if(selfSettingBean?.timeChecked == true && (info.dayCount < selfSettingBean.timeValue || info.dayCount > selfSettingBean.timeValue2)) {
                 continue
             }
 
@@ -601,7 +601,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
 
-            if(selfSettingBean?.xin_gao == true && (info.maxRange != info.totalRange)) {
+            if(selfSettingBean?.xin_gao == true && (info.label2 == null)) {
                 continue
             }
 
@@ -1015,8 +1015,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                mTypeZhiDieTv?.visibility = View.GONE
 //            }
 
-            if(info.maxRange == info.totalRange) {
+            if(info.label2 == "新高") {
                 mTypeXinGaoTv?.visibility = View.VISIBLE
+                mTypeXinGaoTv?.text = "新高 ${info.maxCount}"
             } else {
                 mTypeXinGaoTv?.visibility = View.GONE
             }

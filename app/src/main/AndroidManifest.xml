@@ -42,6 +42,8 @@
             android:theme="@style/CommonTheme"/>
         <activity android:name=".report.MyReportActivity"
             android:theme="@style/CommonTheme"/>
+        <activity android:name=".review.MyReviewActivity"
+            android:theme="@style/CommonTheme"/>
     </application>
 
 </manifest>

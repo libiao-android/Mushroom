@@ -41,4 +41,11 @@
         android:onClick="deleteTuiShi"
         android:text="删除退市数据"/>
 
+    <Button
+        android:enabled="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="test"
+        android:text="Text"/>
+
 </LinearLayout>

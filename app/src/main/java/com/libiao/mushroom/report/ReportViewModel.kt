@@ -58,17 +58,29 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                         val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                         val lines = reader.readLines()
                         var startIndex = 0
+                        var recordIndex = 0
                         lines.forEachIndexed{ind, line ->
-                            if(line.startsWith(it.time!!)) {
+                            if(it.label1 != null && line.startsWith(it.label1!!)) {
                                 startIndex = ind
+                            }
+                            if(line.startsWith(it.time!!)) {
+                                recordIndex = ind
                                 return@forEachIndexed
                             }
                         }
+                        val count = recordIndex - startIndex
+                        var aaa = if(startIndex > 0) count+1 else 10
                         if(it.candleEntryList == null) {
 
-                            var a = startIndex - 10
+                            var a: Int
+                            if(startIndex > 0) {
+                                a = startIndex - 1
+                            } else {
+                                a = recordIndex - 10
+                            }
+
                             if(a < 0) a = 0
-                            var b = startIndex + 10
+                            var b = recordIndex + 10
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(a, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -78,18 +90,34 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             val values_10 = java.util.ArrayList<Entry>()
                             val values_20 = java.util.ArrayList<Entry>()
 
-                            var range = 0.00
-
                             var pre: SharesRecordActivity.ShareInfo? = null
                             var current: SharesRecordActivity.ShareInfo? = null
                             var post: SharesRecordActivity.ShareInfo? = null
 
+                            var yin = 0
+                            var yang = 0
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
                                 if(item.beginPrice == 0.00) {
                                     candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
                                 } else {
                                     candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                }
+
+                                if (startIndex > 0 && index < count && index > 0) {
+                                    if(item.beginPrice > 0.00) {
+                                        if(item.nowPrice > item.beginPrice) {
+                                            yang++
+                                        } else if(item.nowPrice == item.beginPrice) {
+                                            if(item.range > 0) {
+                                                yang++
+                                            } else {
+                                                yin++
+                                            }
+                                        } else {
+                                            yin++
+                                        }
+                                    }
                                 }
 
                                 var line5 = item.line_5
@@ -108,19 +136,15 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
 
-                                if(index < it.dayCount) {
-                                    range += item.range
-                                }
-
-                                if(index == 9) {
+                                if(index == aaa - 1) {
                                     pre = item
                                 }
-                                if(index == 10) {
+                                if(index == aaa) {
                                     colorEntrys.add(Color.BLACK)
                                     it.lastShareInfo = item
                                     current = item
                                 } else {
-                                    if(index == 11) {
+                                    if(index == aaa + 1) {
                                         post = item
                                     }
                                     val green = "#28FF28"
@@ -144,6 +168,10 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             it.values_5 = values_5
                             it.values_10 = values_10
                             it.values_20 = values_20
+
+                            if(startIndex > 0) {
+                                it.label5 = "$count, $yang, $yin"
+                            }
 
                             var liangBi = "0"
                             if(it.lastShareInfo!!.totalPrice > 0) {

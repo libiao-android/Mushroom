@@ -198,12 +198,7 @@ class ReportItemView @JvmOverloads constructor(
         report_item_yin_xian_length.text = String.format("%.2f", info.yinXianLength)
 
         test_item_label_view.removeAllViews()
-        if(info.label1 != null) {
-            val tv = TextView(context)
-            tv.text = info.label1
-            val param = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            test_item_label_view.addView(tv, param)
-        }
+
         if(info.label2 != null) {
             val tv = TextView(context)
             tv.text = info.label2

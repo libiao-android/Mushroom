@@ -21,6 +21,7 @@ class SelfSettingDialog : Dialog {
             val bean = SelfSettingBean()
             bean.timeChecked = dialog_cb_time.isChecked
             bean.timeValue = setting_et_time.text.toString().toInt()
+            bean.timeValue2 = setting_et_time2.text.toString().toInt()
 
             bean.rangeLeftChecked = dialog_cb_rang_left.isChecked
             bean.rangeLeftValue = setting_et_rang_left.text.toString().toDouble()

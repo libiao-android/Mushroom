@@ -70,21 +70,17 @@ class MineMode : BaseMode {
                             it.dayCount = it.dayCount + 1
 
                             if(it.dayCount < 3) {
-                                if(one.totalPrice > it.maxPrice) {
-                                    it.maxPrice = one.totalPrice
+                                if(one.maxPrice > it.maxPrice) {
+                                    it.maxPrice = one.maxPrice
                                 }
                             } else {
-                                if(one.totalPrice > it.maxPrice) {
+                                if(one.maxPrice > it.maxPrice) {
+                                    it.maxPrice = one.maxPrice
+                                    if(it.label2 == null) {
+                                        it.label2 = "新高"
+                                        it.maxCount = 0
+                                    }
                                     it.maxCount ++
-                                    val f = TestShareInfo()
-                                    f.time = one.time
-                                    f.code = one.code
-                                    f.name = one.name
-                                    f.dayCount = it.dayCount
-                                    f.startIndex = mDeviationValue + 1
-                                    f.maxPrice = it.maxPrice
-                                    f.maxCount = it.maxCount
-                                    TestShareDatabase.getInstance()?.getTestShareDao()?.insert(f)
                                 }
                             }
 
@@ -95,7 +91,7 @@ class MineMode : BaseMode {
                             }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
                         }
-                        reportXiaYinXian(one)
+                        reportXiaYinXian(one, it.time)
                     }
                 } else {
                     info?.also {
@@ -109,21 +105,17 @@ class MineMode : BaseMode {
                             it.updateTime = one.time
                             it.dayCount = it.dayCount + 1
                             if(it.dayCount < 3) {
-                                if(one.totalPrice > it.maxPrice) {
-                                    it.maxPrice = one.totalPrice
+                                if(one.maxPrice > it.maxPrice) {
+                                    it.maxPrice = one.maxPrice
                                 }
                             } else {
-                                if(one.totalPrice > it.maxPrice) {
+                                if(one.maxPrice > it.maxPrice) {
+                                    it.maxPrice = one.maxPrice
+                                    if(it.label2 == null) {
+                                        it.label2 = "新高"
+                                        it.maxCount = 0
+                                    }
                                     it.maxCount ++
-                                    val f = TestShareInfo()
-                                    f.time = one.time
-                                    f.code = one.code
-                                    f.name = one.name
-                                    f.dayCount = it.dayCount
-                                    f.startIndex = mDeviationValue + 1
-                                    f.maxPrice = it.maxPrice
-                                    f.maxCount = it.maxCount
-                                    TestShareDatabase.getInstance()?.getTestShareDao()?.insert(f)
                                 }
                             }
                             it.nowPrice = one.nowPrice
@@ -133,7 +125,7 @@ class MineMode : BaseMode {
                             }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
 
-                            reportXiaYinXian(one)
+                            reportXiaYinXian(one, it.time)
 
 
 //                            if(!zhangTing(one) && one.totalPrice < 100000000) {
@@ -145,7 +137,7 @@ class MineMode : BaseMode {
                     }
                 }
             } else {
-                if(one.range >= 8) {
+                if(one.range >= 8 || zero.range + one.range > 8) {
                     val info = MineShareInfo()
                     info.time = one.time
                     info.code = one.code
@@ -153,7 +145,7 @@ class MineMode : BaseMode {
                     info.price = one.nowPrice
                     info.nowPrice = one.nowPrice
                     info.updateTime = one.time
-                    info.maxPrice = one.totalPrice
+                    info.maxPrice = one.maxPrice
                     info.youXuan = true
                     info.duanCeng = false
                     info.delete = false
@@ -170,13 +162,14 @@ class MineMode : BaseMode {
         }
     }
 
-    private fun reportXiaYinXian(one: SharesRecordActivity.ShareInfo) {
+    private fun reportXiaYinXian(one: SharesRecordActivity.ShareInfo, startTime: String?) {
         val a = min(one.rangeBegin, one.range) - one.rangeMin
         if(one.range < 5 && one.range > -5 && a > 2.5) {
             val info = ReportShareInfo()
             info.code = one.code
             info.time = one.time
             info.name = one.name
+            info.label1 = startTime
             info.yinXianLength = a
             ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
             ThreadPoolUtil.execute {

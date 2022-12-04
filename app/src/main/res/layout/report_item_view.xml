@@ -130,7 +130,7 @@
         android:layout_marginTop="6dp"
         android:layout_marginLeft="6dp"
         android:layout_marginRight="10dp"
-        android:layout_below="@+id/test_item_info_view"
+        android:layout_below="@+id/test_item_more_info2"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/test_item_candler_chart"
         android:orientation="vertical"

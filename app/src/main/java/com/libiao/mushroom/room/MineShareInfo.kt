@@ -26,8 +26,8 @@ class MineShareInfo {
     var maxPrice: Double = 0.00
     var maxCount = 0
 
-    var label1: String? = null
-    var label2: String? = null
+    var label1: String? = null // 开始记录时间
+    var label2: String? = null // 新高次数
     var label3: String? = null
     var label4: String? = null
     var label5: String? = null

@@ -10,8 +10,10 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.libiao.mushroom.utils.CodeUtil
+import com.libiao.mushroom.utils.CodeUtil.Companion.getKcCode
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.FileUtil
+import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
 import okhttp3.*
 import org.json.JSONArray
@@ -88,6 +90,17 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
         loadingPb = findViewById(R.id.loading)
         btn = findViewById(R.id.btn)
+    }
+
+    fun test(v: View) {
+        Thread {
+            fileNew_2021.listFiles().forEach {
+                if(it.name.startsWith("sh688")) {
+                    i(TAG, "delete file: ${it.name}")
+                    it.delete()
+                }
+            }
+        }.start()
     }
 
 
@@ -172,14 +185,17 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                 }
                 queryInfo(code)
             }
-            mHandler.post { progressTv?.text = "100%, $count" }
+            mHandler.post { progressTv?.text = "95%, $count" }
 
+            i(TAG, "进度：95%")
             //科创板股票 sh688
-//            for(i in 1 .. 999) {
-//                val code = getKcCode(i)
-//                //Log.i("libiao", code)
-//                queryInfo(code)
-//            }
+            for(i in 1 .. 999) {
+                val code = getKcCode(i)
+                if(codeList.contains(code)) continue
+                //Log.i("libiao", code)
+                queryInfo(code)
+            }
+            mHandler.post { progressTv?.text = "95%, $count" }
             val totalTime = System.currentTimeMillis() - startTime
             i(TAG, "结束查询: $count, totalTime: ${totalTime/(1000*60)}")
             i(TAG, "新增个数：${newCodeList.size}")
@@ -368,7 +384,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         i(TAG, "deleteTuiShiData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220508&end=20220715")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220925&end=20221125")
             .build()
 
         val call = client.newCall(request)
@@ -409,7 +425,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20220715")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20221125")
             .build()
 
         val call = client.newCall(request)
