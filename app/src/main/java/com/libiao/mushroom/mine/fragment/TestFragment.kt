@@ -129,30 +129,16 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
             testViewModel.fetchInfo(4)
             tv_month.text = "4"
         }
-        five_test.setOnClickListener {
+
+        eleven_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(5)
-            tv_month.text = "5"
+            testViewModel.fetchInfo(11)
+            tv_month.text = "11"
         }
-        six_test.setOnClickListener {
+        twelve_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(6)
-            tv_month.text = "6"
-        }
-        seven_test.setOnClickListener {
-            loadingStatus = 1
-            testViewModel.fetchInfo(7)
-            tv_month.text = "7"
-        }
-        eight_test.setOnClickListener {
-            loadingStatus = 1
-            testViewModel.fetchInfo(8)
-            tv_month.text = "8"
-        }
-        nine_test.setOnClickListener {
-            loadingStatus = 1
-            testViewModel.fetchInfo(9)
-            tv_month.text = "9"
+            testViewModel.fetchInfo(12)
+            tv_month.text = "12"
         }
 
         cb_more_price.setOnCheckedChangeListener { buttonView, isChecked ->

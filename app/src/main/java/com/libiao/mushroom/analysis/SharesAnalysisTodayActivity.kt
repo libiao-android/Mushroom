@@ -153,6 +153,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(TestMode())
         mModeList.add(TestMode2())
         mModeList.add(FiveRedMode())
+        mModeList.add(XinGaoMode())
 
         //mModeList.add(ChuangYeBanTouJiMode())
         //        mModeList.add(StrongStock10Mode())
@@ -309,8 +310,11 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
             val lines = reader.readLines()
             //Log.i("libiao", "$lines")
             val shares = ArrayList<SharesRecordActivity.ShareInfo>()
-            for(line in lines) {
-                shares.add(SharesRecordActivity.ShareInfo(line))
+            var begin = lines.size - 150
+            if(begin < 0) begin = 0
+
+            for(i in begin until lines.size) {
+                shares.add(SharesRecordActivity.ShareInfo(lines[i]))
             }
             dataList.add(shares)
         }

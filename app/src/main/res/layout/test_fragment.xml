@@ -60,28 +60,13 @@
         android:layout_width="match_parent"
         android:layout_height="50dp">
         <Button
-            android:id="@+id/five_test"
-            android:text="5月"
+            android:id="@+id/eleven_test"
+            android:text="11月"
             android:layout_width="60dp"
             android:layout_height="wrap_content"/>
         <Button
-            android:id="@+id/six_test"
-            android:text="6月"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/seven_test"
-            android:text="7月"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/eight_test"
-            android:text="8月"
-            android:layout_width="60dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/nine_test"
-            android:text="9月"
+            android:id="@+id/twelve_test"
+            android:text="12月"
             android:layout_width="60dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>

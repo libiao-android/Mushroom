@@ -35,8 +35,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun fetchInfo(month: Int) {
         withState {
-            LogUtil.i(TAG, "fetchInfo")
+
             val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
+            LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<TestShareInfo>()
             data?.forEach {
                 if(it.dayCount > 0 && isFit(month, it.time!!)) {
@@ -48,9 +49,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                         if(it.candleEntryList == null) {
 
-                            var a = it.startIndex - it.dayCount
+                            var a = it.startIndex + 80
                             if(a < 0) a = 0
-                            var b = it.startIndex + 20
+                            var b = it.startIndex + it.dayCount + 20
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(a, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -59,8 +60,6 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             val values_5 = java.util.ArrayList<Entry>()
                             val values_10 = java.util.ArrayList<Entry>()
                             val values_20 = java.util.ArrayList<Entry>()
-
-                            var range = 0.00
 
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
@@ -86,11 +85,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
 
-                                if(index < it.dayCount) {
-                                    range += item.range
-                                }
-
-                                if(index == it.dayCount) {
+                                if(index == 39) {
                                     colorEntrys.add(Color.BLACK)
                                 } else {
 
@@ -119,15 +114,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             it.values_5 = values_5
                             it.values_10 = values_10
                             it.values_20 = values_20
-//                            if(one != null && two != null) {
-//                                if(two!!.minPrice > one!!.minPrice && two!!.maxPrice < one!!.maxPrice && one!!.totalPrice > two!!.totalPrice) {
-//
-//                                }
-//                            }
-                            it.moreInfo = String.format("%.2f", range) + ", ${it.maxCount}"
-                            if(it.maxCount == 1) {
-                                dataT.add(it)
-                            }
+                            dataT.add(it)
                         }
                     }
                 }
