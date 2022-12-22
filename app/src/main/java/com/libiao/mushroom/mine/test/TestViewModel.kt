@@ -47,11 +47,21 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                         val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                         val lines = reader.readLines()
 
+                        var updateIndex = 0
+
+                        lines.forEachIndexed{ index, line ->
+                            if(line.startsWith(it.updateTime!!)) {
+                                updateIndex = index
+                                return@forEachIndexed
+                            }
+                        }
+
+
                         if(it.candleEntryList == null) {
 
-                            var a = it.startIndex + 80
+                            var a = updateIndex - 80
                             if(a < 0) a = 0
-                            var b = it.startIndex + it.dayCount + 20
+                            var b = updateIndex + 20
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(a, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -85,7 +95,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
 
-                                if(index == 39) {
+                                if(index == 80) {
                                     colorEntrys.add(Color.BLACK)
                                 } else {
 
