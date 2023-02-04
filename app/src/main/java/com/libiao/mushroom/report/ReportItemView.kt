@@ -195,8 +195,6 @@ class ReportItemView @JvmOverloads constructor(
             test_item_more_info2.text = info.moreInfo2
         }
 
-        report_item_yin_xian_length.text = String.format("%.2f", info.yinXianLength)
-
         test_item_label_view.removeAllViews()
 
         if(info.label2 != null) {
@@ -222,23 +220,6 @@ class ReportItemView @JvmOverloads constructor(
             tv.text = info.label5
             val param = LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             test_item_label_view.addView(tv, param)
-        }
-        //LogUtil.i("ReportItemView", "info.fenShiPath: ${info.fenShiPath}")
-        Glide.with(context).load(info.fenShiPath)
-            .asGif()
-            .skipMemoryCache(true)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .into(iv_report_item_fen_shi)
-        val file2 = File(info.fenShiPath2)
-        if(file2.exists()) {
-            iv_report_item_fen_shi_2.visibility = View.VISIBLE
-            Glide.with(context).load(info.fenShiPath2)
-                .asGif()
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(iv_report_item_fen_shi_2)
-        } else {
-            iv_report_item_fen_shi_2.visibility = View.GONE
         }
     }
 

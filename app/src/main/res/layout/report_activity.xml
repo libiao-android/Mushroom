@@ -61,6 +61,33 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+        <Button
+            android:id="@+id/one_test"
+            android:text="1月"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/two_test"
+            android:text="2月"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/three_test"
+            android:text="3月"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/four_test"
+            android:text="4月"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
     <com.airbnb.epoxy.EpoxyRecyclerView
         android:id="@+id/epoxy_view_report"
         android:layout_width="match_parent"

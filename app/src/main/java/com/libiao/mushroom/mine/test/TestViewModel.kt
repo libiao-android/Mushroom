@@ -12,6 +12,7 @@ import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.utils.LogUtil
+import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
 import java.io.BufferedReader
 import java.io.File
@@ -71,6 +72,8 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             val values_10 = java.util.ArrayList<Entry>()
                             val values_20 = java.util.ArrayList<Entry>()
 
+                            var itemBlack: SharesRecordActivity.ShareInfo? = null
+
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
                                 if(item.beginPrice == 0.00) {
@@ -97,6 +100,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                                 if(index == 80) {
                                     colorEntrys.add(Color.BLACK)
+                                    itemBlack = item
                                 } else {
 
                                     val green = "#28FF28"
@@ -124,7 +128,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             it.values_5 = values_5
                             it.values_10 = values_10
                             it.values_20 = values_20
-                            dataT.add(it)
+                            if (itemBlack != null && itemBlack!!.range > 0 && itemBlack!!.nowPrice > itemBlack!!.beginPrice && !ShareParseUtil.zhangTing(itemBlack!!)) {
+                                dataT.add(it)
+                            }
                         }
                     }
                 }
@@ -143,22 +149,22 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     private fun isFit(month: Int, time: String): Boolean {
         when(month) {
             1 -> {
-                return time.startsWith("2022-1") || time.startsWith("2022-01")
+                return time.startsWith("2023-1") || time.startsWith("2023-01")
             }
             2 -> {
-                return time.startsWith("2022-2") || time.startsWith("2022-02")
+                return time.startsWith("2023-2") || time.startsWith("2023-02")
             }
             3 -> {
-                return time.startsWith("2022-3") || time.startsWith("2022-03")
+                return time.startsWith("2023-3") || time.startsWith("2023-03")
             }
             4 -> {
-                return time.startsWith("2022-4") || time.startsWith("2022-04")
+                return time.startsWith("2023-4") || time.startsWith("2023-04")
             }
             5 -> {
-                return time.startsWith("2022-5") || time.startsWith("2022-05")
+                return time.startsWith("2023-5") || time.startsWith("2023-05")
             }
             6 -> {
-                return time.startsWith("2022-6") || time.startsWith("2022-06")
+                return time.startsWith("2023-6") || time.startsWith("2023-06")
             }
             7 -> {
                 return time.startsWith("2022-7") || time.startsWith("2022-07")

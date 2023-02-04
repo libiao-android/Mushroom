@@ -40,12 +40,11 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
             var time = ""
             data?.forEach {
-                if(isFit(month, it.time!!) && !isOnlyHeart(it)) {
-                    if(it.time == time) {
+                if(isFit(month, it.updateTime!!) && !isOnlyHeart(it)) {
+                    if(it.updateTime == time) {
 
                     } else {
-                        time = it.time!!
-                        dataTime.sortByDescending { it.yinXianLength }
+                        time = it.updateTime!!
                         if(dataTime.size > 0) {
                             dataTime[0].ext1 = "${dataTime.size}"
                         }
@@ -60,16 +59,17 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                         var startIndex = 0
                         var recordIndex = 0
                         lines.forEachIndexed{ind, line ->
-                            if(it.label1 != null && line.startsWith(it.label1!!)) {
+                            if(it.time != null && line.startsWith(it.time!!)) {
                                 startIndex = ind
                             }
-                            if(line.startsWith(it.time!!)) {
+                            if(line.startsWith(it.updateTime!!)) {
                                 recordIndex = ind
                                 return@forEachIndexed
                             }
                         }
                         val count = recordIndex - startIndex
                         var aaa = if(startIndex > 0) count+1 else 10
+                        //LogUtil.i(TAG, "aaa: $aaa")
                         if(it.candleEntryList == null) {
 
                             var a: Int
@@ -80,7 +80,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             }
 
                             if(a < 0) a = 0
-                            var b = recordIndex + 10
+                            var b = recordIndex + 20
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(a, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -173,39 +173,23 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 it.label5 = "$count, $yang, $yin"
                             }
 
-                            var liangBi = "0"
-                            if(it.lastShareInfo!!.totalPrice > 0) {
-                                liangBi = baoLiuXiaoShu(it.lastShareInfo!!.totalPrice / pre!!.totalPrice)
-                            }
-                            if(post != null && post!!.totalPrice > 0) {
-                                it.moreInfo2 = "${post?.rangeBegin},  ${post?.rangeMin},  ${post?.rangeMax},  ${post?.range}"
+                            it.moreInfo = "${it.lastShareInfo?.rangeBegin},  ${it.lastShareInfo?.rangeMin},  ${it.lastShareInfo?.rangeMax},  ${String.format("%.2f",it.lastShareInfo!!.totalPrice / 100000000)}亿"
 
-                            }
-                            it.moreInfo = "${it.lastShareInfo?.rangeBegin},  ${it.lastShareInfo?.rangeMin},  ${it.lastShareInfo?.rangeMax},  ${String.format("%.2f",it.lastShareInfo!!.totalPrice / 100000000)}亿,  ${liangBi}"
-
-                            it.fenShiPath = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi/${it.code}-${it.time}.jpg").absolutePath
-                            it.fenShiPath2 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi/${it.code}-${it.time}-2.jpg").absolutePath
-                            if(conOne) {
-                                if (current!!.rangeMax <= 3) {
-                                    dataTime.add(it)
-                                }
-                            } else {
-                                dataTime.add(it)
-                            }
+                            dataTime.add(it)
                         }
                     }
                 }
 
             }
 
-            dataTime.sortByDescending { it.yinXianLength }
+            //dataTime.sortByDescending { it.yinXianLength }
             if(dataTime.size > 0) {
                 dataTime[0].ext1 = "${dataTime.size}"
             }
             dataT.addAll(dataTime)
             dataTime.clear()
 
-            dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
+            dataT.sortByDescending { it.updateTime!!.split("-")[2].toInt() }
             dataT.also {
                 localList = it
                 setState {
@@ -225,28 +209,28 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     private fun isFit(month: Int, time: String): Boolean {
         when(month) {
             1 -> {
-                return time.startsWith("2022-1") || time.startsWith("2022-01")
+                return time.startsWith("2023-1") || time.startsWith("2023-01")
             }
             2 -> {
-                return time.startsWith("2022-2") || time.startsWith("2022-02")
+                return time.startsWith("2023-2") || time.startsWith("2023-02")
             }
             3 -> {
-                return time.startsWith("2022-3") || time.startsWith("2022-03")
+                return time.startsWith("2023-3") || time.startsWith("2023-03")
             }
             4 -> {
-                return time.startsWith("2022-4") || time.startsWith("2022-04")
+                return time.startsWith("2023-4") || time.startsWith("2023-04")
             }
             5 -> {
-                return time.startsWith("2022-5") || time.startsWith("2022-05")
+                return time.startsWith("2023-5") || time.startsWith("2023-05")
             }
             6 -> {
-                return time.startsWith("2022-6") || time.startsWith("2022-06")
+                return time.startsWith("2023-6") || time.startsWith("2023-06")
             }
             7 -> {
-                return time.startsWith("2022-7") || time.startsWith("2022-07")
+                return time.startsWith("2023-7") || time.startsWith("2023-07")
             }
             8 -> {
-                return time.startsWith("2022-8") || time.startsWith("2022-08")
+                return time.startsWith("2023-8") || time.startsWith("2023-08")
             }
             9 -> {
                 return time.startsWith("2022-9") || time.startsWith("2022-09")

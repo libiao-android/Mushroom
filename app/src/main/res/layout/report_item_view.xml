@@ -138,6 +138,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <ImageView
+        android:visibility="gone"
         android:layout_marginTop="-30dp"
         android:layout_below="@+id/test_item_bar_chart"
         android:id="@+id/iv_report_item_fen_shi"
@@ -145,6 +146,7 @@
         android:layout_height="200dp"/>
 
     <ImageView
+        android:visibility="gone"
         android:layout_marginTop="-25dp"
         android:layout_below="@+id/iv_report_item_fen_shi"
         android:id="@+id/iv_report_item_fen_shi_2"

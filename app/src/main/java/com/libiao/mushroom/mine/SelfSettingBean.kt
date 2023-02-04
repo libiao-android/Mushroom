@@ -2,6 +2,8 @@ package com.libiao.mushroom.mine
 
 class SelfSettingBean {
 
+    var type = 0
+
     var timeChecked: Boolean = true
     var rangeLeftChecked: Boolean = false
     var rangeRightChecked: Boolean = false

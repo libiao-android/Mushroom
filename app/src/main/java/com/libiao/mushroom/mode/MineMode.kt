@@ -91,7 +91,7 @@ class MineMode : BaseMode {
                             }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
                         }
-                        reportXiaYinXian(one, it.time)
+                        //reportXiaYinXian(one, it.time)
                     }
                 } else {
                     info?.also {
@@ -125,7 +125,7 @@ class MineMode : BaseMode {
                             }
                             MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
 
-                            reportXiaYinXian(one, it.time)
+                            //reportXiaYinXian(one, it.time)
 
 
 //                            if(!zhangTing(one) && one.totalPrice < 100000000) {

@@ -28,6 +28,7 @@ data class ReportShareInfo(
     var collect: Int = 0, // 0 未收藏  1 收藏
     var maxPrice: Double = 0.00,
     var maxCount: Int = 0,
+    var delete: Int = 0,
     var label1: String? = null,
     var label2: String? = null,
     var label3: String? = null,

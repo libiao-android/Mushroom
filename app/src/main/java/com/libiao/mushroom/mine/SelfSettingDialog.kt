@@ -56,6 +56,14 @@ class SelfSettingDialog : Dialog {
 
             dismiss()
         }
+        record_you_two.setOnClickListener {
+            if(dialog_cb_you_xuan_2.isChecked) {
+                val bean = SelfSettingBean()
+                bean.type = 1
+                callback(bean)
+                dismiss()
+            }
+        }
     }
 
 }

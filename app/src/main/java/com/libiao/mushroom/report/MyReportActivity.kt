@@ -62,6 +62,24 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(12)
             tv_month.text = "12"
         }
+
+        one_test.setOnClickListener {
+            reportViewModel.fetchInfo(1)
+            tv_month.text = "1"
+        }
+
+        two_test.setOnClickListener {
+            reportViewModel.fetchInfo(2)
+            tv_month.text = "2"
+        }
+        three_test.setOnClickListener {
+            reportViewModel.fetchInfo(3)
+            tv_month.text = "3"
+        }
+        four_test.setOnClickListener {
+            reportViewModel.fetchInfo(4)
+            tv_month.text = "4"
+        }
     }
 
     override fun invalidate() {
@@ -74,16 +92,16 @@ class MyReportActivity: BaseActivity(), MavericksView {
             var time = ""
             var index = 0
             data?.infoList?.forEach {
-                if (it.time != time) {
-                    time = it.time ?: ""
+                if (it.updateTime != time) {
+                    time = it.updateTime ?: ""
                     index = 0
                     timeItemView {
                         id(time)
-                        time(it.time)
+                        time(it.updateTime)
                         count(it.ext1)
                         expand(it.expand)
                         click { v ->
-                            reportViewModel.expand(it.time!!)
+                            reportViewModel.expand(it.updateTime!!)
                         }
                     }
                 }

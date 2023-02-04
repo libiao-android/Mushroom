@@ -28,8 +28,11 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
 import com.libiao.mushroom.mine.tab.Line20Tab
+import com.libiao.mushroom.report.ReportViewModel
 import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.MineShareInfo
+import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.line_20_fragment.*
@@ -328,16 +331,60 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
         settingDialog = SelfSettingDialog(context!!) {
             LogUtil.i(TAG, "$it")
-            settingBean = it
-            refreshTempData()
-            refreshCount()
-            resetSortUI()
+            if(it.type == 1) {
+                LogUtil.i(TAG, "mTempData.size: ${mTempData.size}")
+
+                val dataOld = ReportShareDatabase.getInstance()?.getReportShareDao()?.getShares()
+                LogUtil.i(TAG, "fetchReportInfo: ${dataOld?.size}")
+
+                mTempData.forEach {
+                    val code = it.code
+                    if(!isContain(dataOld, code)) {
+                        val info = ReportShareInfo()
+                        info.code = it.code
+                        info.time = it.time
+                        info.name = it.name
+                        info.updateTime = it.updateTime
+                        LogUtil.i(TAG, "新增: ${info.code}")
+                        ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
+                    }
+                }
+
+                dataOld?.forEach {
+                    if(!isContain2(mTempData, it.code)) {
+                        it.delete = 1
+                        LogUtil.i(TAG, "标记删除: ${it.code}")
+                        ReportShareDatabase.getInstance()?.getReportShareDao()?.update(it)
+                    }
+                }
+
+
+            } else  {
+                settingBean = it
+                refreshTempData()
+                refreshCount()
+                resetSortUI()
+            }
         }
 
         btn_start.setOnClickListener {
             btn_start.visibility = View.GONE
             initData()
         }
+    }
+
+    private fun isContain2(tempData: List<MineShareInfo>, code: String?): Boolean {
+        tempData.forEach {
+            if(it.code == code) return true
+        }
+        return false
+    }
+
+    private fun isContain(dataOld: MutableList<ReportShareInfo>?, code: String?): Boolean {
+        dataOld?.forEach {
+            if(it.code == code && it.delete == 0) return true
+        }
+        return false
     }
 
     private fun refreshLocalData(data: List<MineShareInfo>, reload: Boolean = false) {
@@ -376,6 +423,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         var xinGao = false
                         var xinGaoCount = 0
                         var noXinGao = false
+                        it.youTwo = true
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
@@ -418,6 +466,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                     if(item.beginPrice > item.nowPrice && tempItem!!.nowPrice >= tempItem!!.beginPrice && item.totalPrice > tempItem!!.totalPrice * 1.1) {
                                         greenLittle = false
                                     }
+                                }
+                                if(item.beginPrice > item.nowPrice && item.totalPrice > tempItem!!.totalPrice) {
+                                    it.youTwo = false
                                 }
                                 tempItem = item
                             }
@@ -499,7 +550,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     }
                     it.shareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
-                    it.youTwo = false
+                    //it.youTwo = false
                     it.youThree = false
                     if(it.dayCount >= 3) {
 
@@ -509,13 +560,13 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         val info_pre2 = lines.get(lines.size - 3)
                         val ten3 = SharesRecordActivity.ShareInfo(info_pre2)
 
-                        if(ten3.beginPrice > ten3.nowPrice && ten2.beginPrice > ten2.nowPrice && ten1.nowPrice >= ten1.beginPrice) {
-                            if(ten2.totalPrice < ten3.totalPrice * 0.9 && ten1.totalPrice < ten2.totalPrice * 0.9) {
-                                if(ten1.totalPrice > 50000000) {
-                                    it.youTwo = true
-                                }
-                            }
-                        }
+//                        if(ten3.beginPrice > ten3.nowPrice && ten2.beginPrice > ten2.nowPrice && ten1.nowPrice >= ten1.beginPrice) {
+//                            if(ten2.totalPrice < ten3.totalPrice * 0.9 && ten1.totalPrice < ten2.totalPrice * 0.9) {
+//                                if(ten1.totalPrice > 50000000) {
+//                                    it.youTwo = true
+//                                }
+//                            }
+//                        }
 
                         if(itemIn > 3) {
                             it.youThree = true
