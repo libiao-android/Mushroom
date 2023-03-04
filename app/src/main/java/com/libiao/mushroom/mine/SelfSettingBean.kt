@@ -29,6 +29,7 @@ class SelfSettingBean {
     var you_one: Boolean = false
     var you_two: Boolean = false
     var you_three: Boolean = false
+    var maxLiang: Boolean = false
 
     override fun toString(): String {
         return "[$timeChecked, $timeValue], [$rangeLeftChecked, $rangeLeftValue], [$rangeRightChecked, $rangeRightValue]" +

@@ -17,4 +17,7 @@ interface ReportShareDao {
 
     @Query("DELETE FROM ReportShareInfo WHERE code = :code")
     fun delete(code: String)
+
+    @Query("DELETE FROM ReportShareInfo WHERE ext5 = :ext")
+    fun deleteTest(ext: String)
 }

@@ -446,6 +446,7 @@ class SharesRecordActivity : AppCompatActivity() {
         var postRange = 0.00
         var post1 = ""
         var post2 = ""
+        var index = 0
 
         constructor(parcel: Parcel) : this() {
             name = parcel.readString()

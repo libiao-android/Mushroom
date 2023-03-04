@@ -141,7 +141,7 @@ class SelfSelectionActivity : BaseActivity() {
             }
         }
 
-        cb_heart.setOnCheckedChangeListener { buttonView, isChecked ->
+        cb_delete.setOnCheckedChangeListener { buttonView, isChecked ->
             currentTab?.fragment?.also {
                 (it as ICommand).order(ICommand.HEART, isChecked)
             }
@@ -190,7 +190,7 @@ class SelfSelectionActivity : BaseActivity() {
             }
 
             val heartStatus = (it as ICommand).obtain(ICommand.HEART_STATUS) as Boolean
-            cb_heart.isChecked = heartStatus
+            cb_delete.isChecked = heartStatus
 
             val onLineStatus = (it as ICommand).obtain(ICommand.ONLINE_STATUS) as Boolean
             cb_network.isChecked = onLineStatus

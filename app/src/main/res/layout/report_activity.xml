@@ -16,18 +16,27 @@
 
         <CheckBox
             android:textSize="13dp"
-            android:id="@+id/cb_heart"
+            android:id="@+id/cb_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="只看收藏"/>
+            android:text="max量"/>
 
         <CheckBox
+            android:checked="true"
+            android:visibility="visible"
             android:layout_marginLeft="5dp"
             android:textSize="13dp"
-            android:id="@+id/cb_one"
+            android:id="@+id/cb_three_yang"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="过滤涨幅>3"/>
+            android:text="3阳"/>
+        <Button
+            android:layout_marginLeft="5dp"
+            android:textSize="13dp"
+            android:id="@+id/btn_online"
+            android:text="线上"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 

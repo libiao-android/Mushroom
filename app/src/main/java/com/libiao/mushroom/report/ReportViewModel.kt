@@ -7,14 +7,15 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.room.report.ReportShareInfo
+import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.LogUtil
+import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
+import okhttp3.*
+import java.io.*
 import java.nio.charset.Charset
 
 class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(initial) {
@@ -27,20 +28,32 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
     var localList = mutableListOf<ReportShareInfo>()
 
-    var onlyHeart: Boolean = false
-    var conOne: Boolean = false
+    var maxLiang: Boolean = false
+    var threeYang: Boolean = false
+
+    private val client = OkHttpClient()
 
 
     fun fetchInfo(month: Int) {
+        if(month == 9) {
+            ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("2")
+        }
         withState {
-            val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getShares()
+            val dataOrign = ReportShareDatabase.getInstance()?.getReportShareDao()?.getShares()
+            val data = dataOrign?.filter {
+                if(maxLiang) {it.ext5 == "1"}
+                else if(threeYang) {it.ext5 == "2"}
+                else {
+                    it.ext5 != "1" && it.ext5 != "2"
+                }
+            }
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<ReportShareInfo>()
             val dataTime = ArrayList<ReportShareInfo>()
 
             var time = ""
             data?.forEach {
-                if(isFit(month, it.updateTime!!) && !isOnlyHeart(it)) {
+                if(isFit(month, it.updateTime!!)) {
                     if(it.updateTime == time) {
 
                     } else {
@@ -96,12 +109,26 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                             var yin = 0
                             var yang = 0
+                            var maxLiang = 0.00
+                            var isMaxLiang = false
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
                                 if(item.beginPrice == 0.00) {
                                     candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
                                 } else {
                                     candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                }
+
+
+
+                                if(index > 4) {
+                                    if(item.totalPrice > maxLiang && item.nowPrice > item.beginPrice) {
+                                        isMaxLiang = true
+                                    }
+                                }
+
+                                if(maxLiang < item.totalPrice) {
+                                    maxLiang = item.totalPrice
                                 }
 
                                 if (startIndex > 0 && index < count && index > 0) {
@@ -142,11 +169,10 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 if(index == aaa) {
                                     colorEntrys.add(Color.BLACK)
                                     it.lastShareInfo = item
-                                    current = item
+                                } else if(isMaxLiang) {
+                                    colorEntrys.add(Color.GRAY)
+                                    isMaxLiang = false
                                 } else {
-                                    if(index == aaa + 1) {
-                                        post = item
-                                    }
                                     val green = "#28FF28"
                                     val red = "#FF0000"
                                     if(item.beginPrice > item.nowPrice) {
@@ -199,9 +225,9 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
         }
     }
 
-    private fun isOnlyHeart(it: ReportShareInfo): Boolean {
-        if(onlyHeart) {
-            return it.collect == 0
+    private fun isOnlyDelete(it: ReportShareInfo): Boolean {
+        if(maxLiang) {
+            return it.delete == 1
         }
         return false
     }
@@ -265,7 +291,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             list.addAll(it.infoList)
             list.forEachIndexed {index, info ->
                 val temp = info.copy()
-                if(temp.time == time) {
+                if(temp.updateTime == time) {
                     temp.expand = !temp.expand
                 }
                 list[index] = temp
@@ -300,11 +326,102 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
         }
     }
 
-    fun setOnlySeeHeart(checked: Boolean) {
-        onlyHeart = checked
+    fun setOnlySeeDelete(checked: Boolean) {
+        maxLiang = checked
     }
 
     fun setConditionOne(checked: Boolean) {
-        conOne = checked
+        threeYang = checked
+    }
+
+    fun online() {
+
+        withState {s ->
+            val temp = mutableListOf<ReportShareInfo>()
+            temp.addAll(s.infoList)
+            var count = 0
+            temp.forEachIndexed { index, banShareInfo ->
+                shiShiQuery(banShareInfo.code!!) {share ->
+                    LogUtil.i(TAG, "share: ${share}")
+                    count ++
+
+                    val oneInfo = banShareInfo.copy()
+
+                    val candleSize = oneInfo.candleEntryList?.size ?: 0
+                    val lastShare = oneInfo.lastShareInfo
+
+                    var liangBi = "0"
+                    if(share.totalPrice > 0) {
+                        liangBi = baoLiuXiaoShu(share.totalPrice / lastShare!!.totalPrice)
+                    }
+
+                    oneInfo.lastShareInfo = share
+
+                    if(share.beginPrice == 0.00) {
+                        oneInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat()))
+                    } else {
+                        oneInfo.candleEntryList?.add(CandleEntry(candleSize.toFloat(), share.maxPrice.toFloat(), share.minPrice.toFloat(), share.beginPrice.toFloat(), share.nowPrice.toFloat()))
+                    }
+
+                    val adP= baoLiuXiaoShu(share.yesterdayPrice * (1 + (share.rangeBegin - 1)/100)) //建议挂单价格
+
+                    oneInfo.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  $liangBi, $adP"
+                    val p = share.totalPrice.toFloat() / 100000000
+                    oneInfo.barEntryList?.add(BarEntry(candleSize.toFloat(), p))
+                    oneInfo.colorsList?.add(Color.GRAY)
+                    temp[index] = oneInfo
+
+                    if(count == temp.size) {
+                        LogUtil.i(TAG, "setState.......................")
+                        setState {
+                            copy(infoList = temp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun shiShiQuery(code: String, result: (info: SharesRecordActivity.ShareInfo) -> Unit) {
+        //http://qt.gtimg.cn/q=s_sz000858
+        val request = Request.Builder()
+            .url("https://qt.gtimg.cn/q=$code")
+            .build()
+        val call = client.newCall(request)
+        call.enqueue(object : Callback {
+            override fun onFailure(call: Call?, e: IOException?) {
+                LogUtil.i(BaseFragment.TAG, "onFailure: ${e}, $code")
+            }
+
+            override fun onResponse(call: Call?, response: Response?) {
+                val value = response?.body()?.string()
+                //Log.i("libiao_A", "response: ${value}")
+                try {
+                    if (value != null) {
+                        //LogUtil.i(TAG, "response: ${value}")
+                        val strs = value.split("~")
+                        if(strs.size > 45) {
+                            val share = ShareParseUtil.parseFromNetwork(code, strs)
+                            LogUtil.i(BaseFragment.TAG, "share: $share")
+                            result(share)
+                        }
+                    } else {
+                        LogUtil.i(
+                            BaseFragment.TAG,
+                            "exception value: $value, $code"
+                        )
+                    }
+                } catch (e: Exception) {
+                    LogUtil.i(
+                        BaseFragment.TAG,
+                        "parseSharesInfo exception: ${e.message}, $code, $value"
+                    )
+                } finally {
+                    ThreadPoolUtil.executeUI(Runnable {
+                        //shiShiRefresh()
+                    })
+                }
+            }
+        })
     }
 }

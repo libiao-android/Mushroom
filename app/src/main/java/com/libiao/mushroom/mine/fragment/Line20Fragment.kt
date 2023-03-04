@@ -28,7 +28,6 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
 import com.libiao.mushroom.mine.tab.Line20Tab
-import com.libiao.mushroom.report.ReportViewModel
 import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.MineShareInfo
 import com.libiao.mushroom.room.report.ReportShareDatabase
@@ -36,9 +35,11 @@ import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.line_20_fragment.*
-import kotlinx.android.synthetic.main.shares_real_time_info_item.view.*
 import java.io.*
 import java.nio.charset.Charset
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -339,27 +340,41 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
                 mTempData.forEach {
                     val code = it.code
-                    if(!isContain(dataOld, code)) {
-                        val info = ReportShareInfo()
-                        info.code = it.code
-                        info.time = it.time
-                        info.name = it.name
-                        info.updateTime = it.updateTime
-                        LogUtil.i(TAG, "新增: ${info.code}")
-                        ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
-                    }
+
+                    val info = ReportShareInfo()
+                    info.code = it.code
+                    info.time = it.time
+                    info.name = it.name
+                    info.updateTime = it.updateTime
+                    LogUtil.i(TAG, "新增: ${info.code}")
+                    ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
+
+//                    if(!isContain(dataOld, code)) {
+//
+//                    }
                 }
 
-                dataOld?.forEach {
-                    if(!isContain2(mTempData, it.code)) {
-                        it.delete = 1
-                        LogUtil.i(TAG, "标记删除: ${it.code}")
-                        ReportShareDatabase.getInstance()?.getReportShareDao()?.update(it)
-                    }
+//                dataOld?.forEach {
+//                    if(!isContain2(mTempData, it.code)) {
+//                        it.delete = 1
+//                        LogUtil.i(TAG, "标记删除: ${it.code}")
+//                        ReportShareDatabase.getInstance()?.getReportShareDao()?.update(it)
+//                    }
+//                }
+
+            } else if(it.type == 2){
+                mTempData.forEach {
+                    val code = it.code
+                    val info = ReportShareInfo()
+                    info.code = it.code
+                    info.time = it.time
+                    info.name = it.name
+                    info.updateTime = it.updateTime
+                    info.ext5 = "1"
+                    LogUtil.i(TAG, "新增: ${info.code}")
+                    ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
                 }
-
-
-            } else  {
+            } else {
                 settingBean = it
                 refreshTempData()
                 refreshCount()
@@ -424,11 +439,34 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         var xinGaoCount = 0
                         var noXinGao = false
                         it.youTwo = true
+                        it.zhiDie = false
+                        var fangLiang = false
+                        var shouHong = false
+                        it.fangLiangList.clear()
+                        var maxLiang = 0.00
+                        it.maxLiang = false
+                        val list = ArrayList<SharesRecordActivity.ShareInfo>()
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
+                            if(index > 0) {
+                                list.add(item)
+                                item.index = index
+                            }
+
                             if(index > 3 && item.minPrice < item.line_20 && !xinGao) {
                                 noXinGao = true
+                            }
+
+                            if(index > 3 && index == records.size - 1) {
+                                if(item.totalPrice > maxLiang && item.range > 0) {
+                                    it.maxLiang = true
+                                }
+                            }
+
+
+                            if(item.totalPrice > maxLiang) {
+                                maxLiang = item.totalPrice
                             }
 
 
@@ -459,6 +497,30 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                     }
                                 }
                             }
+
+//                            if(shouHong) {
+//                                if(item.nowPrice > item.beginPrice) {
+//                                    it.zhiDie = true
+//                                    it.fangLiangList.add(index)
+//                                }
+//                            }
+//                            shouHong = false
+
+                            if(fangLiang) {
+                                if(item.totalPrice > tempItem!!.totalPrice && item.range > 0) {
+                                    //shouHong = true
+                                    it.zhiDie = true
+                                    it.fangLiangList.add(index)
+                                }
+                            }
+
+                            fangLiang = false
+                            if(index > 4 && tempItem != null) {
+                                if(item.totalPrice > tempItem!!.totalPrice * 2 && item.range > 0) {
+                                    fangLiang = true
+                                }
+                            }
+
                             if(tempItem == null) {
                                 tempItem = item
                             } else {
@@ -503,15 +565,20 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             barEntrys.add(BarEntry(index.toFloat(), p))
                             val green = "#28FF28"
                             val red = "#FF0000"
-                            if(item.beginPrice > item.nowPrice) {
-                                colorEntrys.add(Color.parseColor(green))
-                            } else if(item.beginPrice < item.nowPrice) {
-                                colorEntrys.add(Color.parseColor(red))
+
+                            if(it.fangLiangList.contains(index)) {
+                                colorEntrys.add(Color.BLACK)
                             } else {
-                                if(item.range >= 0) {
+                                if(item.beginPrice > item.nowPrice) {
+                                    colorEntrys.add(Color.parseColor(green))
+                                } else if(item.beginPrice < item.nowPrice) {
                                     colorEntrys.add(Color.parseColor(red))
                                 } else {
-                                    colorEntrys.add(Color.parseColor(green))
+                                    if(item.range >= 0) {
+                                        colorEntrys.add(Color.parseColor(red))
+                                    } else {
+                                        colorEntrys.add(Color.parseColor(green))
+                                    }
                                 }
                             }
                         }
@@ -525,6 +592,27 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                            it.youXuan = true
 //                        }
 
+                        list.sortByDescending { it.totalPrice }
+                       // LogUtil.i(TAG, "最大：${list[0].totalPrice}")
+                       // LogUtil.i(TAG, "最小：${list.last().totalPrice}")
+                        it.youThree = false
+                        if(list.size > 4) {
+                            if(list[0].nowPrice > list[0].beginPrice && list[1].nowPrice > list[1].beginPrice && list[2].nowPrice > list[2].beginPrice) {
+                                if(list[0].totalPrice < list[2].totalPrice * 2) {
+                                    val a = abs(list[0].index - list[1].index)
+                                    val b = abs(list[0].index - list[2].index)
+                                    val c = abs(list[1].index - list[2].index)
+                                    if(a > 2 && b > 2 && c > 2) {
+                                        it.youThree = true
+                                        if(list[0].code == "sz002327") {
+                                            LogUtil.i(TAG, "002327: ${list[0].totalPrice}, ${list[0].index}")
+                                            LogUtil.i(TAG, "002327: ${list[1].totalPrice}, ${list[1].index}")
+                                            LogUtil.i(TAG, "002327: ${list[2].totalPrice}, ${list[2].index}")
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         var minP = one.nowPrice
                         if(minP == 0.00) minP = two.yesterdayPrice
                         if(minP == 0.00) minP = two.beginPrice
@@ -551,7 +639,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     it.shareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
                     //it.youTwo = false
-                    it.youThree = false
+                    //it.youThree = false
+                    it.youOne = false
                     if(it.dayCount >= 3) {
 
                         val ten1 = share
@@ -559,6 +648,13 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
                         val info_pre2 = lines.get(lines.size - 3)
                         val ten3 = SharesRecordActivity.ShareInfo(info_pre2)
+
+                        if(ten1.totalPrice > ten2.totalPrice * 2 && ten1.range > 0 && ten1.nowPrice > ten1.beginPrice
+                        ) {
+                            it.youOne = true
+                        }
+
+
 
 //                        if(ten3.beginPrice > ten3.nowPrice && ten2.beginPrice > ten2.nowPrice && ten1.nowPrice >= ten1.beginPrice) {
 //                            if(ten2.totalPrice < ten3.totalPrice * 0.9 && ten1.totalPrice < ten2.totalPrice * 0.9) {
@@ -568,13 +664,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                            }
 //                        }
 
-                        if(itemIn > 3) {
-                            it.youThree = true
-                        }
-
-                        if(ten1.totalPrice > ten2.totalPrice) {
-                            it.zhiDie = true
-                        }
+//                        if(itemIn > 3) {
+//                            it.youThree = true
+//                        }
 
                         //智能选择
 //                        it.youXuan = false
@@ -704,6 +796,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
 
+            if(selfSettingBean?.maxLiang == true && !info.maxLiang) {
+                continue
+            }
+
             temp.add(info)
         }
         mTempData = temp
@@ -745,15 +841,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
             it.redLine = share.nowPrice > share.beginPrice
-
-            it.youOne = false
-            if(share.totalPrice > sharePre.totalPrice * 0.95 && share.range > 1 && share.nowPrice > share.beginPrice) {
-                if(!ShareParseUtil.zhangTing(share) && sharePre.range < 3 && share.totalPrice > 100000000.00) {
-                    if(share.rangeMax - share.range < share.range - share.rangeMin && it.avgP > 150000000) {
-                        it.youOne = true
-                    }
-                }
-            }
 
             var liangBi = "0"
             if(sharePre.totalPrice > 0) {

@@ -2,9 +2,13 @@ package com.libiao.mushroom.mode
 
 import android.content.Context
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.mine.fragment.Line20Fragment
 import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
+import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.utils.Constant
+import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
 import com.libiao.mushroom.utils.ShareParseUtil
 
@@ -29,35 +33,46 @@ class TestMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 5
-        if(mDeviationValue >  0) {
+        mDeviationValue = day - 3
+        if(mDeviationValue > 1) {
+
+            val zero = shares[mDeviationValue - 1]
 
             val one = shares[mDeviationValue + 0]
+            if(one.beginPrice <= 0) return
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
-            val four = shares[mDeviationValue + 3]
-            val five = shares[mDeviationValue + 4]
 
-            if(!isChuang(one.code) && !zhangTing(one) && zhangTing(two) && !zhangTing(three)) {
+            val a = one.nowPrice > one.beginPrice
+            val b = two.nowPrice > two.beginPrice
+            val c = three.nowPrice > three.beginPrice
+            val avg1 = (one.beginPrice + one.nowPrice) / 2
+            val avg2 = (two.beginPrice + two.nowPrice) / 2
+            val avg3 = (three.beginPrice + three.nowPrice) / 2
+            val d = avg2 in avg1..avg3
+            val e = (one.range + two.range + three.range) < 3
+            val l = one.rangeMax - one.rangeMin < 3
+            val m = two.rangeMax - two.rangeMin < 3
+            val n = three.rangeMax - three.rangeMin < 3
 
-                if(yin(three) && yang(four) && yang(five) && !zhangTing(four) && !zhangTing(five)) {
-                    if(four.maxPrice < five.maxPrice) {
-                        i(TAG, "${five.brieflyInfo()}")
-                        mFitModeList.add(Pair(five.range, five))
+            val f = three.totalPrice < two.totalPrice * 2
 
-                        val info = TestShareInfo()
-                        info.time = two.time
-                        info.code = two.code
-                        info.name = two.name
-                        info.dayCount = 3
-                        info.updateTime = two.time
-                        info.startIndex = mDeviationValue + 1
+            val x = two.minPrice > one.minPrice
+            val y = three.minPrice > two.minPrice
 
-                        val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
-                        info.id = id?.toInt() ?: 0
-                        poolMap[two.code!!] = info
-                    }
-                }
+            val q = zero.range < 0
+
+            if(a && b && c && d && e && f && l && m && n && x && y && q) {
+                i(TAG, "${three.brieflyInfo()}")
+                mFitModeList.add(Pair(three.range, three))
+
+                val info = ReportShareInfo()
+                info.code = three.code
+                info.time = three.time
+                info.name = three.name
+                info.updateTime = three.time
+                info.ext5 = "2"
+                ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
             }
         }
     }

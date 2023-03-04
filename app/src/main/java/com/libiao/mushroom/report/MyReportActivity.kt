@@ -34,11 +34,16 @@ class MyReportActivity: BaseActivity(), MavericksView {
     private val reportViewModel: ReportViewModel by viewModel()
 
     private fun initView() {
-        cb_heart.setOnCheckedChangeListener { buttonView, isChecked ->
-            reportViewModel.setOnlySeeHeart(isChecked)
+        reportViewModel.setOnlySeeDelete(cb_delete.isChecked)
+        cb_delete.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setOnlySeeDelete(isChecked)
         }
-        cb_one.setOnCheckedChangeListener { buttonView, isChecked ->
+        reportViewModel.setConditionOne(cb_three_yang.isChecked)
+        cb_three_yang.setOnCheckedChangeListener { buttonView, isChecked ->
             reportViewModel.setConditionOne(isChecked)
+        }
+        btn_online.setOnClickListener {
+            reportViewModel.online()
         }
         epoxy_view_report.setController(controller)
 

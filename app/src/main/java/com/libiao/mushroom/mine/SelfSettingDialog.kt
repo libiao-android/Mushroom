@@ -52,14 +52,25 @@ class SelfSettingDialog : Dialog {
             bean.you_two = dialog_cb_you_xuan_2.isChecked
             bean.you_three = dialog_cb_you_xuan_3.isChecked
 
+            bean.maxLiang = dialog_cb_max_liang.isChecked
+
             callback(bean)
 
             dismiss()
         }
         record_you_two.setOnClickListener {
-            if(dialog_cb_you_xuan_2.isChecked) {
+            if(dialog_cb_you_xuan_1.isChecked) {
                 val bean = SelfSettingBean()
                 bean.type = 1
+                callback(bean)
+                dismiss()
+            }
+        }
+
+        record_max_liang.setOnClickListener {
+            if(dialog_cb_max_liang.isChecked) {
+                val bean = SelfSettingBean()
+                bean.type = 2
                 callback(bean)
                 dismiss()
             }

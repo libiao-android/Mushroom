@@ -40,7 +40,7 @@ class MineShareInfo {
     var ext2: String? = null
     var ext3: String? = null
     var ext4: String? = null
-    var ext5: String? = null
+    var ext5: String? = null // 类型
 
     var duanCeng = false
     var duanCengPrice: Double = 0.00
@@ -104,6 +104,9 @@ class MineShareInfo {
     var zhiDie: Boolean = false
 
     @Ignore
+    var fangLiangList: ArrayList<Int> = ArrayList()
+
+    @Ignore
     var youOne: Boolean = false
 
     @Ignore
@@ -117,6 +120,9 @@ class MineShareInfo {
 
     @Ignore
     var avgP = 0.00
+
+    @Ignore
+    var maxLiang = false
 
     override fun toString(): String {
         return "${time}, ${code}, $name"

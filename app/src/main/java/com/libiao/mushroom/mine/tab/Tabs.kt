@@ -16,7 +16,7 @@ class Tabs {
 
         tabInfos.add(Up50Tab())
 
-        tabInfos.add(BanOneTab())
+        //tabInfos.add(BanOneTab())
 
 
 

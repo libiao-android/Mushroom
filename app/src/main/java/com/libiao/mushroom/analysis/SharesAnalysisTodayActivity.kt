@@ -153,7 +153,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(TestMode())
         mModeList.add(TestMode2())
         mModeList.add(FiveRedMode())
-        mModeList.add(XinGaoMode())
+
 
         //mModeList.add(ChuangYeBanTouJiMode())
         //        mModeList.add(StrongStock10Mode())
@@ -186,6 +186,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(MoreMore4Mode())
 
         mModeList.add(MineMode())
+
+        mModeList.add(XinGaoMode())
 
         val tempList = ArrayList<BaseMode>()
         mModeList.forEach {
