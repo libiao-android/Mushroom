@@ -37,7 +37,6 @@ import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.line_20_fragment.*
 import java.io.*
 import java.nio.charset.Charset
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 import kotlin.math.max
@@ -67,7 +66,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 mRefreshCount = 0
                 mTempData.forEach {
                     shiShiQuery(it.code!!) {share ->
-                        val f = File(file_2021, it.code!!)
+                        val f = File(file_2023, it.code!!)
                         if(f.exists()) {
                             val stream = FileInputStream(f)
                             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
@@ -407,7 +406,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         loadingStatus = 1
         ThreadPoolUtil.execute(Runnable {
             data.forEach {
-                val f = File(file_2021, it.code)
+                val f = File(file_2023, it.code)
                 if(f.exists()) {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

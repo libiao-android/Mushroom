@@ -24,7 +24,7 @@ class JiGouViewModel(initial: JiGouState): MavericksViewModel<JiGouState>(initia
         private const val TAG = "JiGouViewModel"
     }
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<JiGouShareInfo>()
 
@@ -34,7 +34,7 @@ class JiGouViewModel(initial: JiGouState): MavericksViewModel<JiGouState>(initia
             val data = JiGouShareDatabase.getInstance()?.getJiGouShareDao()?.getShares()
             val dataT = ArrayList<JiGouShareInfo>()
             data?.forEach {
-                val f = File(file_2021, it.code)
+                val f = File(file_2023, it.code)
                 if(f.exists()) {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

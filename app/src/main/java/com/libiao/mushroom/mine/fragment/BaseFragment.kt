@@ -21,7 +21,7 @@ open class BaseFragment(resLayout: Int): Fragment(resLayout) {
 
     var mRefreshCount = 0
 
-    val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
     private val client = OkHttpClient()
 
     fun shiShiQuery(code: String, result: (info: SharesRecordActivity.ShareInfo) -> Unit) {

@@ -95,8 +95,6 @@ class MyPool20Activity : AppCompatActivity() {
 
         private var info: String? = null
 
-        private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
-
 
         init {
             mNameTv = view.findViewById(R.id.name)

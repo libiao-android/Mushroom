@@ -6,11 +6,13 @@ class Tabs {
 
     init {
 
-        tabInfos.add(Line20Tab())
-
         tabInfos.add(TestTab())
 
-        tabInfos.add(JiGouTab())
+        tabInfos.add(Line20Tab())
+
+
+
+        //tabInfos.add(JiGouTab())
 
         tabInfos.add(BanThreeTab())
 

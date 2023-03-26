@@ -17,4 +17,7 @@ interface TestShareDao {
 
     @Query("DELETE FROM TestShareInfo WHERE code = :code")
     fun delete(code: String)
+
+    @Query("DELETE FROM TestShareInfo WHERE ext5 = :ext")
+    fun deleteTest(ext: String)
 }

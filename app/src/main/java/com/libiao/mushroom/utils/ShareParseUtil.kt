@@ -81,12 +81,22 @@ class ShareParseUtil {
 
         fun zhangTing(info: SharesRecordActivity.ShareInfo): Boolean {
             var maxRange = 1.1
-            if(info.code?.startsWith("sz3") == true) {
+            if(info.code?.startsWith("sz3") == true || info.code?.startsWith("sh68") == true) {
                 maxRange = 1.2
             }
             var zhangTingPrice = info.yesterdayPrice * maxRange - 0.05
             zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
             return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0
+        }
+
+        fun maxZhangTing(info: SharesRecordActivity.ShareInfo): Boolean {
+            var maxRange = 1.1
+            if(info.code?.startsWith("sz3") == true || info.code?.startsWith("sh68") == true) {
+                maxRange = 1.2
+            }
+            var zhangTingPrice = info.yesterdayPrice * maxRange - 0.05
+            zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
+            return info.maxPrice > 0 && info.maxPrice >= zhangTingPrice && zhangTingPrice > 0
         }
     }
 }

@@ -2,7 +2,6 @@ package com.libiao.mushroom.mine.test
 
 import android.graphics.Color
 import android.os.Environment
-import androidx.room.Ignore
 import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
@@ -14,12 +13,12 @@ import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
+import com.libiao.mushroom.utils.huanSuanYi
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
-import kotlin.math.min
 
 class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) {
 
@@ -27,22 +26,35 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         private const val TAG = "TestViewModel"
     }
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<TestShareInfo>()
 
     var isMorePrice = false
     var isLessPrice = false
 
+    var xingao = false
+    var fangliang = false
+
+    var maxPrice = false
+    var xinGaoAgain = false
+
+    var dayCheck = false
+
     fun fetchInfo(month: Int) {
         withState {
+
+            if(month == 0) {
+                TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("3")
+            }
 
             val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<TestShareInfo>()
+
             data?.forEach {
-                if(it.dayCount > 0 && isFit(month, it.time!!)) {
-                    val f = File(file_2021, it.code)
+                if(it.dayCount > 0 && isFit(month, it.time!!) && isfitCheck(it.ext5)) {
+                    val f = File(file_2023, it.code)
                     if(f.exists()) {
                         val stream = FileInputStream(f)
                         val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
@@ -57,10 +69,11 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             }
                         }
 
+                        val jianGe = it.ext4
 
                         if(it.candleEntryList == null) {
 
-                            var a = updateIndex - 80
+                            var a = updateIndex - 120
                             if(a < 0) a = 0
                             var b = updateIndex + 20
                             if(lines.size < b) b = lines.size
@@ -73,13 +86,65 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             val values_20 = java.util.ArrayList<Entry>()
 
                             var itemBlack: SharesRecordActivity.ShareInfo? = null
+                            var itemBlack2: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPost: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPost2: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPost3: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPre: SharesRecordActivity.ShareInfo? = null
+                            var secondPrice = 0.00 // 之前最高价
+                            var secondIndex = 0
+                            var secondItem:  SharesRecordActivity.ShareInfo? = null
+
+                            var minPrice = 9999.99 // 之前最低价
+                            var minIndex = 0
+
+                            var secondTotal = 0.00 // 之前最大量能
+                            var secondTotalIndex = 0
+
+                            var moreXinGao = false // 新高后新高
+                            var moreXinGaoIndex = -1
+                            var moreXinGaoItem: SharesRecordActivity.ShareInfo? = null
+
+                            var moreLiangXinGao = false // 量能新高后新高
+                            var moreLiangXinGaoIndex = -1
+                            var moreLiangXinGaoItem: SharesRecordActivity.ShareInfo? = null
+
 
                             records.forEachIndexed { index, s ->
+                                //if(index == 0) return@forEachIndexed
                                 val item = SharesRecordActivity.ShareInfo(s)
-                                if(item.beginPrice == 0.00) {
-                                    candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+
+                                if(dayCheck) {
+                                    if(index > 60) {
+                                        if(item.beginPrice == 0.00) {
+                                            candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+                                        } else {
+                                            candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                        }
+                                    }
                                 } else {
-                                    candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                    if(item.beginPrice == 0.00) {
+                                        candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+                                    } else {
+                                        candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                    }
+                                }
+
+                                if(index in 1..119) {
+                                    if(item.maxPrice > secondPrice) {
+                                        secondPrice = item.maxPrice
+                                        secondItem = item
+                                        secondIndex = index
+                                    }
+
+                                    if(item.minPrice < minPrice) {
+                                        minPrice = item.minPrice
+                                        minIndex = index
+                                    }
+                                    if(item.totalPrice > secondTotal) {
+                                        secondTotal = item.totalPrice
+                                        secondTotalIndex = index
+                                    }
                                 }
 
                                 var line5 = item.line_5
@@ -91,29 +156,98 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 var line20 = item.line_20
                                 if(line20 == 0.00) { line20 = item.beginPrice }
 
-                                values_5.add(Entry(index.toFloat(), line5.toFloat()))
-                                values_10.add(Entry(index.toFloat(), line10.toFloat()))
-                                values_20.add(Entry(index.toFloat(), line20.toFloat()))
+                                if(dayCheck) {
+                                    if(index > 60) {
+                                        values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                                        values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                                        values_20.add(Entry(index.toFloat(), line20.toFloat()))
+                                    }
+                                } else {
+                                    values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                                    values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                                    values_20.add(Entry(index.toFloat(), line20.toFloat()))
+                                }
+
 
                                 val p = item.totalPrice.toFloat() / 100000000
-                                barEntrys.add(BarEntry(index.toFloat(), p))
+                                if(dayCheck) {
+                                    if(index > 60) {
+                                        barEntrys.add(BarEntry(index.toFloat(), p))
+                                    }
+                                } else {
+                                    barEntrys.add(BarEntry(index.toFloat(), p))
+                                }
 
-                                if(index == 80) {
+                                if(index == 119) {
+                                    itemBlack2 = item
+                                }
+
+
+                                if(index > 120) {
+                                    if(item.maxPrice > itemBlack!!.maxPrice && !moreXinGao && item.nowPrice > item.beginPrice) {
+                                        moreXinGao = true
+                                        moreXinGaoIndex = index
+                                        moreXinGaoItem = item
+                                    }
+
+                                    if(item.totalPrice > itemBlack!!.totalPrice && !moreLiangXinGao && item.nowPrice > item.beginPrice) {
+                                        moreLiangXinGao = true
+                                        moreLiangXinGaoIndex = index
+                                        moreLiangXinGaoItem = item
+                                    }
+                                }
+
+                                if(index == 119) {
+                                    itemBlackPre = item
+                                }
+
+                                if(index == 121) {
+                                    itemBlackPost = item
+                                }
+
+                                if(index == 122) {
+                                    itemBlackPost2 = item
+                                }
+
+                                if(index == 123) {
+                                    itemBlackPost3 = item
+                                }
+
+
+                                if(index == 120) {
                                     colorEntrys.add(Color.BLACK)
                                     itemBlack = item
+                                } else if((index == moreXinGaoIndex && xingao) || (index == moreLiangXinGaoIndex && fangliang)){
+                                    colorEntrys.add(Color.GRAY)
                                 } else {
-
                                     val green = "#28FF28"
                                     val red = "#FF0000"
-                                    if(item.beginPrice > item.nowPrice) {
-                                        colorEntrys.add(Color.parseColor(green))
-                                    } else if(item.beginPrice < item.nowPrice) {
-                                        colorEntrys.add(Color.parseColor(red))
+
+                                    if(dayCheck) {
+                                        if(index > 60) {
+                                            if(item.beginPrice > item.nowPrice) {
+                                                colorEntrys.add(Color.parseColor(green))
+                                            } else if(item.beginPrice < item.nowPrice) {
+                                                colorEntrys.add(Color.parseColor(red))
+                                            } else {
+                                                if(item.range >= 0) {
+                                                    colorEntrys.add(Color.parseColor(red))
+                                                } else {
+                                                    colorEntrys.add(Color.parseColor(green))
+                                                }
+                                            }
+                                        }
                                     } else {
-                                        if(item.range >= 0) {
+                                        if(item.beginPrice > item.nowPrice) {
+                                            colorEntrys.add(Color.parseColor(green))
+                                        } else if(item.beginPrice < item.nowPrice) {
                                             colorEntrys.add(Color.parseColor(red))
                                         } else {
-                                            colorEntrys.add(Color.parseColor(green))
+                                            if(item.range >= 0) {
+                                                colorEntrys.add(Color.parseColor(red))
+                                            } else {
+                                                colorEntrys.add(Color.parseColor(green))
+                                            }
                                         }
                                     }
                                 }
@@ -128,8 +262,99 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             it.values_5 = values_5
                             it.values_10 = values_10
                             it.values_20 = values_20
-                            if (itemBlack != null && itemBlack!!.range > 0 && itemBlack!!.nowPrice > itemBlack!!.beginPrice && !ShareParseUtil.zhangTing(itemBlack!!)) {
-                                dataT.add(it)
+
+                            if(fangliang) {
+                                val aa = "${itemBlack!!.range}, ${itemBlack!!.rangeBegin},  ${itemBlack!!.rangeMin},  ${itemBlack!!.rangeMax},  ${huanSuanYi(itemBlack!!.totalPrice)}"
+                                val bb = "${baoLiuXiaoShu(itemBlack!!.totalPrice / secondTotal)}"
+                                if(isMorePrice) {
+                                    if(itemBlackPost != null) {
+                                        if(itemBlackPost!!.totalPrice > itemBlack!!.totalPrice && itemBlackPost!!.maxPrice > itemBlack!!.maxPrice) {
+                                            if(itemBlackPost!!.range > 0 && itemBlackPost!!.nowPrice > itemBlackPost!!.beginPrice) {
+                                                val cc = "${itemBlackPost!!.range}, ${itemBlackPost!!.rangeBegin},  ${itemBlackPost!!.rangeMin},  ${itemBlackPost!!.rangeMax},  ${huanSuanYi(itemBlackPost!!.totalPrice)}"
+                                                it.moreInfo = "$aa\n$cc\n$bb"
+
+                                                if(itemBlackPost2 != null && itemBlackPost3 != null) {
+                                                    val d = itemBlackPost2!!.range - itemBlackPost2!!.rangeBegin
+                                                    val e = itemBlackPost3!!.range
+                                                    val f = d + e
+                                                    it.moreInfo = "$aa\n$cc\n$bb,    ${baoLiuXiaoShu(d)}, ${baoLiuXiaoShu(e)}, ${baoLiuXiaoShu(f)}"
+                                                }
+
+                                                dataT.add(it)
+                                            }
+
+                                        }
+                                    }
+                                } else {
+//                                    if(moreLiangXinGao) {
+//
+//                                    }
+                                    it.moreInfo = "$aa\n$bb"
+                                    dataT.add(it)
+                                }
+                            }
+
+                            if (xingao) {
+                                if (itemBlack != null && itemBlack!!.range > 0 && itemBlack!!.nowPrice > itemBlack!!.beginPrice) {
+
+                                    val a =
+                                        "${itemBlack!!.range}, ${itemBlack!!.rangeBegin},  ${itemBlack!!.rangeMin},  ${itemBlack!!.rangeMax},  ${huanSuanYi(
+                                            itemBlack!!.totalPrice
+                                        )}"
+                                    val b =
+                                        "$secondIndex, ${baoLiuXiaoShu((itemBlack!!.maxPrice - secondItem!!.maxPrice) / secondItem!!.maxPrice * 100)}"
+
+                                    val c = "$secondTotalIndex, ${baoLiuXiaoShu((itemBlack!!.totalPrice) / secondTotal)}"
+                                    var d = ""
+                                    if(itemBlackPost != null) {
+                                        d = "${itemBlackPost!!.range}, ${itemBlackPost!!.rangeBegin},  ${itemBlackPost!!.rangeMin},  ${itemBlackPost!!.rangeMax}"
+                                    }
+                                    it.moreInfo = "$a\n$b   |   $c\n$d"
+
+                                    val isZhaBan = itemBlack!!.range < itemBlack!!.rangeMax && ShareParseUtil.maxZhangTing(itemBlack!!)
+
+                                    val diDianMid = secondIndex < minIndex
+                                    val liangNengJianGe = secondTotalIndex < 100
+
+                                    val shangYinXian = itemBlack!!.rangeMax - itemBlack!!.range > itemBlack!!.range - itemBlack!!.rangeBegin
+
+                                    val zhangTing = ShareParseUtil.zhangTing(itemBlack!!) //涨停会带来很多打板客，这些都是短线资金，带来的量能放大，不是逻辑驱动
+
+                                    val zhangTingPre = ShareParseUtil.zhangTing(itemBlackPre!!)
+
+                                    val jiaGeJianGe = jianGe?.toInt() ?: 0 > 20
+
+                                    if(maxPrice) {
+                                        if (itemBlack!!.totalPrice > secondTotal) {
+                                            if(
+                                                !isZhaBan
+                                                && !shangYinXian
+                                                && !diDianMid
+                                                && !zhangTingPre
+                                                && !zhangTing
+                                                //&& liangNengJianGe
+                                                //&& jiaGeJianGe
+                                                && itemBlack!!.totalPrice > 300000000
+                                            ) {
+                                                dataT.add(it)
+                                            } else {
+//                                                if (moreXinGaoIndex > 122
+//                                                    //&& moreXinGaoItem!!.totalPrice > itemBlack!!.totalPrice
+//                                                    //&& itemBlack!!.totalPrice > 100000000 && moreXinGaoIndex < 130
+//                                                ) {
+//                                                    it.moreInfo = "$a\n$b\n$c\n新高"
+//                                                    dataT.add(it)
+//                                                }
+                                            }
+                                        }
+                                    } else if(xinGaoAgain) {
+                                        if(moreXinGao && moreXinGaoIndex > 125) {
+                                            dataT.add(it)
+                                        }
+                                    } else {
+                                        dataT.add(it)
+                                    }
+                                }
                             }
                         }
                     }
@@ -137,6 +362,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
             }
             dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
+
+            oneDayCount(dataT)
+
             dataT.also {
                 localList = it
                 setState {
@@ -144,6 +372,34 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 }
             }
         }
+    }
+
+    private fun oneDayCount(dataT: java.util.ArrayList<TestShareInfo>) {
+        var time = ""
+        val dataTime = ArrayList<TestShareInfo>()
+        dataT.forEach {
+
+            if(it.updateTime == time) {
+                dataTime.add(it)
+            } else {
+                time = it.updateTime!!
+                if(dataTime.size > 0) {
+                    dataTime[0].count = "${dataTime.size}"
+                }
+                dataTime.clear()
+                dataTime.add(it)
+            }
+        }
+        if(dataTime.size > 0) {
+            dataTime[0].count = "${dataTime.size}"
+        }
+        dataTime.clear()
+    }
+
+    private fun isfitCheck(ext5: String?): Boolean {
+        if(xingao && ext5 == "1") return true
+        if(fangliang && ext5 == "2") return true
+        return false
     }
 
     private fun isFit(month: Int, time: String): Boolean {
@@ -158,13 +414,13 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 return time.startsWith("2023-3") || time.startsWith("2023-03")
             }
             4 -> {
-                return time.startsWith("2023-4") || time.startsWith("2023-04")
+                return time.startsWith("2022-4") || time.startsWith("2022-04")
             }
             5 -> {
-                return time.startsWith("2023-5") || time.startsWith("2023-05")
+                return time.startsWith("2022-5") || time.startsWith("2022-05")
             }
             6 -> {
-                return time.startsWith("2023-6") || time.startsWith("2023-06")
+                return time.startsWith("2022-6") || time.startsWith("2022-06")
             }
             7 -> {
                 return time.startsWith("2022-7") || time.startsWith("2022-07")
@@ -289,5 +545,25 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun setLessPricechecked(checked: Boolean) {
         isLessPrice = checked
+    }
+
+    fun setXinGaoChecked(checked: Boolean) {
+        xingao = checked
+    }
+
+    fun setFangLiangChecked(checked: Boolean) {
+        fangliang = checked
+    }
+
+    fun setMaxPriceChecked(checked: Boolean) {
+        maxPrice = checked
+    }
+
+    fun setXinGaoAgainChecked(checked: Boolean) {
+        xinGaoAgain = checked
+    }
+
+    fun set120Checked(checked: Boolean) {
+        dayCheck = checked
     }
 }

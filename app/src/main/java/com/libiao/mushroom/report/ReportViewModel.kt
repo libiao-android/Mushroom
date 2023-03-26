@@ -24,7 +24,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
         private const val TAG = "ReportViewModel"
     }
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<ReportShareInfo>()
 
@@ -35,14 +35,14 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
 
     fun fetchInfo(month: Int) {
-        if(month == 9) {
-            ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("2")
+        if(month == 0) {
+            ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("3")
         }
         withState {
             val dataOrign = ReportShareDatabase.getInstance()?.getReportShareDao()?.getShares()
             val data = dataOrign?.filter {
                 if(maxLiang) {it.ext5 == "1"}
-                else if(threeYang) {it.ext5 == "2"}
+                else if(threeYang) {it.ext5 == "3"}
                 else {
                     it.ext5 != "1" && it.ext5 != "2"
                 }
@@ -52,6 +52,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             val dataTime = ArrayList<ReportShareInfo>()
 
             var time = ""
+            var rangeCount = 0.00
             data?.forEach {
                 if(isFit(month, it.updateTime!!)) {
                     if(it.updateTime == time) {
@@ -64,13 +65,14 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                         dataT.addAll(dataTime)
                         dataTime.clear()
                     }
-                    val f = File(file_2021, it.code)
+                    val f = File(file_2023, it.code)
                     if(f.exists()) {
                         val stream = FileInputStream(f)
                         val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                         val lines = reader.readLines()
                         var startIndex = 0
                         var recordIndex = 0
+
                         lines.forEachIndexed{ind, line ->
                             if(it.time != null && line.startsWith(it.time!!)) {
                                 startIndex = ind
@@ -81,19 +83,19 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             }
                         }
                         val count = recordIndex - startIndex
-                        var aaa = if(startIndex > 0) count+1 else 10
+                        var aaa = 10
                         //LogUtil.i(TAG, "aaa: $aaa")
                         if(it.candleEntryList == null) {
 
                             var a: Int
                             if(startIndex > 0) {
-                                a = startIndex - 1
+                                a = startIndex - 10
                             } else {
                                 a = recordIndex - 10
                             }
 
                             if(a < 0) a = 0
-                            var b = recordIndex + 20
+                            var b = recordIndex + 10
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(a, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -105,7 +107,8 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                             var pre: SharesRecordActivity.ShareInfo? = null
                             var current: SharesRecordActivity.ShareInfo? = null
-                            var post: SharesRecordActivity.ShareInfo? = null
+                            var post1: SharesRecordActivity.ShareInfo? = null
+                            var post2: SharesRecordActivity.ShareInfo? = null
 
                             var yin = 0
                             var yang = 0
@@ -123,7 +126,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                                 if(index > 4) {
                                     if(item.totalPrice > maxLiang && item.nowPrice > item.beginPrice) {
-                                        isMaxLiang = true
+                                        //isMaxLiang = true
                                     }
                                 }
 
@@ -173,6 +176,8 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                     colorEntrys.add(Color.GRAY)
                                     isMaxLiang = false
                                 } else {
+                                    if(index == aaa + 1) post1 = item
+                                    if(index == aaa + 2) post2 = item
                                     val green = "#28FF28"
                                     val red = "#FF0000"
                                     if(item.beginPrice > item.nowPrice) {
@@ -199,7 +204,20 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 it.label5 = "$count, $yang, $yin"
                             }
 
-                            it.moreInfo = "${it.lastShareInfo?.rangeBegin},  ${it.lastShareInfo?.rangeMin},  ${it.lastShareInfo?.rangeMax},  ${String.format("%.2f",it.lastShareInfo!!.totalPrice / 100000000)}亿"
+                            var x = 0.00
+                            post1?.also {
+                                x = it.range - it.rangeBegin
+                            }
+
+                            var y = 0.00
+                            post2?.also {
+                                y = it.range
+                            }
+
+                            var m = x + y
+                            rangeCount += m
+
+                            it.moreInfo = "${baoLiuXiaoShu(x)}, ${baoLiuXiaoShu(y)}, ${baoLiuXiaoShu(m)}, ${baoLiuXiaoShu(rangeCount)}"
 
                             dataTime.add(it)
                         }
@@ -207,7 +225,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 }
 
             }
-
+            LogUtil.i(TAG, "rangeCount: $rangeCount")
             //dataTime.sortByDescending { it.yinXianLength }
             if(dataTime.size > 0) {
                 dataTime[0].ext1 = "${dataTime.size}"
@@ -244,19 +262,19 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 return time.startsWith("2023-3") || time.startsWith("2023-03")
             }
             4 -> {
-                return time.startsWith("2023-4") || time.startsWith("2023-04")
+                return time.startsWith("2022-4") || time.startsWith("2022-04")
             }
             5 -> {
-                return time.startsWith("2023-5") || time.startsWith("2023-05")
+                return time.startsWith("2022-5") || time.startsWith("2022-05")
             }
             6 -> {
-                return time.startsWith("2023-6") || time.startsWith("2023-06")
+                return time.startsWith("2022-6") || time.startsWith("2022-06")
             }
             7 -> {
-                return time.startsWith("2023-7") || time.startsWith("2023-07")
+                return time.startsWith("2022-7") || time.startsWith("2022-07")
             }
             8 -> {
-                return time.startsWith("2023-8") || time.startsWith("2023-08")
+                return time.startsWith("2022-8") || time.startsWith("2022-08")
             }
             9 -> {
                 return time.startsWith("2022-9") || time.startsWith("2022-09")
@@ -335,6 +353,9 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     }
 
     fun online() {
+
+        ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("3")
+        return
 
         withState {s ->
             val temp = mutableListOf<ReportShareInfo>()

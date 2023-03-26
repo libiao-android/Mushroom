@@ -129,6 +129,36 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
             testViewModel.fetchInfo(4)
             tv_month.text = "4"
         }
+        five_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(5)
+            tv_month.text = "5"
+        }
+        six_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(6)
+            tv_month.text = "6"
+        }
+        seven_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(7)
+            tv_month.text = "7"
+        }
+        eight_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(8)
+            tv_month.text = "8"
+        }
+        nine_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(9)
+            tv_month.text = "9"
+        }
+        ten_test.setOnClickListener {
+            loadingStatus = 1
+            testViewModel.fetchInfo(10)
+            tv_month.text = "10"
+        }
 
         eleven_test.setOnClickListener {
             loadingStatus = 1
@@ -147,6 +177,39 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
         cb_less_price.setOnCheckedChangeListener { buttonView, isChecked ->
             testViewModel.setLessPricechecked(isChecked)
         }
+        cb_xin_gao_test.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                cb_fang_liang_test.isChecked = false
+            }
+            testViewModel.setXinGaoChecked(isChecked)
+            xin_gao_sub_view.visibility = if(isChecked) View.VISIBLE else View.GONE
+        }
+        cb_fang_liang_test.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                cb_xin_gao_test.isChecked = false
+            }
+            testViewModel.setFangLiangChecked(isChecked)
+            fang_liang_sub_view.visibility = if(isChecked) View.VISIBLE else View.GONE
+        }
+
+        cb_max_price.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setMaxPriceChecked(isChecked)
+        }
+        cb_xin_gao_again.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setXinGaoAgainChecked(isChecked)
+        }
+
+        cb_120.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.set120Checked(isChecked)
+        }
+
+//        cb_fang_liang_test.isChecked = true
+//        cb_more_price.isChecked = true
+
+        cb_xin_gao_test.isChecked = true
+        cb_max_price.isChecked = true
+        cb_more_price.isChecked = true
+
     }
 
     inner class TestController: TypedEpoxyController<TestState>() {
@@ -165,6 +228,7 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
                     timeItemView {
                         id(time)
                         time(it.time)
+                        count(it.count)
                         expand(it.expand)
                         click {v ->
                             testViewModel.expand(it.time!!)

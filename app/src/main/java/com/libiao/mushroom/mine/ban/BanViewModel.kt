@@ -9,7 +9,6 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.ban.BanShareInfo
 import com.libiao.mushroom.utils.LogUtil
-import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
 import java.io.BufferedReader
 import java.io.File
@@ -23,7 +22,7 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
         private const val TAG = "BanViewModel"
     }
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<BanShareInfo>()
 
@@ -32,7 +31,7 @@ class BanViewModel(initial: BanState): MavericksViewModel<BanState>(initial) {
             LogUtil.i(TAG, "fetchInfo")
             val dataT = ArrayList<BanShareInfo>()
             data?.forEach {
-                val f = File(file_2021, it.code)
+                val f = File(file_2023, it.code)
                 if(f.exists()) {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

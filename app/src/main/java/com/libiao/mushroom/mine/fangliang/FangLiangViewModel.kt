@@ -23,7 +23,7 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
         private const val TAG = "FangLiangViewModel"
     }
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<FangLiangShareInfo>()
 
@@ -32,7 +32,7 @@ class FangLiangViewModel(initial: FangLiangState): MavericksViewModel<FangLiangS
             LogUtil.i(TAG, "fetchInfo")
             val data = FangLiangShareDatabase.getInstance()?.getFangLiangShareDao()?.getFangLiangShares()
             data?.forEach {
-                val f = File(file_2021, it.code)
+                val f = File(file_2023, it.code)
                 if(f.exists()) {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

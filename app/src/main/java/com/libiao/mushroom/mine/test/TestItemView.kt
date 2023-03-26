@@ -266,7 +266,7 @@ class TestItemView @JvmOverloads constructor(
             w = size * 30
         }
         if(w < 150) w = 150
-        if(w > 800) w = 800
+        if(w > 980) w = 980
         return w
     }
 

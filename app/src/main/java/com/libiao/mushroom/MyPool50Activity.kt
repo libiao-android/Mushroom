@@ -93,8 +93,6 @@ class MyPool50Activity : AppCompatActivity() {
         private var mLine10Tv: TextView? = null
         private var mLine20Tv: TextView? = null
 
-        private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
-
         private var info: String? = null
 
 
@@ -118,7 +116,7 @@ class MyPool50Activity : AppCompatActivity() {
             this.info = info
             mNameTv?.text = info
 
-//            val f = File(file_2021, info)
+//            val f = File(file_2023, info)
 //            if(f.exists()) {
 //                val stream = FileInputStream(f)
 //                val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

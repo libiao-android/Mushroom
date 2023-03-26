@@ -50,6 +50,14 @@ class MyReportActivity: BaseActivity(), MavericksView {
         reportViewModel.onEach(deliveryMode = UniqueOnly(UUID.randomUUID().toString())) {
             controller.setData(it)
         }
+        seven_test.setOnClickListener {
+            reportViewModel.fetchInfo(7)
+            tv_month.text = "7"
+        }
+        eight_test.setOnClickListener {
+            reportViewModel.fetchInfo(8)
+            tv_month.text = "8"
+        }
 
         nine_test.setOnClickListener {
             reportViewModel.fetchInfo(9)
@@ -84,6 +92,14 @@ class MyReportActivity: BaseActivity(), MavericksView {
         four_test.setOnClickListener {
             reportViewModel.fetchInfo(4)
             tv_month.text = "4"
+        }
+        five_test.setOnClickListener {
+            reportViewModel.fetchInfo(5)
+            tv_month.text = "5"
+        }
+        six_test.setOnClickListener {
+            reportViewModel.fetchInfo(6)
+            tv_month.text = "6"
         }
     }
 

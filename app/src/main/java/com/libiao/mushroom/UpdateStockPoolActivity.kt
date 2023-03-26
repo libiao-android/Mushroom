@@ -34,9 +34,8 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
     //private val file = File(Environment.getExternalStorageDirectory(), "SharesInfo")
     private val fileNew = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
-    private val fileNew_2019 = File(fileNew, "2019")
-    private val fileNew_2020 = File(fileNew, "2020")
-    private val fileNew_2021 = File(fileNew, "2021")
+
+    private val fileNew_2023 = File(fileNew, "2023")
     private var stockPoolFile: File? = null
 
     private var latelyTime: String? = null
@@ -64,15 +63,9 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         if (!fileNew.exists()) {
             fileNew.mkdir()
         }
-        if (!fileNew_2019.exists()) {
-            fileNew_2019.mkdir()
-        }
-        if (!fileNew_2020.exists()) {
-            fileNew_2020.mkdir()
-        }
 
-        if (!fileNew_2021.exists()) {
-            fileNew_2021.mkdir()
+        if (!fileNew_2023.exists()) {
+            fileNew_2023.mkdir()
         }
 
 //        val file1 = File(fileNew, "sh601528")
@@ -94,7 +87,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
     fun test(v: View) {
         Thread {
-            fileNew_2021.listFiles().forEach {
+            fileNew_2023.listFiles().forEach {
                 if(it.name.startsWith("sh688")) {
                     i(TAG, "delete file: ${it.name}")
                     it.delete()
@@ -214,12 +207,12 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             writeFileAppend(sb.toString())
             i(TAG, "新增写入完成")
 
-            codes.forEach {
-                val a = it.split(",")
-                getHistoryData(a[0].trim(), a[1].trim())
-                Thread.sleep(500)
-            }
-            i(TAG, "补充历史数据完成")
+//            codes.forEach {
+//                val a = it.split(",")
+//                getHistoryData(a[0].trim(), a[1].trim())
+//                Thread.sleep(500)
+//            }
+//            i(TAG, "补充历史数据完成")
 
             mHandler.post {
                 loadingPb?.visibility = View.GONE
@@ -312,12 +305,13 @@ class UpdateStockPoolActivity : AppCompatActivity() {
             var count = 0
             while (str != null) {
                 count++
-                if(count % 100 == 0) {
+                if(count == 2) {
                     //i(TAG, "str: $str, $count")
+                    //break
                 }
                 val a = str.split(",")
                 val code  = a[0].trim()
-                val f = File(fileNew_2021, code)
+                val f = File(fileNew_2023, code)
                 if(f.exists()) {
 
                 } else {
@@ -384,7 +378,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         i(TAG, "deleteTuiShiData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220925&end=20221125")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20230101&end=20230325")
             .build()
 
         val call = client.newCall(request)
@@ -404,7 +398,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                         }
                     } else {
                         i(TAG, "getHistoryData exception value: ${value}, $code, $name")
-                        val f = File(fileNew_2021, code)
+                        val f = File(fileNew_2023, code)
                         if(f.exists()) {
                             f.delete()
                         }
@@ -412,7 +406,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                     i(TAG, "getHistoryData exception: ${e.message}, $code, $name")
-                    val f = File(fileNew_2021, code)
+                    val f = File(fileNew_2023, code)
                     if(f.exists()) {
                         f.delete()
                     }
@@ -425,7 +419,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20220101&end=20221125")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20210601&end=20230325")
             .build()
 
         val call = client.newCall(request)
@@ -437,13 +431,13 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call?, response: Response?) {
                 val value = response?.body()?.string()
-                //Log.i("libiao", "response: ${value}")
+                //i(TAG, "response: ${value}")
                 try {
                     if (value != null && value.length > 50) {
                         parseHistoryInfo(value, code, name)
                     } else {
                         i(TAG, "getHistoryData exception value: ${value}, $code, $name")
-                        val f = File(fileNew_2021, code)
+                        val f = File(fileNew_2023, code)
                         if(f.exists()) {
                             f.delete()
                         }
@@ -452,7 +446,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     e.printStackTrace()
                     i(TAG, "getHistoryData exception: ${e.message}, $code, $name")
-                    val f = File(fileNew_2021, code)
+                    val f = File(fileNew_2023, code)
                     if(f.exists()) {
                         f.delete()
                     }
@@ -559,7 +553,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
 
     private fun writeToFile(code: String, info: String) {
         //i(TAG, "$info")
-        val file = File(fileNew_2021, code)
+        val file = File(fileNew_2023, code)
         if(!file.exists()) {
             file.createNewFile()
         }

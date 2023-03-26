@@ -39,13 +39,16 @@ data class TestShareInfo(
     var ext1: String? = null,
     var ext2: String? = null,
     var ext3: String? = null,
-    var ext4: String? = null,
-    var ext5: String? = null,
+    var ext4: String? = null, //间隔天数
+    var ext5: String? = null, //类型
     @Ignore
     var moreInfo: String? = null,
 
     @Ignore
     var expand: Boolean = true,
+
+    @Ignore
+    var count: String = "0",
 
     @Ignore
     var candleEntryList: ArrayList<CandleEntry>? = null,
@@ -96,6 +99,8 @@ data class TestShareInfo(
         info.ext3 = this.ext3
         info.ext4 = this.ext4
         info.ext5 = this.ext5
+
+        info.count = this.count
 
         info.expand = this.expand
         info.moreInfo = this.moreInfo

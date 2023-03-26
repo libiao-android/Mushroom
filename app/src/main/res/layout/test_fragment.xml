@@ -12,16 +12,70 @@
 
         <CheckBox
             android:textSize="13dp"
+            android:id="@+id/cb_xin_gao_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新高"/>
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_fang_liang_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="放量"/>
+
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_120"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="60"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/fang_liang_sub_view"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:textSize="13dp"
             android:id="@+id/cb_more_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="只看放量"/>
+            android:text="继续放量"/>
         <CheckBox
+            android:visibility="gone"
             android:textSize="13dp"
             android:id="@+id/cb_less_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="只看缩量"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/xin_gao_sub_view"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_max_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="量能最大"/>
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_xin_gao_again"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="再新高"/>
 
     </LinearLayout>
 
@@ -32,22 +86,32 @@
         <Button
             android:id="@+id/one_test"
             android:text="1月"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"/>
         <Button
             android:id="@+id/two_test"
             android:text="2月"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"/>
         <Button
             android:id="@+id/three_test"
             android:text="3月"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"/>
         <Button
             android:id="@+id/four_test"
             android:text="4月"
-            android:layout_width="60dp"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/five_test"
+            android:text="5月"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/six_test"
+            android:text="6月"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_month"
@@ -60,14 +124,34 @@
         android:layout_width="match_parent"
         android:layout_height="50dp">
         <Button
+            android:id="@+id/seven_test"
+            android:text="7月"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/eight_test"
+            android:text="8月"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/nine_test"
+            android:text="9月"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/ten_test"
+            android:text="10月"
+            android:layout_width="55dp"
+            android:layout_height="wrap_content"/>
+        <Button
             android:id="@+id/eleven_test"
             android:text="11月"
-            android:layout_width="60dp"
+            android:layout_width="55dp"
             android:layout_height="wrap_content"/>
         <Button
             android:id="@+id/twelve_test"
             android:text="12月"
-            android:layout_width="60dp"
+            android:layout_width="55dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
 

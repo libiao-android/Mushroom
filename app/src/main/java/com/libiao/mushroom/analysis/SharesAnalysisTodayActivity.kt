@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.*
-import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,7 +51,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     private var oneDayTime: TextView? = null
 
     private val file = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
-    private val file_2021 = File(file, "2021")
+    private val file_2023 = File(file, "2023")
 
     private var time = "2021-4-30"
 
@@ -61,7 +60,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.more_and_less_activity)
-        title = "2021"
+        title = "2023"
 
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd")// HH:mm:ss
         time = simpleDateFormat.format(Date())
@@ -93,7 +92,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     }
 
     private fun chooseDate() {
-        val f = File(file_2021, "sz000001")
+        val f = File(file_2023, "sz000001")
         var lines : List<String>? = null
         if(f.exists()) {
             val stream = FileInputStream(f)
@@ -188,6 +187,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(MineMode())
 
         mModeList.add(XinGaoMode())
+        mModeList.add(XinLiangMode())
+        mModeList.add(SuoLiangMode())
 
         val tempList = ArrayList<BaseMode>()
         mModeList.forEach {
@@ -305,14 +306,14 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     }
 
     private fun analysis(code: String, dataList: ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>) {
-        val f = File(file_2021, code)
+        val f = File(file_2023, code)
         if(f.exists()) {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
             val lines = reader.readLines()
             //Log.i("libiao", "$lines")
             val shares = ArrayList<SharesRecordActivity.ShareInfo>()
-            var begin = lines.size - 150
+            var begin = lines.size - 365
             if(begin < 0) begin = 0
 
             for(i in begin until lines.size) {
@@ -323,7 +324,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     }
 
     private fun analysis(code: String) {
-        val f = File(file_2021, code)
+        val f = File(file_2023, code)
         if(f.exists()) {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

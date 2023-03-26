@@ -24,7 +24,6 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.room.CollectShareInfo
 import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.utils.ClipboardUtil
-import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.k_line_main.*
 import java.io.BufferedReader
 import java.io.File
@@ -42,7 +41,7 @@ class KLineActivity : AppCompatActivity() {
     }
 
     private val file = File(Environment.getExternalStorageDirectory(), "A_SharesInfo")
-    private val file_2021 = File(file, "2021")
+    private val file_2023 = File(file, "2023")
 
     private val infos = ArrayList<SharesRecordActivity.ShareInfo>()
     private val values = ArrayList<CandleEntry>()
@@ -66,7 +65,7 @@ class KLineActivity : AppCompatActivity() {
 
         code = intent.getStringExtra("code")
         Log.i("libiao", "code: $code")
-        val f = File(file_2021, code)
+        val f = File(file_2023, code)
         if(f.exists()) {
             initData()
             initView()
@@ -75,7 +74,7 @@ class KLineActivity : AppCompatActivity() {
 
     private fun initData() {
         collected = MineShareDatabase.getInstance()?.getCollectShareDao()?.find(code!!) ?: false
-        val f = File(file_2021, code)
+        val f = File(file_2023, code)
         if(f.exists()) {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

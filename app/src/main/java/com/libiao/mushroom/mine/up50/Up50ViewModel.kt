@@ -23,7 +23,7 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
         private const val TAG = "TestViewModel"
     }
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<Up50ShareInfo>()
 
@@ -32,7 +32,7 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
             LogUtil.i(TAG, "fetchInfo")
             val data = Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.getShares()
             data?.forEach {
-                val f = File(file_2021, it.code)
+                val f = File(file_2023, it.code)
                 if(f.exists()) {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))

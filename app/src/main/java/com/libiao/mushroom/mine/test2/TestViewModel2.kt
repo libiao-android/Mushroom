@@ -2,7 +2,6 @@ package com.libiao.mushroom.mine.test2
 
 import android.graphics.Color
 import android.os.Environment
-import androidx.room.Ignore
 import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
@@ -27,7 +26,7 @@ class TestViewModel2(initial: TestState): MavericksViewModel<TestState>(initial)
         private const val TAG = "TestViewModel"
     }
 
-    private val file_2021 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2021")
+    private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<TestShareInfo>()
 
@@ -41,7 +40,7 @@ class TestViewModel2(initial: TestState): MavericksViewModel<TestState>(initial)
             val dataT = ArrayList<TestShareInfo>()
             data?.forEach {
                 if(it.dayCount > 0 && isFit(month, it.time!!)) {
-                    val f = File(file_2021, it.code)
+                    val f = File(file_2023, it.code)
                     if(f.exists()) {
                         val stream = FileInputStream(f)
                         val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
