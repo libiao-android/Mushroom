@@ -157,10 +157,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
         }
-        cb_yin_xian.setOnCheckedChangeListener { buttonView, isChecked ->
+        cb_jing_jia.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 2
-                tv_ke_xuan.text = "引线"
+                tv_ke_xuan.text = "竞价"
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.VISIBLE
                 yang_yin_child_view.visibility = View.GONE
@@ -226,7 +226,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     //为什么不用temp， 主要考虑删除时要保持顺序
                     when(currentCb) {
                         1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.shareInfo!!.rangeBegin })
                         3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
                         4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
                         5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.cha_20 })
@@ -239,7 +239,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     //低-高
                     when(currentCb) {
                         1 -> mTempData = ArrayList(mTempData.sortedBy { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedBy { it.yinXianLength })
+                        2 -> mTempData = ArrayList(mTempData.sortedBy { it.shareInfo!!.rangeBegin })
                         3 -> mTempData = ArrayList(mTempData.sortedBy { it.liangBi })
                         4 -> mTempData = ArrayList(mTempData.sortedBy { it.yangYin })
                         5 -> mTempData = ArrayList(mTempData.sortedBy { it.cha_20 })
@@ -252,7 +252,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     //高-低
                     when(currentCb) {
                         1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinXianLength })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.shareInfo!!.rangeBegin })
                         3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
                         4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
                         5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.cha_20 })
@@ -416,6 +416,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     var allPrice = 0.00
                     var allDay = 0
                     var itemIn = 0
+                    var maxLiang = 0.00
                     if(it.candleEntryList == null || reload) {
                         var begin = lines.size - it.dayCount - 2
                         if(begin < 0) begin = 0
@@ -437,12 +438,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         var xinGao = false
                         var xinGaoCount = 0
                         var noXinGao = false
-                        it.youTwo = true
                         it.zhiDie = false
                         var fangLiang = false
                         var shouHong = false
                         it.fangLiangList.clear()
-                        var maxLiang = 0.00
+
                         it.maxLiang = false
                         val list = ArrayList<SharesRecordActivity.ShareInfo>()
                         records.forEachIndexed { index, s ->
@@ -528,9 +528,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                         greenLittle = false
                                     }
                                 }
-                                if(item.beginPrice > item.nowPrice && item.totalPrice > tempItem!!.totalPrice) {
-                                    it.youTwo = false
-                                }
                                 tempItem = item
                             }
 
@@ -581,7 +578,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 }
                             }
                         }
-                        it.yangYin = yang - yin
+                        it.yangYin = yang.toDouble() / (yang + yin)
                         val tMaxItem = SharesRecordActivity.ShareInfo(records[itemIn])
 //                        it.sanLianYin = false
 //                        if(tMaxItem.nowPrice > tMaxItem.beginPrice && greenLittle) {
@@ -595,23 +592,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                        // LogUtil.i(TAG, "最大：${list[0].totalPrice}")
                        // LogUtil.i(TAG, "最小：${list.last().totalPrice}")
                         it.youThree = false
-                        if(list.size > 4) {
-                            if(list[0].nowPrice > list[0].beginPrice && list[1].nowPrice > list[1].beginPrice && list[2].nowPrice > list[2].beginPrice) {
-                                if(list[0].totalPrice < list[2].totalPrice * 2) {
-                                    val a = abs(list[0].index - list[1].index)
-                                    val b = abs(list[0].index - list[2].index)
-                                    val c = abs(list[1].index - list[2].index)
-                                    if(a > 2 && b > 2 && c > 2) {
-                                        it.youThree = true
-                                        if(list[0].code == "sz002327") {
-                                            LogUtil.i(TAG, "002327: ${list[0].totalPrice}, ${list[0].index}")
-                                            LogUtil.i(TAG, "002327: ${list[1].totalPrice}, ${list[1].index}")
-                                            LogUtil.i(TAG, "002327: ${list[2].totalPrice}, ${list[2].index}")
-                                        }
-                                    }
-                                }
-                            }
-                        }
+
                         var minP = one.nowPrice
                         if(minP == 0.00) minP = two.yesterdayPrice
                         if(minP == 0.00) minP = two.beginPrice
@@ -637,77 +618,44 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     }
                     it.shareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
-                    //it.youTwo = false
-                    //it.youThree = false
                     it.youOne = false
-                    if(it.dayCount >= 3) {
+                    it.youTwo = false
+
+                    if(share.totalPrice > share_pre.totalPrice
+                        && share.nowPrice > share.beginPrice
+                        && share_pre.nowPrice > share_pre.beginPrice
+                        && share.range > share_pre.range
+                    ) {
+                        it.youThree = true
+                    }
+
+
+
+                    if(it.dayCount >= 4) {
 
                         val ten1 = share
                         val ten2 = share_pre
 
                         val info_pre2 = lines.get(lines.size - 3)
+                        val info_pre3 = lines.get(lines.size - 4)
+                        val info_pre4 = lines.get(lines.size - 5)
                         val ten3 = SharesRecordActivity.ShareInfo(info_pre2)
+                        val ten4 = SharesRecordActivity.ShareInfo(info_pre3)
+                        val ten5 = SharesRecordActivity.ShareInfo(info_pre4)
 
-                        if(ten1.totalPrice > ten2.totalPrice * 2 && ten1.range > 0 && ten1.nowPrice > ten1.beginPrice
+                        var tM = Math.max(ten4.totalPrice, ten5.totalPrice)
+                        tM = Math.max(tM, ten3.totalPrice)
+                        tM = Math.max(tM, ten2.totalPrice)
+                        tM = Math.max(tM, ten1.totalPrice)
+
+                        if(ten1.range < 0 && ten2.range < 0 && ten1.totalPrice < ten2.totalPrice && ten1.maxPrice < ten2.maxPrice && tM > maxLiang * 0.75
                         ) {
                             it.youOne = true
                         }
 
-
-
-//                        if(ten3.beginPrice > ten3.nowPrice && ten2.beginPrice > ten2.nowPrice && ten1.nowPrice >= ten1.beginPrice) {
-//                            if(ten2.totalPrice < ten3.totalPrice * 0.9 && ten1.totalPrice < ten2.totalPrice * 0.9) {
-//                                if(ten1.totalPrice > 50000000) {
-//                                    it.youTwo = true
-//                                }
-//                            }
-//                        }
-
-//                        if(itemIn > 3) {
-//                            it.youThree = true
-//                        }
-
-                        //智能选择
-//                        it.youXuan = false
-//                        it.tips = ""
-//                        if(ten1.nowPrice >= ten1.beginPrice && ten2.nowPrice >= ten2.beginPrice) {
-//                            //双阳
-//                            if(!ShareParseUtil.zhangTing(ten1) && !ShareParseUtil.zhangTing(ten2)) {
-//                                if(ten1.totalPrice >= ten2.totalPrice && ten1.range > 0 || ten1.totalPrice < ten2.totalPrice && ten1.range < 0) {
-//                                    it.youXuan = true
-//                                    it.tips += "双阳 "
-//                                }
-//                            }
-//                        }
-//
-//                        if(lines.size >= 3) {
-//                            //放量收阳止跌
-//                            val info_pre2 = lines.get(lines.size - 3)
-//                            val share_pre2 = SharesRecordActivity.ShareInfo(info_pre2)
-//                            val ten3 = share_pre2
-//                            if(ten1.nowPrice >= ten1.beginPrice && ten2.beginPrice >= ten2.nowPrice && ten1.totalPrice > ten2.totalPrice * 1.3) {
-//                                if(!ShareParseUtil.zhangTing(ten1) && !ShareParseUtil.zhangTing(ten2)) {
-//                                    if(ten3.beginPrice >= ten3.nowPrice) {
-//                                        it.youXuan = true
-//                                        it.tips += "放量止跌收阳 "
-//                                    }
-//                                }
-//                            }
-//                            if(lines.size >= 4) {
-//                                val info_pre3 = lines.get(lines.size - 4)
-//                                val share_pre3 = SharesRecordActivity.ShareInfo(info_pre3)
-//                                val ten4 = share_pre3
-//                                // 缩量回调
-//                                if(ten4.nowPrice > ten4.beginPrice && ten3.nowPrice > ten3.beginPrice && ten2.beginPrice >= ten2.nowPrice && ten1.beginPrice >= ten1.nowPrice) {
-//                                    if(ten3.totalPrice > ten2.totalPrice && ten2.totalPrice > ten1.totalPrice) {
-//                                        it.youXuan = true
-//                                        it.tips += "缩量回调 "
-//                                    }
-//                                }
-//                            }
-//
-//                        }
-
+                        if(ten3.range < 0 && ten2.range < 0 && ten1.nowPrice > ten1.beginPrice) {
+                            it.youTwo = true
+                        }
                     }
 
                     updateCurrentData(it, share, share_pre)
@@ -1095,8 +1043,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 }
             }
             if(info.currentCb == 2) {
-                mRangeTv?.text = baoLiuXiaoShu(info.yinXianLength)
-                if(info.yinXianLength >= 0) {
+                mRangeTv?.text = baoLiuXiaoShu(info.shareInfo!!.rangeBegin)
+                if(info.shareInfo!!.rangeBegin >= 0) {
                     mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
                 } else {
                     mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
@@ -1113,7 +1061,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
             if(info.currentCb == 4) {
-                mRangeTv?.text = "${info.yangYin}"
+                mRangeTv?.text = baoLiuXiaoShu(info.yangYin)
                 if(info.yangYin >= 0) {
                     mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
                 } else {
@@ -1205,7 +1153,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
             mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.totalRange)
-            mTypeYinYangTv?.text = "${info.yangYin}"
+            mTypeYinYangTv?.text = baoLiuXiaoShu(info.yangYin)
             mTypeFangLiangTv?.text = baoLiuXiaoShu(info.liangBi)
             mTypeYinXianTv?.text = baoLiuXiaoShu(info.yinXianLength)
 

@@ -17,10 +17,10 @@
         <CheckBox
             android:textSize="13dp"
             android:layout_centerVertical="true"
-            android:id="@+id/cb_yin_xian"
+            android:id="@+id/cb_jing_jia"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="引线"/>
+            android:text="竞价"/>
         <CheckBox
             android:textSize="13dp"
             android:layout_centerVertical="true"

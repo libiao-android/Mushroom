@@ -85,7 +85,7 @@ class MineShareInfo {
     @Ignore
     var liangBi = 0.00
     @Ignore
-    var yangYin = 0
+    var yangYin = 0.00
 
     @Ignore
     var cha_20 = 0.00

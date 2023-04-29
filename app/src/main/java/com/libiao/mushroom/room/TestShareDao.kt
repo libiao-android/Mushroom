@@ -20,4 +20,7 @@ interface TestShareDao {
 
     @Query("DELETE FROM TestShareInfo WHERE ext5 = :ext")
     fun deleteTest(ext: String)
+
+    @Query("SELECT * FROM TestShareInfo WHERE ext5 = 3")
+    fun getXinGao2Shares(): MutableList<TestShareInfo>
 }

@@ -40,7 +40,7 @@ data class TestShareInfo(
     var ext2: String? = null,
     var ext3: String? = null,
     var ext4: String? = null, //间隔天数
-    var ext5: String? = null, //类型
+    var ext5: String? = null, //类型 1新高 2新量 3新高two
     @Ignore
     var moreInfo: String? = null,
 
@@ -49,6 +49,35 @@ data class TestShareInfo(
 
     @Ignore
     var count: String = "0",
+
+    @Ignore
+    var currentCb: Int = 1,
+    @Ignore
+    var todayRange: Double = 0.00, //今日涨幅
+
+    @Ignore
+    var price: Double = 1.00, //开始的记录价格
+
+    @Ignore
+    var tuPo: Boolean = false, //站稳新高
+
+    @Ignore
+    var totalRange: Double = 0.00, //记录后至今日涨幅
+
+    @Ignore
+    var todayMaxRange: Double = 0.00, //今日最大涨幅
+
+    @Ignore
+    var todayLiang: Double = 0.00, //今日量能
+
+    @Ignore
+    var liangBi: Double = 0.00,
+
+    @Ignore
+    var index: Int = 0,
+
+    @Ignore
+    var zuiDaLiangCount: Int = 0,
 
     @Ignore
     var candleEntryList: ArrayList<CandleEntry>? = null,
@@ -104,6 +133,8 @@ data class TestShareInfo(
 
         info.expand = this.expand
         info.moreInfo = this.moreInfo
+
+        info.index = this.index
 
 
         candleEntryList?.also {

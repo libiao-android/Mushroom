@@ -35,7 +35,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
 
     fun fetchInfo(month: Int) {
-        if(month == 0) {
+        if(month == 4) {
             ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("3")
         }
         withState {
@@ -353,10 +353,6 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     }
 
     fun online() {
-
-        ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("3")
-        return
-
         withState {s ->
             val temp = mutableListOf<ReportShareInfo>()
             temp.addAll(s.infoList)

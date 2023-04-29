@@ -29,8 +29,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="60"/>
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_xin_gao_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="新高2"/>
 
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#f1f1f1"/>
 
     <LinearLayout
         android:visibility="gone"
@@ -80,6 +91,88 @@
     </LinearLayout>
 
     <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/xin_gao2_sub_view"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <CheckBox
+                android:textSize="13dp"
+                android:id="@+id/cb_xin_liang2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="新量"/>
+
+            <CheckBox
+                android:textSize="13dp"
+                android:id="@+id/cb_gao2_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="日期"/>
+
+            <CheckBox
+                android:textSize="13dp"
+                android:id="@+id/cb_gao2_liang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="量>"/>
+            <EditText
+                android:id="@+id/et_liang"
+                android:inputType="number"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:layout_marginLeft="10dp"
+                android:id="@+id/load"
+                android:text="Load"
+                android:textSize="10dp"
+                android:layout_width="60dp"
+                android:layout_height="40dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Spinner
+                android:entries="@array/pai_xu_list"
+                android:id="@+id/gao2_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"/>
+
+            <CheckBox
+                android:textSize="13dp"
+                android:id="@+id/cb_gao2_zheng_xu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="正序"/>
+
+            <CheckBox
+                android:textSize="13dp"
+                android:id="@+id/cb_gao2_he_xin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="核心"/>
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#f1f1f1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/month1"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="50dp">
@@ -120,6 +213,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/month2"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="50dp">
@@ -156,6 +250,7 @@
     </LinearLayout>
 
     <com.airbnb.epoxy.EpoxyRecyclerView
+        android:layout_marginTop="5dp"
         android:id="@+id/epoxy_view_test"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

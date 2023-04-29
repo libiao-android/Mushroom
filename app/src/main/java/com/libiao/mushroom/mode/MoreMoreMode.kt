@@ -1,6 +1,9 @@
 package com.libiao.mushroom.mode
 
+import android.content.Context
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import kotlin.math.abs
@@ -10,87 +13,203 @@ class MoreMoreMode : BaseMode() {
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = size - 3 - Constant.PRE
+        mDeviationValue = size - 7 - Constant.PRE
 
-        for(mDeviationValue in 1 .. size - 5) {
+        if(mDeviationValue >  0) {
+            val zero = shares[mDeviationValue - 1]
+            val one = shares[mDeviationValue + 0]
+            val two = shares[mDeviationValue + 1]
+            val three = shares[mDeviationValue + 2]
+            val four = shares[mDeviationValue + 3]
+            val five = shares[mDeviationValue + 4]
+            val six = shares[mDeviationValue + 5]
+            val seven = shares[mDeviationValue + 6]
+            var a = 0
+            val list = ArrayList<SharesRecordActivity.ShareInfo>()
 
-            if(mDeviationValue >  0) {
+            list.add(one)
+            list.add(two)
+            list.add(three)
+            list.add(four)
+            list.add(five)
+            list.add(six)
+            list.add(seven)
 
-                val zero = shares[mDeviationValue - 1]
-                val one = shares[mDeviationValue + 0]
-                val two = shares[mDeviationValue + 1]
-                val three = shares[mDeviationValue + 2]
-                val four = shares[mDeviationValue + 3]
-                val five = shares[mDeviationValue + 4]
-                //val six = shares[mDeviationValue + 5]
+            val indexList = ArrayList<Int>()
+            val pList = ArrayList<Double>()
 
-                if(more(zero, one)) {
+            if(yang(seven)) {
+                indexList.add(7)
+                pList.add(seven.totalPrice)
+            } else {
+                return
+            }
+            if(yang(six)) {
+                indexList.add(6)
+                pList.add(six.totalPrice)
+            }
+            if(yang(five)) {
+                indexList.add(5)
+                pList.add(five.totalPrice)
+            }
+            if(pList.size == 3) return
+
+            if(yang(four)) {
+                indexList.add(4)
+                pList.add(four.totalPrice)
+
+                if(pList.size == 3) {
+                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
+                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
+                    val m = four.totalPrice > three.totalPrice
+                    val n = four.totalPrice > five.totalPrice
+
+                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
+                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
+                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
+                    val z = q > w && w > e
+
+                    if(x && y && m && n && z) {
+                        i(TAG, "${four.brieflyInfo()}")
+                        mFitModeList.add(Pair(seven.range, seven))
+                        record(four)
+                    }
+                    return
+                }
+            }
 
 
-                    if(two.totalPrice > one.totalPrice * 1) { // 连续两天放量
-                        if(two.nowPrice > (one.beginPrice + one.nowPrice)/2
-                            && three.nowPrice > (one.beginPrice + one.nowPrice)/2
-                            && two.maxPrice > one.nowPrice ) { //放量后价格不能低于放量前
 
-                            if(two.beginPrice > two.nowPrice && three.beginPrice > three.nowPrice) { //连续两天收阴线
-                                if(three.totalPrice > zero.totalPrice * 2 && three.totalPrice > 130000000 && three.totalPrice > one.totalPrice * 0.7) { //连续收阴量能不能太低
-                                    if(three.totalPrice > zero.totalPrice * 3 || three.totalPrice * 2 > two.totalPrice) {
-                                        i(TAG, "${three.brieflyInfo()}, ${one.range}, ${two.range}, ${three.range}, ${four.range}, ${five.range}")
-                                        mFitModeList.add(Pair(three.range, three))
-                                    }
-                                }
+            if(yang(three)) {
+                indexList.add(3)
+                pList.add(three.totalPrice)
 
-                            }
+                if(pList.size == 3) {
 
+                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
+                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
+                    val m = three.totalPrice > two.totalPrice
 
-                            if (two.beginPrice < two.nowPrice && three.beginPrice < three.nowPrice && two.range > 0 && three.range > 0) { //连续两天阳线
-                                if(two.totalPrice > one.totalPrice * 1.2 && (three.totalPrice > one.totalPrice * 0.9 || three.totalPrice > 1000000000)) {
-                                    if(three.totalCount < two.totalCount) {
-                                        val a = (three.maxPrice - three.nowPrice) / (three.nowPrice - three.beginPrice)
-                                        if(a < 5) {
-                                            //if(isChuang(three.code))
-                                            val beishu = one.totalPrice / zero.totalPrice
-                                            if(beishu > 3.5 || one.totalPrice > 1000000000) {
-                                                i(TAG, "${three.brieflyInfo()}, ${one.range}, ${two.range}, ${three.range}, ${four.range}, ${five.range}")
-                                                mFitModeList.add(Pair(three.range, three))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
+                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
+                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
+                    val z = q > w && w > e
 
-                            if (two.range > 0 && two.nowPrice > two.beginPrice && two.range > 5) { //阳阴阴
-                                if(three.nowPrice < three.beginPrice && four.nowPrice < four.beginPrice && three.range < 0 && four.range < 0) {
-                                    if(three.totalPrice > one.totalPrice * 0.7 && four.totalPrice > one.totalPrice * 0.7) {
-                                        if(four.nowPrice > (one.beginPrice + one.nowPrice)/2) {
-                                            i(TAG, "${three.brieflyInfo()}, ${one.range}, ${two.range}, ${three.range}, ${four.range}, ${five.range}")
-                                            mFitModeList.add(Pair(three.range, three))
-                                        }
-                                    }
-
-                                }
-                            }
-
-                            if(three.totalPrice > two.totalPrice && four.totalPrice > three.totalPrice) { //连续三天放量
-                                i(TAG, "${three.brieflyInfo()}, ${one.range}, ${two.range}, ${three.range}, ${four.range}, ${five.range}")
-                                mFitModeList.add(Pair(three.range, three))
-                            }
-
-                            if(two.range > 0 && three.range > 0 && four.range < 0 && five.range < 0) {
-                                if(five.totalPrice < two.totalPrice * 0.8) {
-                                    if(five.totalPrice > zero.totalPrice * 3 || (five.totalPrice > zero.totalPrice * 2.5 && five.totalPrice > 500000000)) {
-                                        i(TAG, "${three.brieflyInfo()}, ${one.range}, ${two.range}, ${three.range}, ${four.range}, ${five.range}")
-                                        mFitModeList.add(Pair(three.range, three))
-                                    }
+                    if(x && y && m && z) {
+                        var yangT = three
+                        for(i in 4 .. 7) {
+                            val t = list[i-1]
+                            if(yang(t)) {
+                                yangT = t
+                            } else {
+                                if(t.totalPrice > yangT.totalPrice) {
+                                    return
                                 }
                             }
                         }
+                        i(TAG, "${three.brieflyInfo()}")
+                        mFitModeList.add(Pair(seven.range, seven))
+                        record(three)
+                    }
+                    return
+                }
+            }
 
+
+
+            if(yang(two)) {
+                indexList.add(2)
+                pList.add(two.totalPrice)
+
+                if(pList.size == 3) {
+
+                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
+                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
+                    val m = two.totalPrice > one.totalPrice
+
+                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
+                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
+                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
+                    val z = q > w && w > e
+
+                    if(x && y && m && z) {
+                        var yangT = two
+                        for(i in 3 .. 7) {
+                            val t = list[i-1]
+                            if(yang(t)) {
+                                yangT = t
+                            } else {
+                                if(t.totalPrice > yangT.totalPrice) {
+                                    return
+                                }
+                            }
+                        }
+                        i(TAG, "${two.brieflyInfo()}")
+                        mFitModeList.add(Pair(seven.range, seven))
+                        record(two)
                     }
 
+
+                    return
+                }
+            }
+
+
+
+            if(yang(one)) {
+                indexList.add(1)
+                pList.add(one.totalPrice)
+
+                if(pList.size == 3) {
+
+                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
+                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
+                    val m = one.totalPrice > zero.totalPrice
+
+                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
+                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
+                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
+                    val z = q > w && w > e
+
+                    if(x && y && m && z) {
+                        var yangT = one
+                        for(i in 2 .. 7) {
+                            val t = list[i-1]
+                            if(yang(t)) {
+                                yangT = t
+                            } else {
+                                if(t.totalPrice > yangT.totalPrice) {
+                                    return
+                                }
+                            }
+                        }
+                        i(TAG, "${one.brieflyInfo()}")
+                        mFitModeList.add(Pair(seven.range, seven))
+                        record(one)
+                    }
+
+                    return
                 }
             }
         }
+    }
+
+    private fun record(one: SharesRecordActivity.ShareInfo) {
+        val info = ReportShareInfo()
+        info.code = one.code
+        info.time = one.time
+        info.name = one.name
+        info.updateTime = one.time
+        info.ext5 = "3"
+        ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
+    }
+
+    private fun yang(info: SharesRecordActivity.ShareInfo): Boolean {
+        return info.range > 0 && info.nowPrice >= info.beginPrice
+    }
+
+    override fun shouldAnalysis(context: Context): Boolean {
+        return false
     }
 
     override fun des(): String {

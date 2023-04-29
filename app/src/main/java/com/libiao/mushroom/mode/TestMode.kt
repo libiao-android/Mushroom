@@ -33,46 +33,30 @@ class TestMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 3
-        if(mDeviationValue > 1) {
+        mDeviationValue = day - 2
+        if(mDeviationValue >= 0) {
 
-            val zero = shares[mDeviationValue - 1]
 
             val one = shares[mDeviationValue + 0]
-            if(one.beginPrice <= 0) return
             val two = shares[mDeviationValue + 1]
-            val three = shares[mDeviationValue + 2]
 
             val a = one.nowPrice > one.beginPrice
             val b = two.nowPrice > two.beginPrice
-            val c = three.nowPrice > three.beginPrice
-            val avg1 = (one.beginPrice + one.nowPrice) / 2
-            val avg2 = (two.beginPrice + two.nowPrice) / 2
-            val avg3 = (three.beginPrice + three.nowPrice) / 2
-            val d = avg2 in avg1..avg3
-            val e = (one.range + two.range + three.range) < 3
-            val l = one.rangeMax - one.rangeMin < 3
-            val m = two.rangeMax - two.rangeMin < 3
-            val n = three.rangeMax - three.rangeMin < 3
+            val c = two.range > one.range
+            val d = two.totalPrice / one.totalPrice > 1.1 && two.totalPrice > 200000000
+            val e = two.range > 2
 
-            val f = three.totalPrice < two.totalPrice * 2
+            if(a && b && c && d && e) {
+                i(TAG, "${two.brieflyInfo()}")
+                mFitModeList.add(Pair(two.range, two))
 
-            val x = two.minPrice > one.minPrice
-            val y = three.minPrice > two.minPrice
-
-            val q = zero.range < 0
-
-            if(a && b && c && d && e && f && l && m && n && x && y && q) {
-                i(TAG, "${three.brieflyInfo()}")
-                mFitModeList.add(Pair(three.range, three))
-
-                val info = ReportShareInfo()
-                info.code = three.code
-                info.time = three.time
-                info.name = three.name
-                info.updateTime = three.time
-                info.ext5 = "2"
-                ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
+                val info = TestShareInfo()
+                info.code = two.code
+                info.time = two.time
+                info.name = two.name
+                info.updateTime = two.time
+                info.ext5 = "5"
+                TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
             }
         }
     }
@@ -89,14 +73,6 @@ class TestMode : BaseMode {
 
     override fun des(): String {
         return "test"
-    }
-
-    private fun yin(two: SharesRecordActivity.ShareInfo): Boolean {
-        return two.beginPrice > two.nowPrice
-    }
-
-    private fun yang(two: SharesRecordActivity.ShareInfo): Boolean {
-        return two.nowPrice > two.beginPrice
     }
 
 }

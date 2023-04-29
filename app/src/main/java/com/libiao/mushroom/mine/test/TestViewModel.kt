@@ -10,6 +10,7 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
+import com.libiao.mushroom.room.test.TestShareDatabase2
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
@@ -34,26 +35,46 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     var isLessPrice = false
 
     var xingao = false
+    var xingao2 = false
     var fangliang = false
+
+    var xinDi = false
+
+    var test = false
 
     var maxPrice = false
     var xinGaoAgain = false
 
     var dayCheck = false
 
+    var gao2XinLiang = false
+    var gao2LiangChecked = false
+    var gao2Liang = 0
+
+    var time = false
+
+    var paiXu = 0
+    var zhengXu = false
+    var heXin = false
+
     fun fetchInfo(month: Int) {
+        if(xingao2) {
+            fetchXinGao2Info()
+            return
+        }
         withState {
 
-            if(month == 0) {
-                TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("3")
+            if(month == 5) {
+                TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("5")
             }
 
             val data = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
+
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<TestShareInfo>()
 
             data?.forEach {
-                if(it.dayCount > 0 && isFit(month, it.time!!) && isfitCheck(it.ext5)) {
+                if(it.dayCount >= 0 && isFit(month, it.time!!) && isfitCheck(it.ext5)) {
                     val f = File(file_2023, it.code)
                     if(f.exists()) {
                         val stream = FileInputStream(f)
@@ -263,6 +284,20 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             it.values_10 = values_10
                             it.values_20 = values_20
 
+                            if(test) {
+                                //val aa = "${itemBlack!!.range}, ${huanSuanYi(itemBlack!!.totalPrice)}"
+                                //it.moreInfo = "$aa, ${it.ext4}"
+                                dataT.add(it)
+                                return@forEach
+                            }
+
+                            if(xinDi) {
+                                val aa = "${itemBlack!!.range}, ${huanSuanYi(itemBlack!!.totalPrice)}"
+                                it.moreInfo = "$aa, ${it.ext4}"
+                                dataT.add(it)
+                                return@forEach
+                            }
+
                             if(fangliang) {
                                 val aa = "${itemBlack!!.range}, ${itemBlack!!.rangeBegin},  ${itemBlack!!.rangeMin},  ${itemBlack!!.rangeMax},  ${huanSuanYi(itemBlack!!.totalPrice)}"
                                 val bb = "${baoLiuXiaoShu(itemBlack!!.totalPrice / secondTotal)}"
@@ -325,13 +360,13 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                     val jiaGeJianGe = jianGe?.toInt() ?: 0 > 20
 
                                     if(maxPrice) {
-                                        if (itemBlack!!.totalPrice > secondTotal) {
+                                        if (itemBlack!!.totalPrice > secondTotal && itemBlackPost?.totalPrice ?: 0.00 > itemBlack!!.totalPrice) {
                                             if(
                                                 !isZhaBan
                                                 && !shangYinXian
-                                                && !diDianMid
-                                                && !zhangTingPre
-                                                && !zhangTing
+                                              //  && !diDianMid
+                                              //  && !zhangTingPre
+                                             //   && !zhangTing
                                                 //&& liangNengJianGe
                                                 //&& jiaGeJianGe
                                                 && itemBlack!!.totalPrice > 300000000
@@ -374,14 +409,331 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         }
     }
 
+    private fun fetchXinGao2Info() {
+        withState {
+
+            val data = TestShareDatabase2.getInstance()?.getTestShareDao()?.getShares()
+
+            LogUtil.i(TAG, "fetchInfo: ${data?.size}")
+            val dataT = ArrayList<TestShareInfo>()
+
+            data?.forEach {
+                if(it.dayCount > 0) {
+                    val f = File(file_2023, it.code)
+                    if(f.exists()) {
+                        val stream = FileInputStream(f)
+                        val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
+                        val lines = reader.readLines()
+
+                        if(it.candleEntryList == null) {
+
+                            var a = lines.size - 120 - it.dayCount
+                            if(a < 0) a = 0
+                            var b = lines.size
+                            val records = lines.subList(a, b)
+                            val candleEntrys = java.util.ArrayList<CandleEntry>()
+                            val barEntrys = java.util.ArrayList<BarEntry>()
+                            val colorEntrys = java.util.ArrayList<Int>()
+                            val values_5 = java.util.ArrayList<Entry>()
+                            val values_10 = java.util.ArrayList<Entry>()
+                            val values_20 = java.util.ArrayList<Entry>()
+
+                            var itemBlack: SharesRecordActivity.ShareInfo? = null
+                            var itemBlack2: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPost: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPost2: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPost3: SharesRecordActivity.ShareInfo? = null
+                            var itemBlackPre: SharesRecordActivity.ShareInfo? = null
+                            var secondPrice = 0.00 // 之前最高价
+                            var secondIndex = 0
+                            var secondItem:  SharesRecordActivity.ShareInfo? = null
+
+                            var minPrice = 9999.99 // 之前最低价
+                            var minIndex = 0
+
+                            var secondTotal = 0.00 // 之前最大量能
+                            var secondTotalIndex = 0
+                            var maxLiang = false
+                            var maxLiangIndex = -1
+
+                            var moreXinGao = false // 新高后新高
+                            var moreXinGaoIndex = -1
+                            var moreXinGaoItem: SharesRecordActivity.ShareInfo? = null
+
+                            var moreLiangXinGao = false // 量能新高后新高
+                            var moreLiangXinGaoIndex = -1
+                            var moreLiangXinGaoItem: SharesRecordActivity.ShareInfo? = null
+
+
+                            var zuiDaLiang = 0.00
+                            var zuiDaLiangCount = 0
+                            var zuiDaLiangIndex = -1
+
+
+                            var shuang = false
+
+
+                            records.forEachIndexed { index, s ->
+                                //if(index == 0) return@forEachIndexed
+                                val item = SharesRecordActivity.ShareInfo(s)
+
+                                if(dayCheck) {
+                                    if(index > 60) {
+                                        if(item.beginPrice == 0.00) {
+                                            candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+                                        } else {
+                                            candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                        }
+                                    }
+                                } else {
+                                    if(item.beginPrice == 0.00) {
+                                        candleEntrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
+                                    } else {
+                                        candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
+                                    }
+                                }
+
+                                if(index in 1..119) {
+                                    if(item.maxPrice > secondPrice) {
+                                        secondPrice = item.maxPrice
+                                        secondItem = item
+                                        secondIndex = index
+                                    }
+
+                                    if(item.minPrice < minPrice) {
+                                        minPrice = item.minPrice
+                                        minIndex = index
+                                    }
+                                    if(item.totalPrice > secondTotal) {
+                                        secondTotal = item.totalPrice
+                                        secondTotalIndex = index
+                                    }
+                                }
+
+                                var line5 = item.line_5
+                                if(line5 == 0.00) { line5 = item.beginPrice }
+
+                                var line10 = item.line_10
+                                if(line10 == 0.00) { line10 = item.beginPrice }
+
+                                var line20 = item.line_20
+                                if(line20 == 0.00) { line20 = item.beginPrice }
+
+                                if(dayCheck) {
+                                    if(index > 60) {
+                                        values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                                        values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                                        values_20.add(Entry(index.toFloat(), line20.toFloat()))
+                                    }
+                                } else {
+                                    values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                                    values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                                    values_20.add(Entry(index.toFloat(), line20.toFloat()))
+                                }
+
+
+                                val p = item.totalPrice.toFloat() / 100000000
+                                if(dayCheck) {
+                                    if(index > 60) {
+                                        barEntrys.add(BarEntry(index.toFloat(), p))
+                                    }
+                                } else {
+                                    barEntrys.add(BarEntry(index.toFloat(), p))
+                                }
+
+                                if(index == 119) {
+                                    itemBlack2 = item
+                                }
+
+
+                                if(index > 120) {
+                                    if(!maxLiang && item.totalPrice > itemBlack!!.totalPrice) {
+                                        maxLiang = true
+                                        maxLiangIndex = index
+                                    }
+
+                                    if(item.totalPrice > zuiDaLiang) {
+                                        zuiDaLiang = item.totalPrice
+                                        zuiDaLiangCount++
+                                        if(index - zuiDaLiangIndex == 1) {
+                                            shuang = true
+                                        }
+                                        zuiDaLiangIndex = index
+                                    }
+                                }
+
+                                if(index == 119) {
+                                    itemBlackPre = item
+                                }
+
+                                if(index == 121) {
+                                    itemBlackPost = item
+                                }
+
+                                if(index == 120) {
+                                    colorEntrys.add(Color.BLACK)
+                                    itemBlack = item
+                                    zuiDaLiang = item.totalPrice
+                                } else if((index == maxLiangIndex && index != 120) || zuiDaLiangIndex == index){
+                                    if(index == 121) {
+                                        shuang = true
+                                    }
+                                    colorEntrys.add(Color.GRAY)
+                                } else {
+                                    val green = "#28FF28"
+                                    val red = "#FF0000"
+
+                                    if(dayCheck) {
+                                        if(index > 60) {
+                                            if(item.beginPrice > item.nowPrice) {
+                                                colorEntrys.add(Color.parseColor(green))
+                                            } else if(item.beginPrice < item.nowPrice) {
+                                                colorEntrys.add(Color.parseColor(red))
+                                            } else {
+                                                if(item.range >= 0) {
+                                                    colorEntrys.add(Color.parseColor(red))
+                                                } else {
+                                                    colorEntrys.add(Color.parseColor(green))
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        if(item.beginPrice > item.nowPrice) {
+                                            colorEntrys.add(Color.parseColor(green))
+                                        } else if(item.beginPrice < item.nowPrice) {
+                                            colorEntrys.add(Color.parseColor(red))
+                                        } else {
+                                            if(item.range >= 0) {
+                                                colorEntrys.add(Color.parseColor(red))
+                                            } else {
+                                                colorEntrys.add(Color.parseColor(green))
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if(index == records.size - 1) {
+                                    it.lastShareInfo = item
+                                }
+                            }
+                            it.candleEntryList = candleEntrys
+                            it.barEntryList = barEntrys
+                            it.colorsList = colorEntrys
+                            it.values_5 = values_5
+                            it.values_10 = values_10
+                            it.values_20 = values_20
+
+                            val aa =
+                                "${itemBlack!!.range}, ${itemBlack!!.rangeBegin},  ${itemBlack!!.rangeMin},  ${itemBlack!!.rangeMax},  ${huanSuanYi(itemBlack!!.totalPrice)}"
+
+                            it.zuiDaLiangCount = zuiDaLiangCount
+                            val bb = "${it.dayCount}, ${it.maxCount}, ${zuiDaLiangCount}"
+                            it.moreInfo = "${aa}\n${bb}"
+
+                            val isHexin = it.lastShareInfo?.totalPrice ?: 0.00 > zuiDaLiang / 3
+                            if(!shuang) return@forEach
+                            if(gao2LiangChecked) {
+                                if(itemBlack!!.totalPrice > gao2Liang * 100000000.00) {
+                                    if(gao2XinLiang) {
+                                        if(maxLiang) {
+                                            if(heXin) {
+                                                if(isHexin) {
+                                                    dataT.add(it)
+                                                }
+                                            } else {
+                                                dataT.add(it)
+                                            }
+                                        }
+                                    } else {
+                                        if(heXin) {
+                                            if(isHexin) {
+                                                dataT.add(it)
+                                            }
+                                        } else {
+                                            dataT.add(it)
+                                        }
+                                    }
+                                }
+                            } else {
+                                if(gao2XinLiang) {
+                                    if(maxLiang) {
+                                        if(heXin) {
+                                            if(isHexin) {
+                                                dataT.add(it)
+                                            }
+                                        } else {
+                                            dataT.add(it)
+                                        }
+                                    }
+                                } else {
+                                    if(heXin) {
+                                        if(isHexin) {
+                                            dataT.add(it)
+                                        }
+                                    } else {
+                                        dataT.add(it)
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            if(zhengXu) {
+                dataT.sortBy { getPaiXuType(it) }
+            } else {
+                dataT.sortByDescending { getPaiXuType(it) }
+            }
+
+            oneDayCount2(dataT)
+
+            dataT.also {
+                localList = it
+                setState {
+                    copy(infoList = it)
+                }
+            }
+        }
+    }
+
+    private fun oneDayCount2(dataT: java.util.ArrayList<TestShareInfo>) {
+        var time = ""
+        val dataTime = ArrayList<TestShareInfo>()
+        var count = 0
+        dataT.forEach {
+            if(this.time) {
+                if(it.time == time) {
+                    dataTime.add(it)
+                } else {
+                    count = 0
+                    time = it.time!!
+                    if(dataTime.size > 0) {
+                        dataTime[0].count = "${dataTime.size}"
+                    }
+                    dataTime.clear()
+                    dataTime.add(it)
+                }
+            }
+            count++
+            it.index = count
+        }
+        if(dataTime.size > 0) {
+            dataTime[0].count = "${dataTime.size}"
+        }
+        dataTime.clear()
+    }
+
     private fun oneDayCount(dataT: java.util.ArrayList<TestShareInfo>) {
+        var count = 0
         var time = ""
         val dataTime = ArrayList<TestShareInfo>()
         dataT.forEach {
-
             if(it.updateTime == time) {
                 dataTime.add(it)
             } else {
+                count = 0
                 time = it.updateTime!!
                 if(dataTime.size > 0) {
                     dataTime[0].count = "${dataTime.size}"
@@ -389,6 +741,8 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 dataTime.clear()
                 dataTime.add(it)
             }
+            count++
+            it.index = count
         }
         if(dataTime.size > 0) {
             dataTime[0].count = "${dataTime.size}"
@@ -397,8 +751,10 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     }
 
     private fun isfitCheck(ext5: String?): Boolean {
+        if(test && ext5 == "5") return true
         if(xingao && ext5 == "1") return true
         if(fangliang && ext5 == "2") return true
+        if(xinDi && ext5 == "4") return true
         return false
     }
 
@@ -414,7 +770,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 return time.startsWith("2023-3") || time.startsWith("2023-03")
             }
             4 -> {
-                return time.startsWith("2022-4") || time.startsWith("2022-04")
+                return time.startsWith("2023-4") || time.startsWith("2023-04")
             }
             5 -> {
                 return time.startsWith("2022-5") || time.startsWith("2022-05")
@@ -549,10 +905,12 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun setXinGaoChecked(checked: Boolean) {
         xingao = checked
+        xinDi = !xingao
     }
 
     fun setFangLiangChecked(checked: Boolean) {
         fangliang = checked
+        xinDi = !fangliang
     }
 
     fun setMaxPriceChecked(checked: Boolean) {
@@ -565,5 +923,45 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     fun set120Checked(checked: Boolean) {
         dayCheck = checked
+    }
+
+    fun setXinGao2Checked(checked: Boolean) {
+        xingao2 = checked
+    }
+
+    fun setGao2XinLiangChecked(checked: Boolean) {
+        gao2XinLiang = checked
+    }
+
+    fun setGao2LiangChecked(checked: Boolean, liang: Int) {
+        LogUtil.i(TAG, "setGao2LiangChecked: $checked, $liang")
+        gao2LiangChecked = checked
+        gao2Liang = liang
+    }
+
+    fun setTimeChecked(checked: Boolean) {
+        time = checked
+    }
+
+    fun setPaiXuSelect(position: Int) {
+        paiXu = position
+    }
+
+    fun setZhengXuChecked(checked: Boolean) {
+        zhengXu = checked
+    }
+
+    private fun getPaiXuType(info: TestShareInfo): Double {
+        return when(paiXu) {
+            0 -> info.zuiDaLiangCount.toDouble()
+            1 -> info.maxCount.toDouble()
+            2 -> info.lastShareInfo?.range ?: 0.00
+            3 -> info.dayCount.toDouble()
+            else -> info.zuiDaLiangCount.toDouble()
+        }
+    }
+
+    fun setHeXinChecked(checked: Boolean) {
+        heXin = checked
     }
 }

@@ -110,6 +110,7 @@ class TestItemView @JvmOverloads constructor(
 
     @ModelProp
     fun setData(info: TestShareInfo) {
+        test_item_index.text = info.index.toString()
         test_item_code.text = info.code?.substring(2)
         test_item_name.text = info.name
         test_item_total_price.text = huanSuanYi(info.lastShareInfo?.totalPrice ?: 0.00)
