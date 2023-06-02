@@ -10,10 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.CandleStickChart
 import com.github.mikephil.charting.charts.CombinedChart
@@ -27,27 +26,47 @@ import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
-import com.libiao.mushroom.mine.tab.Line20Tab
-import com.libiao.mushroom.room.MineShareDatabase
-import com.libiao.mushroom.room.MineShareInfo
+import com.libiao.mushroom.mine.tab.FanBaoTab
 import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.*
-import kotlinx.android.synthetic.main.line_20_fragment.*
+import kotlinx.android.synthetic.main.try_fan_bao_fragment.*
+import kotlinx.android.synthetic.main.xin_gao_fragment.*
+import kotlinx.android.synthetic.main.xin_gao_fragment.btn_start
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_fang_liang
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_first_xin_gao
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_line_20
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_tu_po
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_xin_gao_count
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_yang_yin
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_yang_yin_one
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_yin_xian_one
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_zhang_fu
+import kotlinx.android.synthetic.main.xin_gao_fragment.iv_self_range
+import kotlinx.android.synthetic.main.xin_gao_fragment.iv_self_time
+import kotlinx.android.synthetic.main.xin_gao_fragment.iv_self_today
+import kotlinx.android.synthetic.main.xin_gao_fragment.self_selection_rv
+import kotlinx.android.synthetic.main.xin_gao_fragment.tv_id
+import kotlinx.android.synthetic.main.xin_gao_fragment.tv_ke_xuan
+import kotlinx.android.synthetic.main.xin_gao_fragment.view_self_range
+import kotlinx.android.synthetic.main.xin_gao_fragment.view_self_time
+import kotlinx.android.synthetic.main.xin_gao_fragment.view_self_today
+import kotlinx.android.synthetic.main.xin_gao_fragment.view_share_bar
+import kotlinx.android.synthetic.main.xin_gao_fragment.yang_yin_child_view
+import kotlinx.android.synthetic.main.xin_gao_fragment.yin_xian_child_view
 import java.io.*
 import java.nio.charset.Charset
 import kotlin.collections.ArrayList
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
+class TryFanBaoFragment: BaseFragment(R.layout.try_fan_bao_fragment), ICommand {
 
     override fun order(type: Int, data: Any?) {
         when(type) {
             ICommand.SETTING -> {
-                settingDialog?.show()
+                //settingDialog?.show()
             }
             ICommand.HEART -> {
                 heartChecked = data as Boolean
@@ -84,7 +103,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
                             it.colorsList?.add(Color.GRAY)
 
-                            updateCurrentData(it, share, share_pre)
+                            updateCurrentData(it, share, share_pre, true)
                         }
                     }
                 }
@@ -111,7 +130,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     companion object {
-        private const val TAG = "Line20Fragment"
+        private const val TAG = "TryFanBaoFragment"
+        var recordTuPo = false
     }
 
     private var mAdapter: MyPoolInfoAdater? = null
@@ -119,17 +139,20 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     private var mTodayStatus = 0
     private var mTimeStatus = 0
 
-    private var isYinXianOne = false
+    private var xinGaoCount = false
+    private var tuPoChecked = false
     private var isYangYinOne = false
-    private var isXianChaOne = false
+    private var firstXinGaoChecked = false
 
-    private var mData: List<MineShareInfo> = ArrayList()
-    private var mTempData: List<MineShareInfo> = ArrayList()
+    private var mData: List<ReportShareInfo> = ArrayList()
+    private var mTempData: List<ReportShareInfo> = ArrayList()
 
     private var settingDialog: SelfSettingDialog? = null
     private var settingBean: SelfSettingBean? = SelfSettingBean()
 
     private var currentCb = 1
+
+    private var dayCount = 20
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -138,7 +161,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun initData() {
-        val data = MineShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
+        val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("7")
         data?.also {
             mData = it
             mTempData = it
@@ -153,24 +176,28 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 currentCb = 1
                 tv_ke_xuan.text = "涨幅"
                 mAdapter?.changeCurrentCb(currentCb)
-                yin_xian_child_view.visibility = View.GONE
+                //yin_xian_child_view.visibility = View.GONE
                 yang_yin_child_view.visibility = View.GONE
-                xian_cha_child_view.visibility = View.GONE
             }
 
         }
-        cb_jing_jia.setOnCheckedChangeListener { buttonView, isChecked ->
+        cb_xin_gao_count.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 2
-                tv_ke_xuan.text = "竞价"
+                tv_ke_xuan.text = "新高"
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.VISIBLE
                 yang_yin_child_view.visibility = View.GONE
-                xian_cha_child_view.visibility = View.GONE
             }
         }
         cb_yin_xian_one.setOnCheckedChangeListener { buttonView, isChecked ->
-            isYinXianOne = isChecked
+            xinGaoCount = isChecked
+            refreshTempData()
+            resetSortUI()
+            refreshCount()
+        }
+        cb_tu_po.setOnCheckedChangeListener { buttonView, isChecked ->
+            tuPoChecked = isChecked
             refreshTempData()
             resetSortUI()
             refreshCount()
@@ -182,7 +209,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.GONE
                 yang_yin_child_view.visibility = View.GONE
-                xian_cha_child_view.visibility = View.GONE
             }
         }
         cb_yang_yin.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -192,7 +218,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.GONE
                 yang_yin_child_view.visibility = View.VISIBLE
-                xian_cha_child_view.visibility = View.GONE
             }
         }
         cb_yang_yin_one.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -208,18 +233,25 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 mAdapter?.changeCurrentCb(currentCb)
                 yin_xian_child_view.visibility = View.GONE
                 yang_yin_child_view.visibility = View.GONE
-                xian_cha_child_view.visibility = View.VISIBLE
             }
         }
-        cb_xian_cha_one.setOnCheckedChangeListener { buttonView, isChecked ->
-            isXianChaOne = isChecked
-            refreshTempData()
-            resetSortUI()
-            refreshCount()
+
+        cb_first_xin_gao.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                firstXinGaoChecked = isChecked
+                refreshTempData()
+                resetSortUI()
+                refreshCount()
+            }
         }
 
         tv_id?.setOnClickListener {
             mAdapter?.changeShiTu()
+        }
+
+        btn_qing_kong.setOnClickListener {
+            ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteByExt("7")
+            Toast.makeText(context, "删除完成", Toast.LENGTH_SHORT).show()
         }
 
         self_selection_rv?.layoutManager = LinearLayoutManager(context)
@@ -237,11 +269,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     //高-低
                     //为什么不用temp， 主要考虑删除时要保持顺序
                     when(currentCb) {
-                        1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.shareInfo!!.rangeBegin })
-                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
-                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
-                        5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.cha_20 })
+                        1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount})
+                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -250,11 +282,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     mRangeStatus = 2
                     //低-高
                     when(currentCb) {
-                        1 -> mTempData = ArrayList(mTempData.sortedBy { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedBy { it.shareInfo!!.rangeBegin })
-                        3 -> mTempData = ArrayList(mTempData.sortedBy { it.liangBi })
-                        4 -> mTempData = ArrayList(mTempData.sortedBy { it.yangYin })
-                        5 -> mTempData = ArrayList(mTempData.sortedBy { it.cha_20 })
+                        1 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
+                        2 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
+                        3 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
+                        4 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
+                        5 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -263,11 +295,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     mRangeStatus = 1
                     //高-低
                     when(currentCb) {
-                        1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.shareInfo!!.rangeBegin })
-                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
-                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yangYin })
-                        5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.cha_20 })
+                        1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -399,21 +431,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         }
     }
 
-    private fun isContain2(tempData: List<MineShareInfo>, code: String?): Boolean {
-        tempData.forEach {
-            if(it.code == code) return true
-        }
-        return false
-    }
-
-    private fun isContain(dataOld: MutableList<ReportShareInfo>?, code: String?): Boolean {
-        dataOld?.forEach {
-            if(it.code == code && it.delete == 0) return true
-        }
-        return false
-    }
-
-    private fun refreshLocalData(data: List<MineShareInfo>, reload: Boolean = false) {
+    private fun refreshLocalData(data: List<ReportShareInfo>, reload: Boolean = false) {
         //(activity as SelfSelectionActivity).showLoading()
         loadingStatus = 1
         ThreadPoolUtil.execute(Runnable {
@@ -423,74 +441,56 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                     val lines = reader.readLines()
-                    val one = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 2])
-                    val two = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 1])
                     var allPrice = 0.00
                     var allDay = 0
-                    var itemIn = 0
-                    var maxLiang = 0.00
-                    var maxLiangIndex = -9
+
+                    var begin = 0
+
+                    lines.forEachIndexed{index, s ->
+                        if(s.startsWith(it.time!!)) {
+                            begin = index
+                            return@forEachIndexed
+                        }
+                    }
+
+                    var maxPrice = 9999.99
+                    var maxNowPrice = 9999.99
+                    val xinGaoList = ArrayList<String>()
+                    val xinGaoIndexList = ArrayList<Int>()
+                    var black = false
+
+                    var lastOne = false
+                    var lastTwo = false
+
+                    var lastOneMaxNowPrice = false
+
                     if(it.candleEntryList == null || reload) {
-                        var begin = lines.size - it.dayCount - 2
-                        if(begin < 0) begin = 0
-                        val records = lines.subList(begin, lines.size)
+                        var blackIndex = dayCount
+                        var start = begin - dayCount
+                        if(start < 0) {
+                            start = 0
+                            blackIndex = begin
+                        }
+                        it.startIndex = blackIndex
+                        val records = lines.subList(start, lines.size)
                         val entrys = java.util.ArrayList<CandleEntry>()
                         val barEntrys = java.util.ArrayList<BarEntry>()
                         val colorEntrys = java.util.ArrayList<Int>()
-                        var maxPrice = one.nowPrice
-                        var totalP = 0.00
+
+                        val values_5 = java.util.ArrayList<Entry>()
+                        val values_10 = java.util.ArrayList<Entry>()
+                        val values_20 = java.util.ArrayList<Entry>()
 
                         var tempItem: SharesRecordActivity.ShareInfo? = null
                         var greenLittle = true
-                        it.values_5.clear()
-                        it.values_10.clear()
-                        it.values_20.clear()
+
                         var yang = 0
                         var yin = 0
-                        var tempMaxP = 0.00
-                        var xinGao = false
-                        var xinGaoCount = 0
-                        var noXinGao = false
-                        it.zhiDie = false
-                        var fangLiang = false
-                        var shouHong = false
-                        it.fangLiangList.clear()
 
-                        it.maxLiang = false
-                        val list = ArrayList<SharesRecordActivity.ShareInfo>()
-                        //it.youOne = true
-                        it.youOne = false
+
+
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
-
-                            if(index > 0) {
-                                list.add(item)
-                                item.index = index
-                            }
-
-                            if(index > 3 && item.minPrice < item.line_20 && !xinGao) {
-                                noXinGao = true
-                            }
-
-                            if(index > 3 && index == records.size - 1) {
-                                if(item.totalPrice > maxLiang && item.range > 0) {
-                                    it.maxLiang = true
-                                }
-                            }
-
-
-                            if(item.totalPrice > maxLiang) {
-                                maxLiang = item.totalPrice
-                            }
-
-
-                            if(!noXinGao && item.maxPrice > tempMaxP * 1.01) {
-                                tempMaxP = item.maxPrice
-                                if(index > 3) {
-                                    xinGao = true
-                                    xinGaoCount ++
-                                }
-                            }
 
                             if(index > 0) {
                                 if(item.totalPrice > 0) {
@@ -512,35 +512,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 }
                             }
 
-//                            if(shouHong) {
-//                                if(item.nowPrice > item.beginPrice) {
-//                                    it.zhiDie = true
-//                                    it.fangLiangList.add(index)
-//                                }
-//                            }
-//                            shouHong = false
-
-                            if(fangLiang) {
-                                if(item.totalPrice > tempItem!!.totalPrice && item.range > 0) {
-                                    //shouHong = true
-                                    it.zhiDie = true
-                                    it.fangLiangList.add(index)
-                                }
-                            }
-
-                            fangLiang = false
-                            if(index > 4 && tempItem != null) {
-                                if(item.totalPrice > tempItem!!.totalPrice * 2 && item.range > 0) {
-                                    fangLiang = true
-                                }
-                            }
-
-//                            if(tempItem != null && it.youOne) {
-//                                if(item.beginPrice > item.nowPrice && item.totalPrice > tempItem!!.totalPrice) {
-//                                    it.youOne = false
-//                                }
-//                            }
-
 
                             if(tempItem == null) {
                                 tempItem = item
@@ -553,13 +524,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 tempItem = item
                             }
 
-                            if(item.totalPrice > totalP) {
-                                totalP = item.totalPrice
-                                itemIn = index
-                            }
-                            if(item.nowPrice > maxPrice) {
-                                maxPrice = item.nowPrice
-                            }
                             if(item.beginPrice == 0.00) {
                                 entrys.add(CandleEntry((index).toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat(), item.nowPrice.toFloat()))
                             } else {
@@ -575,21 +539,47 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             var line20 = item.line_20
                             if(line20 == 0.00) { line20 = item.beginPrice }
 
-                            it.values_5.add(Entry(index.toFloat(), line5.toFloat()))
-                            it.values_10.add(Entry(index.toFloat(), line10.toFloat()))
-                            it.values_20.add(Entry(index.toFloat(), line20.toFloat()))
+                            values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                            values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                            values_20.add(Entry(index.toFloat(), line20.toFloat()))
 
                             val p = item.totalPrice.toFloat() / 100000000
                             barEntrys.add(BarEntry(index.toFloat(), p))
                             val green = "#28FF28"
                             val red = "#FF0000"
 
-                            if(item.totalPrice == maxLiang && item.nowPrice > item.beginPrice) {
-                                colorEntrys.add(Color.GRAY)
-                                if(maxLiangIndex == index - 1) {
-                                    it.youOne = true
+                            if(item.maxPrice > maxPrice) {
+                                maxPrice = item.maxPrice
+                                if(index == records.size - 2) {
+                                    lastTwo = true
                                 }
-                                maxLiangIndex = index
+                                if(index == records.size - 1) {
+                                    lastOne = true
+                                }
+                                black = true
+                            } else {
+                                black = false
+                            }
+
+                            if(item.nowPrice > maxNowPrice) {
+                                maxNowPrice = item.nowPrice
+
+                                if(index == records.size - 1) {
+                                    lastOneMaxNowPrice = true
+                                }
+                            }
+
+
+                            if(index == blackIndex) {
+                                colorEntrys.add(Color.BLACK)
+                                maxPrice = item.maxPrice
+                                maxNowPrice = item.nowPrice
+                                xinGaoList.add(item.time!!)
+                                xinGaoIndexList.add(records.size - index)
+                            } else if(black){
+                                colorEntrys.add(Color.GRAY)
+                                xinGaoList.add(item.time!!)
+                                xinGaoIndexList.add(records.size - index)
                             } else {
                                 if(item.beginPrice > item.nowPrice) {
                                     colorEntrys.add(Color.parseColor(green))
@@ -604,89 +594,26 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 }
                             }
                         }
-                        it.yangYin = yang.toDouble() / (yang + yin)
-                        val tMaxItem = SharesRecordActivity.ShareInfo(records[itemIn])
-//                        it.sanLianYin = false
-//                        if(tMaxItem.nowPrice > tMaxItem.beginPrice && greenLittle) {
-//                            it.sanLianYin = true
-//                        }
-//                        if(greenLittle) {
-//                            it.youXuan = true
-//                        }
 
-                        list.sortByDescending { it.totalPrice }
-                       // LogUtil.i(TAG, "最大：${list[0].totalPrice}")
-                       // LogUtil.i(TAG, "最小：${list.last().totalPrice}")
-                        it.youThree = false
-
-                        var minP = one.nowPrice
-                        if(minP == 0.00) minP = two.yesterdayPrice
-                        if(minP == 0.00) minP = two.beginPrice
-                        it.maxRange = (maxPrice - minP) / minP * 100
                         it.candleEntryList = entrys
                         it.barEntryList = barEntrys
                         it.colorsList = colorEntrys
-                        if(allDay > 0) {
-                            it.avgP = allPrice / allDay
-                        }
-                        if(xinGao) {
-                            it.label2 = "新高"
-                            it.maxCount = xinGaoCount
-                        }
+                        it.values_5 = values_5
+                        it.values_10 = values_10
+                        it.values_20 = values_20
+
                     }
-                    it.price = one.nowPrice
+
                     val info = lines.get(lines.size - 1)
                     val info_pre = lines.get(lines.size - 2)
 
                     val share = SharesRecordActivity.ShareInfo(info)
-                    if(share.minPrice > 0) {
-                        it.cha_20 =  (share.nowPrice - share.line_20) / share.line_20
-                    }
-                    it.shareInfo = share
+
+                    it.lastShareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
-                    it.youTwo = false
-
-                    if(share.totalPrice > share_pre.totalPrice
-                        && share.nowPrice > share.beginPrice
-                        && share_pre.nowPrice > share_pre.beginPrice
-                        && share.range > share_pre.range
-                    ) {
-                        it.youThree = true
-                    }
-
-
-
-                    if(it.dayCount >= 4) {
-
-                        val ten1 = share
-                        val ten2 = share_pre
-
-                        val info_pre2 = lines.get(lines.size - 3)
-                        val info_pre3 = lines.get(lines.size - 4)
-                        val info_pre4 = lines.get(lines.size - 5)
-                        val ten3 = SharesRecordActivity.ShareInfo(info_pre2)
-                        val ten4 = SharesRecordActivity.ShareInfo(info_pre3)
-                        val ten5 = SharesRecordActivity.ShareInfo(info_pre4)
-
-                        var tM = Math.max(ten4.totalPrice, ten5.totalPrice)
-                        tM = Math.max(tM, ten3.totalPrice)
-                        tM = Math.max(tM, ten2.totalPrice)
-                        tM = Math.max(tM, ten1.totalPrice)
-
-//                        if(ten1.range < 0 && ten2.range < 0 && ten1.totalPrice < ten2.totalPrice && ten1.maxPrice < ten2.maxPrice && tM > maxLiang * 0.75
-//                        ) {
-//                            it.youOne = true
-//                        }
-
-                        if(ten3.range < 0 && ten2.range < 0 && ten1.nowPrice > ten1.beginPrice) {
-                            it.youTwo = true
-                        }
-                    }
 
                     updateCurrentData(it, share, share_pre)
 
-                    //LogUtil.i(TAG, "info: $info")
-                    //LogUtil.i(TAG, "info_pre: $info_pre")
                 }
             }
             ThreadPoolUtil.executeUI(Runnable {
@@ -699,81 +626,64 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun refreshTempData() {
-        val temp  = ArrayList<MineShareInfo>()
+        val temp  = ArrayList<ReportShareInfo>()
         for (info in mData) {
 
-            if(heartChecked && !info.heart) {
+//            if(heartChecked && !info.heart) {
+//                continue
+//            }
+            if(xinGaoCount && info.maxCount <= 1) {
                 continue
             }
-            if(isYinXianOne && info.todayMaxRange > 3) {
-                continue
-            }
-            if(isYangYinOne && info.yangYin < yang_yin_et_count.text.toString().toInt()) {
-                continue
-            }
-            if(isXianChaOne && (info.cha_20 > 0.02 || info.cha_20 <= 0.00)) {
-                continue
-            }
+
+
+//            if(isYangYinOne && info.yangYin < yang_yin_et_count.text.toString().toInt()) {
+//                continue
+//            }
             val selfSettingBean = settingBean
             if(selfSettingBean?.timeChecked == true && (info.dayCount < selfSettingBean.timeValue || info.dayCount > selfSettingBean.timeValue2)) {
                 continue
             }
 
-            if(selfSettingBean?.rangeLeftChecked == true && info.todayRange < selfSettingBean.rangeLeftValue) {
-                continue
-            }
+//            if(selfSettingBean?.redLine == true && !info.redLine) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.youXuan == true && !info.youXuan) {
+//                continue
+//            }
 
-            if(selfSettingBean?.rangeRightChecked == true && info.todayRange > selfSettingBean.rangeRightValue) {
-                continue
-            }
-
-            if(selfSettingBean?.liangLeftChecked == true && info.todayLiang < selfSettingBean.liangLeftValue) {
-                continue
-            }
-
-            if(selfSettingBean?.liangRightChecked == true && info.todayLiang > selfSettingBean.liangRightValue) {
-                continue
-            }
-
-            if(selfSettingBean?.redLine == true && !info.redLine) {
-                continue
-            }
-
-            if(selfSettingBean?.youXuan == true && !info.youXuan) {
-                continue
-            }
-
-            if(selfSettingBean?.maxRangChecked == true && info.yinXianLength < selfSettingBean.maxRangValue) {
-                continue
-            }
-
-            if(selfSettingBean?.zhiDie == true && !info.zhiDie) {
-                continue
-            }
-
-            if(selfSettingBean?.duan_ceng_Checked == true && !info.duanCeng) {
-                continue
-            }
+//            if(selfSettingBean?.maxRangChecked == true && info.yinXianLength < selfSettingBean.maxRangValue) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.zhiDie == true && !info.zhiDie) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.duan_ceng_Checked == true && !info.duanCeng) {
+//                continue
+//            }
 
             if(selfSettingBean?.xin_gao == true && (info.label2 == null)) {
                 continue
             }
 
-            if(selfSettingBean?.you_one == true && !info.youOne) {
-                continue
-            }
-
-            if(selfSettingBean?.you_two == true && !info.youTwo) {
-                continue
-            }
-
-            if(selfSettingBean?.you_three == true && !info.youThree) {
-                continue
-            }
-
-            if(selfSettingBean?.maxLiang == true && !info.maxLiang) {
-                continue
-            }
+//            if(selfSettingBean?.you_one == true && !info.youOne) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.you_two == true && !info.youTwo) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.you_three == true && !info.youThree) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.maxLiang == true && !info.maxLiang) {
+//                continue
+//            }
 
             temp.add(info)
         }
@@ -781,7 +691,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         mAdapter?.setData(mTempData)
     }
 
-    private fun deleteItem(mineShareInfo: MineShareInfo?) {
+    private fun deleteItem(mineShareInfo: ReportShareInfo?) {
         (mData as ArrayList).remove(mineShareInfo)
         (mTempData as ArrayList).remove(mineShareInfo)
         mAdapter?.setData(mTempData)
@@ -789,34 +699,24 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun refreshCount() {
-        (activity as SelfSelectionActivity).notifyData(1, Line20Tab.TAG, mTempData.size)
+        (activity as SelfSelectionActivity).notifyData(1, FanBaoTab.TAG, mTempData.size)
     }
 
     private fun updateCurrentData(
-        it: MineShareInfo,
+        it: ReportShareInfo,
         share: SharesRecordActivity.ShareInfo,
-        sharePre: SharesRecordActivity.ShareInfo
+        sharePre: SharesRecordActivity.ShareInfo,
+        oneline: Boolean = false
     ) {
-        if(it.price > 0) {
+        if(it.dayCount > 0) {
+
+            it.fanbao = false
+            if(share.maxPrice > sharePre.maxPrice) {
+                it.fanbao = true
+            }
             val a = min(share.rangeBegin, share.range) - share.rangeMin
             val b = share.rangeMax - max(share.rangeBegin, share.range)
-
-            if(share.range < 5 && share.range > -5) {
-                it.yinXianLength = a
-            } else {
-                it.yinXianLength = 0.00
-            }
-            it.totalRange = (share.nowPrice - it.price) / it.price * 100
             it.todayRange = share.range
-            it.todayMaxRange = share.rangeMax
-            it.fangLiang = share.totalPrice > sharePre.totalPrice
-            it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
-            if(sharePre.totalPrice > 0) {
-                it.liangBi = share.totalPrice / sharePre.totalPrice
-            }
-
-            it.redLine = sharePre.nowPrice < sharePre.beginPrice && share.nowPrice < share.beginPrice && sharePre.range < 0 && share.range < 0
-
             var liangBi = "0"
             if(sharePre.totalPrice > 0) {
                 liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
@@ -836,12 +736,12 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
     inner class MyPoolInfoAdater(val context: Context) : RecyclerView.Adapter<MyPoolHolder>() {
 
-        private var mSharesInfoList: List<MineShareInfo> = ArrayList()
+        private var mSharesInfoList: List<ReportShareInfo> = ArrayList()
 
         private var showFenShi = false
 
 
-        fun setData(sharesInfoList: List<MineShareInfo>) {
+        fun setData(sharesInfoList: List<ReportShareInfo>) {
             mSharesInfoList = sharesInfoList
             notifyDataSetChanged()
         }
@@ -866,7 +766,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         fun changeShiTu() {
             showFenShi = !showFenShi
             mSharesInfoList.forEach {
-                it.showFenShi = showFenShi
+
             }
             notifyDataSetChanged()
         }
@@ -891,7 +791,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         private var moreInfoTv: TextView? = null
         private var heartIv: ImageView? = null
 
-        private var mineShareInfo: MineShareInfo? = null
+        private var mineShareInfo: ReportShareInfo? = null
         private var chart: CandleStickChart? = null
         private var combinedChart: CombinedChart? = null
         private var bar: BarChart? = null
@@ -952,7 +852,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     when(it.id) {
                         R.id.btn_dialog_delete -> {
                             mineShareInfo?.code?.also {
-                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(it)
+                                ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest(it, "7")
                                 deleteItem(mineShareInfo)
                             }
                         }
@@ -991,10 +891,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
             heartIv?.setOnClickListener {
                 heart = !heart
-                mineShareInfo?.heart = heart
-                mineShareInfo?.also {
-                    MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
-                }
+//                mineShareInfo?.heart = heart
+//                mineShareInfo?.also {
+//                    MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+//                }
                 if(heart) {
                     heartIv?.setImageResource(R.mipmap.heart_selected)
                 } else {
@@ -1052,7 +952,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
         }
 
-        fun bindData(position: Int, info: MineShareInfo) {
+        fun bindData(position: Int, info: ReportShareInfo) {
             //LogUtil.i(TAG, "bindData: ${info.code}, ${info.candleEntryList?.size}")
             this.mineShareInfo = info
             mIdTv?.text = position.toString()
@@ -1063,16 +963,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
 
             if(info.currentCb == 1) {
-                mRangeTv?.text = baoLiuXiaoShu(info.totalRange)
-                if(info.totalRange >= 0) {
-                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-                } else {
-                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
-                }
+
             }
             if(info.currentCb == 2) {
-                mRangeTv?.text = baoLiuXiaoShu(info.shareInfo!!.rangeBegin)
-                if(info.shareInfo!!.rangeBegin >= 0) {
+                mRangeTv?.text = "${info.maxCount}"
+                if(info.maxCount >= 10) {
                     mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
                 } else {
                     mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
@@ -1080,30 +975,30 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
             if(info.currentCb == 3) {
-                mRangeTv?.text = baoLiuXiaoShu(info.liangBi)
-                if(info.liangBi >= 0) {
-                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-                } else {
-                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
-                }
+//                mRangeTv?.text = baoLiuXiaoShu(info.liangBi)
+//                if(info.liangBi >= 0) {
+//                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+//                } else {
+//                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+//                }
             }
 
             if(info.currentCb == 4) {
-                mRangeTv?.text = baoLiuXiaoShu(info.yangYin)
-                if(info.yangYin >= 0) {
-                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-                } else {
-                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
-                }
+//                mRangeTv?.text = "${info.yangYin}"
+//                if(info.yangYin >= 0) {
+//                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+//                } else {
+//                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+//                }
             }
 
             if(info.currentCb == 5) {
-                mRangeTv?.text = baoLiuXiaoShu(info.cha_20 * 100)
-                if(info.cha_20 >= 0) {
-                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-                } else {
-                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
-                }
+//                mRangeTv?.text = baoLiuXiaoShu(info.cha_20 * 100)
+//                if(info.cha_20 >= 0) {
+//                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+//                } else {
+//                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+//                }
             }
 
 
@@ -1117,50 +1012,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
             moreInfoTv?.text = info.moreInfo
 
-            info.candleEntryList?.also {
-//                val data = CandleData(getCanleDataSet(it))
-//                val params = chart?.layoutParams
-//                params?.width = getWidth(it.size)
-//                chart?.layoutParams = params
-//                chart?.data = data
-//                chart?.invalidate()
+            refreshChart(0)
 
-
-                val data = CombinedData()
-
-                val dataSets = ArrayList<ILineDataSet>()
-                dataSets.add(getLineDataSet(info.values_5, Color.BLUE, "line 5"))
-                dataSets.add(getLineDataSet(info.values_10, Color.RED, "line 10"))
-                dataSets.add(getLineDataSet(info.values_20, Color.GREEN, "line 20"))
-                data.setData(LineData(dataSets))
-
-                data.setData(CandleData(getCanleDataSet(it)))
-
-                xAxis?.axisMaximum = data.xMax + 1f
-                xAxis?.axisMinimum = data.xMin - 1f
-
-                val params = combinedChart?.layoutParams
-                params?.width = getWidth(it.size)
-                params?.height = getHeight(it.size)
-                combinedChart?.layoutParams = params
-
-                combinedChart?.data = data
-                combinedChart?.invalidate()
-
-            }
-
-            info.barEntryList?.also {
-                val barData = BarData(getBarDataSet(info.barEntryList, info.colorsList))
-                barData.setDrawValues(false)
-
-                val barParams = bar?.layoutParams
-                barParams?.width = getWidth(it.size)
-                bar?.layoutParams = barParams
-                bar?.data = barData
-                bar?.invalidate()
-            }
-
-            heart = info.heart
+            //heart = info.heart
             if(heart) {
                 heartIv?.setImageResource(R.mipmap.heart_selected)
             } else {
@@ -1180,22 +1034,66 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 mTypeXinGaoTv?.visibility = View.GONE
             }
 
-            mTypeMaxRangeTv?.text = baoLiuXiaoShu(info.totalRange)
-            mTypeYinYangTv?.text = baoLiuXiaoShu(info.yangYin)
-            mTypeFangLiangTv?.text = baoLiuXiaoShu(info.liangBi)
-            mTypeYinXianTv?.text = baoLiuXiaoShu(info.yinXianLength)
+            mTypeMaxRangeTv?.visibility = View.GONE
+            mTypeYinYangTv?.visibility = View.GONE
+            mTypeFangLiangTv?.visibility = View.GONE
+            mTypeYinXianTv?.visibility = View.GONE
 
-            mAvgP?.text = "${String.format("%.2f",info.avgP / 100000000)}亿"
-
-            if(info.showFenShi) {
-                mFenShiIv?.visibility = View.VISIBLE
-                Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${info.code}.gif")
-                    .asGif()
-                    .skipMemoryCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .into(mFenShiIv)
+            if(info.fanbao) {
+                mAvgP?.visibility = View.VISIBLE
+                mAvgP?.text = "反包"
             } else {
-                mFenShiIv?.visibility = View.GONE
+                mAvgP?.visibility = View.GONE
+            }
+
+           //mAvgP?.text = "${info.range}"
+
+            mFenShiIv?.visibility = View.GONE
+        }
+
+        private fun refreshChart(index: Int) {
+            val info = mineShareInfo!!
+            info.candleEntryList?.also {
+                //                val data = CandleData(getCanleDataSet(it))
+//                val params = chart?.layoutParams
+//                params?.width = getWidth(it.size)
+//                chart?.layoutParams = params
+//                chart?.data = data
+//                chart?.invalidate()
+
+
+                val data = CombinedData()
+
+                val dataSets = ArrayList<ILineDataSet>()
+                dataSets.add(getLineDataSet(info.values_5!!.subList(index, info.values_5!!.size), Color.BLUE, "line 5"))
+                dataSets.add(getLineDataSet(info.values_10!!.subList(index, info.values_10!!.size), Color.RED, "line 10"))
+                dataSets.add(getLineDataSet(info.values_20!!.subList(index, info.values_20!!.size), Color.GREEN, "line 20"))
+                data.setData(LineData(dataSets))
+
+                data.setData(CandleData(getCanleDataSet(it)))
+
+                xAxis?.axisMaximum = data.xMax + 1f
+                xAxis?.axisMinimum = data.xMin - 1f
+
+                val params = combinedChart?.layoutParams
+                params?.width = getWidth(it.size)
+                params?.height = getHeight(it.size)
+                combinedChart?.layoutParams = params
+
+                combinedChart?.data = data
+                combinedChart?.invalidate()
+
+            }
+
+            info.barEntryList?.also {
+                val barData = BarData(getBarDataSet(info.barEntryList!!.subList(index, info.barEntryList!!.size), info.colorsList!!.subList(index, info.colorsList!!.size)))
+                barData.setDrawValues(false)
+
+                val barParams = bar?.layoutParams
+                barParams?.width = getWidth(it.size)
+                bar?.layoutParams = barParams
+                bar?.data = barData
+                bar?.invalidate()
             }
         }
 
@@ -1272,7 +1170,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             return dataSets
         }
 
-        private fun getLineDataSet(values: ArrayList<Entry>, color: Int, lable: String): ILineDataSet {
+        private fun getLineDataSet(values: List<Entry>, color: Int, lable: String): ILineDataSet {
             // create a dataset and give it a type
             val set1 = LineDataSet(values, lable)
             set1.isHighlightEnabled = false
@@ -1292,11 +1190,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
     override fun shiShiRefresh() {
         mRefreshCount ++
-        (activity as SelfSelectionActivity).notifyData(2, Line20Tab.TAG, mRefreshCount)
+        (activity as SelfSelectionActivity).notifyData(2, FanBaoTab.TAG, mRefreshCount)
         LogUtil.i(TAG, "mRefreshCount: $mRefreshCount")
         if(mRefreshCount == mTempData.size) {
             mAdapter?.setData(mTempData)
-            (activity as SelfSelectionActivity).notifyData(3, Line20Tab.TAG, 0)
+            (activity as SelfSelectionActivity).notifyData(3, FanBaoTab.TAG, 0)
             resetSortUI()
         }
     }

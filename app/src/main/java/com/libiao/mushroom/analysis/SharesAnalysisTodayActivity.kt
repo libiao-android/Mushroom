@@ -149,7 +149,6 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
 
         //mModeList.add(DuanCengMode())
-        mModeList.add(TestMode())
 
 
         mModeList.add(TestMode2())
@@ -189,10 +188,18 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
         mModeList.add(MineMode())
 
+
+        mModeList.add(TestMode())
         mModeList.add(XinGaoMode())
         mModeList.add(XinLiangMode())
         mModeList.add(XinGao2Mode())
         mModeList.add(XinDiMode())
+
+        mModeList.add(FanBaoMode())
+        mModeList.add(MayFanBaoMode())
+
+
+
 
         val tempList = ArrayList<BaseMode>()
         mModeList.forEach {
@@ -390,7 +397,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     }
 
     private fun test() {
-        analysis("sz002618")
+        analysis("sz301215")
     }
 
     class SharesInfoAdater(val context: Context) : RecyclerView.Adapter<SharesInfoHolder>() {

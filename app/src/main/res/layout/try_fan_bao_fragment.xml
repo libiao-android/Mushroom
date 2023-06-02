@@ -17,11 +17,12 @@
         <CheckBox
             android:textSize="13dp"
             android:layout_centerVertical="true"
-            android:id="@+id/cb_jing_jia"
+            android:id="@+id/cb_xin_gao_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="竞价"/>
+            android:text="新高次数"/>
         <CheckBox
+            android:visibility="gone"
             android:textSize="13dp"
             android:layout_centerVertical="true"
             android:id="@+id/cb_fang_liang"
@@ -29,6 +30,7 @@
             android:layout_height="wrap_content"
             android:text="放量"/>
         <CheckBox
+            android:visibility="gone"
             android:textSize="13dp"
             android:layout_centerVertical="true"
             android:id="@+id/cb_yang_yin"
@@ -36,6 +38,7 @@
             android:layout_height="wrap_content"
             android:text="阳阴"/>
         <CheckBox
+            android:visibility="gone"
             android:textSize="13dp"
             android:layout_centerVertical="true"
             android:id="@+id/cb_line_20"
@@ -44,22 +47,9 @@
             android:text="20线差"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/xian_cha_child_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <CheckBox
-            android:textSize="11dp"
-            android:layout_centerVertical="true"
-            android:id="@+id/cb_xian_cha_one"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="20线差小于2"/>
-    </LinearLayout>
 
     <LinearLayout
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/yin_xian_child_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -69,7 +59,34 @@
             android:id="@+id/cb_yin_xian_one"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="过滤涨幅>3"/>
+            android:text="新高次数>1"/>
+        <CheckBox
+            android:textSize="11dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/cb_tu_po"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="突破"/>
+        <Button
+            android:layout_marginLeft="5dp"
+            android:id="@+id/btn_qing_kong"
+            android:text="清空"
+            android:textSize="10dp"
+            android:layout_width="50dp"
+            android:layout_height="35dp"/>
+        <CheckBox
+            android:textSize="11dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/cb_first_xin_gao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="首次"/>
+        <EditText
+            android:id="@+id/et_first_xin_gao"
+            android:text="1"
+            android:inputType="number"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"/>
     </LinearLayout>
     <LinearLayout
         android:visibility="gone"

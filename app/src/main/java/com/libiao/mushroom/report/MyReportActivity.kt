@@ -112,17 +112,18 @@ class MyReportActivity: BaseActivity(), MavericksView {
             LogUtil.i(TAG, "buildModels: ${data?.infoList?.size}")
             var time = ""
             var index = 0
+            size.text = "${data?.infoList?.size}"
             data?.infoList?.forEach {
-                if (it.updateTime != time) {
-                    time = it.updateTime ?: ""
+                if (it.time != time) {
+                    time = it.time ?: ""
                     index = 0
                     timeItemView {
                         id(time)
-                        time(it.updateTime)
+                        time(it.time)
                         count(it.ext1)
                         expand(it.expand)
                         click { v ->
-                            reportViewModel.expand(it.updateTime!!)
+                            reportViewModel.expand(it.time!!)
                         }
                     }
                 }

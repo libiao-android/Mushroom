@@ -7,7 +7,7 @@ import com.libiao.mushroom.room.TestShareInfo
 @Dao
 interface TestShareDao2 {
 
-    @Query("SELECT * FROM TestShareInfo")
+    @Query("SELECT * FROM TestShareInfo WHERE ext5 = 3")
     fun getShares(): MutableList<TestShareInfo>
 
     @Insert
@@ -16,6 +16,6 @@ interface TestShareDao2 {
     @Update
     fun update(info: TestShareInfo)
 
-    @Query("DELETE FROM TestShareInfo WHERE code = :code")
+    @Query("DELETE FROM TestShareInfo WHERE code = :code & ext5 = 3")
     fun delete(code: String)
 }

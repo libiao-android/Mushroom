@@ -128,6 +128,18 @@ class MineMode : BaseMode {
                             //reportXiaYinXian(one, it.time)
 
 
+                            if(one.totalPrice > zero.totalPrice
+                                && one.nowPrice > one.beginPrice
+                                && zero.nowPrice > zero.beginPrice
+                                && one.range > zero.range
+                            ) {
+                                val report = ReportShareInfo()
+                                report.code = one.code
+                                report.time = one.time
+                                report.name = one.name
+                                report.dayCount = it.dayCount
+                                ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(report)
+                            }
 //                            if(!zhangTing(one) && one.totalPrice < 100000000) {
 //                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
 //                            } else {

@@ -37,7 +37,7 @@ class ReviewViewModel(initial: ReviewState): MavericksViewModel<ReviewState>(ini
                 return time.startsWith("2022-5") || time.startsWith("2022-05")
             }
             6 -> {
-                return time.startsWith("2022-6") || time.startsWith("2022-06")
+                return time.startsWith("2023-6") || time.startsWith("2023-06")
             }
             7 -> {
                 return time.startsWith("2022-7") || time.startsWith("2022-07")

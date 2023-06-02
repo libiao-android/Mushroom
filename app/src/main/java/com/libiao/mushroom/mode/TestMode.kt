@@ -11,6 +11,7 @@ import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil
 import com.libiao.mushroom.utils.LogUtil.i
 import com.libiao.mushroom.utils.ShareParseUtil
+import kotlin.math.abs
 
 class TestMode : BaseMode {
 
@@ -33,29 +34,39 @@ class TestMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 2
+        mDeviationValue = day - 3
         if(mDeviationValue >= 0) {
 
 
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
+            val three = shares[mDeviationValue + 2]
 
-            val a = one.nowPrice > one.beginPrice
-            val b = two.nowPrice > two.beginPrice
-            val c = two.range > one.range
-            val d = two.totalPrice / one.totalPrice > 1.1 && two.totalPrice > 200000000
-            val e = two.range > 2
+            if(one.totalPrice <= 0 || two.totalPrice <= 0) return
 
-            if(a && b && c && d && e) {
-                i(TAG, "${two.brieflyInfo()}")
-                mFitModeList.add(Pair(two.range, two))
+            val a = two.totalPrice > one.totalPrice && one.totalPrice > 30000000
+            val b = three.totalPrice > two.totalPrice
+           // val c = one.nowPrice > one.line_20
+           // val d = two.nowPrice > two.line_20
+           // val e = three.nowPrice > three.line_20
+            val f = (two.totalPrice - one.totalPrice) / one.totalPrice
+            val g = (three.totalPrice - two.totalPrice) / two.totalPrice
+            val h = abs(f - g) < 0.99 && f > 0.2 && g > 0.2
+            val j = one.nowPrice > one.beginPrice && two.nowPrice > two.beginPrice && three.nowPrice > three.beginPrice
+            val k = three.range > two.range && two.range > one.range
+
+
+            if(a && b && h && j && k) {
+                i(TAG, "${three.brieflyInfo()}")
+                mFitModeList.add(Pair(three.range, three))
 
                 val info = TestShareInfo()
-                info.code = two.code
-                info.time = two.time
-                info.name = two.name
-                info.updateTime = two.time
+                info.code = three.code
+                info.time = three.time
+                info.name = three.name
+                info.updateTime = three.time
                 info.ext5 = "5"
+                info.label1 = "${baoLiuXiaoShu(f)}, ${baoLiuXiaoShu(g)}"
                 TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
             }
         }
@@ -68,7 +79,7 @@ class TestMode : BaseMode {
     }
 
     override fun shouldAnalysis(context: Context): Boolean {
-        return false
+        return true
     }
 
     override fun des(): String {

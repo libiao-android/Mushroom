@@ -180,12 +180,13 @@ class ReportItemView @JvmOverloads constructor(
             test_item_bar_chart.invalidate()
 
         }
+        test_item_more_info.text = info.moreInfo3
 
         if(info.moreInfo == null) {
-            test_item_more_info.visibility = View.GONE
+            report_item_yin_xian_length.visibility = View.GONE
         } else {
-            test_item_more_info.visibility = View.VISIBLE
-            test_item_more_info.text = info.moreInfo
+            report_item_yin_xian_length.visibility = View.VISIBLE
+            report_item_yin_xian_length.text = info.moreInfo
         }
 
         if(info.moreInfo2 == null) {

@@ -48,9 +48,20 @@ data class ReportShareInfo(
     var moreInfo: String? = null,
     @Ignore
     var moreInfo2: String? = null,
+    @Ignore
+    var moreInfo3: String? = null,
+
+    @Ignore
+    var currentCb: Int = 1,
+
+    @Ignore
+    var todayRange: Double = 0.00, //今日涨幅
 
     @Ignore
     var expand: Boolean = true,
+
+    @Ignore
+    var fanbao: Boolean = false,
 
     @Ignore
     var candleEntryList: ArrayList<CandleEntry>? = null,
@@ -109,6 +120,7 @@ data class ReportShareInfo(
         info.expand = this.expand
         info.moreInfo = this.moreInfo
         info.moreInfo2 = this.moreInfo2
+        info.moreInfo3 = this.moreInfo3
 
 
         candleEntryList?.also {

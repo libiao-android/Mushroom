@@ -33,7 +33,7 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
 
     val handler = Handler(Looper.getMainLooper())
 
-    var needTime = false
+    var needTime = true
 
     override fun order(type: Int, data: Any?) {
         when(type) {
@@ -223,6 +223,12 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
                 xin_gao2_sub_view.visibility = View.VISIBLE
             }
         }
+        cb_xin_di.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setXindi(isChecked)
+        }
+        cb_wen_liang.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setWenLiang(isChecked)
+        }
 
 //        cb_fang_liang_test.isChecked = true
 //        cb_more_price.isChecked = true
@@ -231,7 +237,7 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
         cb_max_price.isChecked = true
         cb_more_price.isChecked = true
 
-        cb_xin_gao_2.isChecked = true
+        cb_xin_gao_2.isChecked = false
 
 
         cb_xin_liang2.setOnCheckedChangeListener { buttonView, isChecked ->

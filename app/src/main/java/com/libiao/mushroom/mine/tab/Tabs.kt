@@ -6,6 +6,8 @@ class Tabs {
 
     init {
 
+
+        tabInfos.add(FanBaoTab())
         tabInfos.add(XinGaoTab())
         tabInfos.add(TestTab())
 

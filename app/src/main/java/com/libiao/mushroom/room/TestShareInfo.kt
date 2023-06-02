@@ -40,7 +40,7 @@ data class TestShareInfo(
     var ext2: String? = null,
     var ext3: String? = null,
     var ext4: String? = null, //间隔天数
-    var ext5: String? = null, //类型 1新高 2新量 3新高two
+    var ext5: String? = null, //类型 1新高 2新量 3新高two 4新低 5主升 6记录突破
     @Ignore
     var moreInfo: String? = null,
 
@@ -59,7 +59,22 @@ data class TestShareInfo(
     var price: Double = 1.00, //开始的记录价格
 
     @Ignore
+    var range: Double = 0.00, //开始的记录zhangfu
+
+    @Ignore
     var tuPo: Boolean = false, //站稳新高
+
+    @Ignore
+    var xinGaoList: ArrayList<String>? = null,
+
+    @Ignore
+    var xinGaoIndexList: ArrayList<Int>? = null,
+
+    @Ignore
+    var maxPriceH: Double = 0.00,
+
+    @Ignore
+    var maxNowPriceH: Double= 0.00,
 
     @Ignore
     var totalRange: Double = 0.00, //记录后至今日涨幅

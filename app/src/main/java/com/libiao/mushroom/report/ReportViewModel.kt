@@ -36,16 +36,12 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
     fun fetchInfo(month: Int) {
         if(month == 4) {
-            ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("3")
+           // ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("3")
         }
         withState {
-            val dataOrign = ReportShareDatabase.getInstance()?.getReportShareDao()?.getShares()
+            val dataOrign = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("2")
             val data = dataOrign?.filter {
-                if(maxLiang) {it.ext5 == "1"}
-                else if(threeYang) {it.ext5 == "3"}
-                else {
-                    it.ext5 != "1" && it.ext5 != "2"
-                }
+                true
             }
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<ReportShareInfo>()
@@ -54,11 +50,11 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             var time = ""
             var rangeCount = 0.00
             data?.forEach {
-                if(isFit(month, it.updateTime!!)) {
-                    if(it.updateTime == time) {
+                if(isFit(month, it.time!!)) {
+                    if(it.time == time) {
 
                     } else {
-                        time = it.updateTime!!
+                        time = it.time!!
                         if(dataTime.size > 0) {
                             dataTime[0].ext1 = "${dataTime.size}"
                         }
@@ -75,24 +71,16 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                         lines.forEachIndexed{ind, line ->
                             if(it.time != null && line.startsWith(it.time!!)) {
-                                startIndex = ind
-                            }
-                            if(line.startsWith(it.updateTime!!)) {
                                 recordIndex = ind
                                 return@forEachIndexed
                             }
                         }
-                        val count = recordIndex - startIndex
-                        var aaa = 10
+                        startIndex = recordIndex - it.dayCount
+
                         //LogUtil.i(TAG, "aaa: $aaa")
                         if(it.candleEntryList == null) {
 
-                            var a: Int
-                            if(startIndex > 0) {
-                                a = startIndex - 10
-                            } else {
-                                a = recordIndex - 10
-                            }
+                            var a: Int = startIndex - 1
 
                             if(a < 0) a = 0
                             var b = recordIndex + 10
@@ -110,10 +98,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             var post1: SharesRecordActivity.ShareInfo? = null
                             var post2: SharesRecordActivity.ShareInfo? = null
 
-                            var yin = 0
-                            var yang = 0
-                            var maxLiang = 0.00
-                            var isMaxLiang = false
+
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
                                 if(item.beginPrice == 0.00) {
@@ -122,33 +107,6 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                     candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
                                 }
 
-
-
-                                if(index > 4) {
-                                    if(item.totalPrice > maxLiang && item.nowPrice > item.beginPrice) {
-                                        //isMaxLiang = true
-                                    }
-                                }
-
-                                if(maxLiang < item.totalPrice) {
-                                    maxLiang = item.totalPrice
-                                }
-
-                                if (startIndex > 0 && index < count && index > 0) {
-                                    if(item.beginPrice > 0.00) {
-                                        if(item.nowPrice > item.beginPrice) {
-                                            yang++
-                                        } else if(item.nowPrice == item.beginPrice) {
-                                            if(item.range > 0) {
-                                                yang++
-                                            } else {
-                                                yin++
-                                            }
-                                        } else {
-                                            yin++
-                                        }
-                                    }
-                                }
 
                                 var line5 = item.line_5
                                 if(line5 == 0.00) { line5 = item.beginPrice }
@@ -166,18 +124,19 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
 
-                                if(index == aaa - 1) {
+                                if(index == it.dayCount) {
                                     pre = item
                                 }
-                                if(index == aaa) {
+                                if(index == it.dayCount + 1) {
                                     colorEntrys.add(Color.BLACK)
-                                    it.lastShareInfo = item
-                                } else if(isMaxLiang) {
-                                    colorEntrys.add(Color.GRAY)
-                                    isMaxLiang = false
-                                } else {
-                                    if(index == aaa + 1) post1 = item
-                                    if(index == aaa + 2) post2 = item
+                                    current = item
+                                }else {
+                                    if(index == it.dayCount + 2) {
+                                        post1 = item
+                                    }
+                                    if(index == it.dayCount + 3) {
+                                        post2 = item
+                                    }
                                     val green = "#28FF28"
                                     val red = "#FF0000"
                                     if(item.beginPrice > item.nowPrice) {
@@ -192,6 +151,10 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                         }
                                     }
                                 }
+                                if(index == records.size - 1) {
+                                    it.lastShareInfo = item
+                                    it.moreInfo3 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
+                                }
                             }
                             it.candleEntryList = candleEntrys
                             it.barEntryList = barEntrys
@@ -200,26 +163,37 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             it.values_10 = values_10
                             it.values_20 = values_20
 
-                            if(startIndex > 0) {
-                                it.label5 = "$count, $yang, $yin"
+
+                            val liangBi = baoLiuXiaoShu(current!!.totalPrice / pre!!.totalPrice)
+
+                            it.moreInfo = "${current!!.rangeBegin}, ${current!!.rangeMin}, ${current!!.rangeMax}, ${current!!.range}, $liangBi"
+
+                            if(maxLiang) {
+                                dataTime.add(it)
+                            } else {
+                                if(threeYang) {
+                                    val max = Math.max(pre!!.beginPrice, pre!!.nowPrice)
+                                    if(current!!.nowPrice < max) {
+                                        dataTime.add(it)
+                                    }
+                                } else {
+                                    if(post1 != null) {
+                                        if(post1!!.nowPrice > current!!.nowPrice && post1!!.maxPrice > current!!.maxPrice) {
+                                            dataTime.add(it)
+                                            it.moreInfo2 = "${post1!!.range}"
+                                        } else {
+                                            if(post2 != null) {
+                                                if(post2!!.nowPrice > current!!.nowPrice && post2!!.maxPrice > current!!.maxPrice) {
+                                                    dataTime.add(it)
+                                                    it.moreInfo2 = "${post1!!.range}, ${post2!!.range}"
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        dataTime.add(it)
+                                    }
+                                }
                             }
-
-                            var x = 0.00
-                            post1?.also {
-                                x = it.range - it.rangeBegin
-                            }
-
-                            var y = 0.00
-                            post2?.also {
-                                y = it.range
-                            }
-
-                            var m = x + y
-                            rangeCount += m
-
-                            it.moreInfo = "${baoLiuXiaoShu(x)}, ${baoLiuXiaoShu(y)}, ${baoLiuXiaoShu(m)}, ${baoLiuXiaoShu(rangeCount)}"
-
-                            dataTime.add(it)
                         }
                     }
                 }
@@ -233,7 +207,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             dataT.addAll(dataTime)
             dataTime.clear()
 
-            dataT.sortByDescending { it.updateTime!!.split("-")[2].toInt() }
+            dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
             dataT.also {
                 localList = it
                 setState {
@@ -262,13 +236,13 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 return time.startsWith("2023-3") || time.startsWith("2023-03")
             }
             4 -> {
-                return time.startsWith("2022-4") || time.startsWith("2022-04")
+                return time.startsWith("2023-4") || time.startsWith("2023-04")
             }
             5 -> {
-                return time.startsWith("2022-5") || time.startsWith("2022-05")
+                return time.startsWith("2023-5") || time.startsWith("2023-05")
             }
             6 -> {
-                return time.startsWith("2022-6") || time.startsWith("2022-06")
+                return time.startsWith("2023-6") || time.startsWith("2023-06")
             }
             7 -> {
                 return time.startsWith("2022-7") || time.startsWith("2022-07")
@@ -309,7 +283,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             list.addAll(it.infoList)
             list.forEachIndexed {index, info ->
                 val temp = info.copy()
-                if(temp.updateTime == time) {
+                if(temp.time == time) {
                     temp.expand = !temp.expand
                 }
                 list[index] = temp

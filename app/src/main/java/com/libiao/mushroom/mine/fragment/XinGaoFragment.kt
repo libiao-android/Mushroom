@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.charts.BarChart
@@ -25,8 +26,8 @@ import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
-import com.libiao.mushroom.mine.tab.Line20Tab
 import com.libiao.mushroom.mine.tab.XinGaoTab
+import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.room.report.ReportShareInfo
@@ -82,7 +83,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
                             it.colorsList?.add(Color.GRAY)
 
-                            updateCurrentData(it, share, share_pre)
+                            updateCurrentData(it, share, share_pre, true)
                         }
                     }
                 }
@@ -110,6 +111,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
     companion object {
         private const val TAG = "Line20Fragment"
+        var recordTuPo = false
     }
 
     private var mAdapter: MyPoolInfoAdater? = null
@@ -120,6 +122,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
     private var xinGaoCount = false
     private var tuPoChecked = false
     private var isYangYinOne = false
+    private var firstXinGaoChecked = false
 
     private var mData: List<TestShareInfo> = ArrayList()
     private var mTempData: List<TestShareInfo> = ArrayList()
@@ -213,8 +216,38 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             }
         }
 
+        cb_first_xin_gao.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                firstXinGaoChecked = isChecked
+                refreshTempData()
+                resetSortUI()
+                refreshCount()
+            }
+        }
+
         tv_id?.setOnClickListener {
             mAdapter?.changeShiTu()
+        }
+
+        record_tu_po.setOnClickListener {
+            if(!recordTuPo && cb_tu_po.isChecked) {
+                recordTuPo = true
+                mTempData.forEach {
+                    val info = ReportShareInfo()
+                    info.time = it.time
+                    info.code = it.code
+                    info.name = it.name
+                    info.dayCount = it.dayCount
+                    info.updateTime = it.updateTime
+                    info.maxPrice = it.maxPrice
+                    info.maxCount = it.maxCount
+                    info.startIndex = it.startIndex
+                    info.ext5 = "6"
+                    LogUtil.i(TAG, "新增: ${info.code}")
+                    ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
+                }
+                Toast.makeText(context, "记录完成", Toast.LENGTH_SHORT).show()
+            }
         }
 
         self_selection_rv?.layoutManager = LinearLayoutManager(context)
@@ -418,6 +451,8 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
                     var maxPrice = 9999.99
                     var maxNowPrice = 9999.99
+                    val xinGaoList = ArrayList<String>()
+                    val xinGaoIndexList = ArrayList<Int>()
                     var black = false
 
                     var lastOne = false
@@ -534,10 +569,15 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                             if(index == blackIndex) {
                                 colorEntrys.add(Color.BLACK)
                                 it.price = item.nowPrice
+                                it.range = item.range
                                 maxPrice = item.maxPrice
                                 maxNowPrice = item.nowPrice
+                                xinGaoList.add(item.time!!)
+                                xinGaoIndexList.add(records.size - index)
                             } else if(black){
                                 colorEntrys.add(Color.GRAY)
+                                xinGaoList.add(item.time!!)
+                                xinGaoIndexList.add(records.size - index)
                             } else {
                                 if(item.beginPrice > item.nowPrice) {
                                     colorEntrys.add(Color.parseColor(green))
@@ -566,6 +606,10 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                     if(lastOneMaxNowPrice && lastOne && !lastTwo) {
                         it.tuPo = true
                     }
+                    it.maxPriceH = maxPrice
+                    it.maxNowPriceH = maxNowPrice
+                    it.xinGaoList = xinGaoList
+                    it.xinGaoIndexList = xinGaoIndexList
 
                     val info = lines.get(lines.size - 1)
                     val info_pre = lines.get(lines.size - 2)
@@ -595,11 +639,21 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 //            if(heartChecked && !info.heart) {
 //                continue
 //            }
-            if(xinGaoCount && info.maxCount <= 3) {
+            if(xinGaoCount && info.maxCount <= 1) {
                 continue
             }
             if(tuPoChecked && !info.tuPo) {
                 continue
+            }
+
+            if(firstXinGaoChecked) {
+                val num = et_first_xin_gao.text.toString().toInt()
+//                if (info.xinGaoIndexList?.first() != num) {
+//                    continue
+//                }
+                if (info.range < 7) {
+                    continue
+                }
             }
 //            if(isYangYinOne && info.yangYin < yang_yin_et_count.text.toString().toInt()) {
 //                continue
@@ -685,11 +739,25 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
     private fun updateCurrentData(
         it: TestShareInfo,
         share: SharesRecordActivity.ShareInfo,
-        sharePre: SharesRecordActivity.ShareInfo
+        sharePre: SharesRecordActivity.ShareInfo,
+        oneline: Boolean = false
     ) {
         if(it.price > 0) {
+
+            if(oneline) {
+                val maxB = share.maxPrice > it.maxPriceH && share.nowPrice > it.maxNowPriceH
+                it.tuPo = maxB && !it.xinGaoList!!.contains(sharePre.time)
+                if(it.tuPo) {
+                    LogUtil.i(TAG, "tupo: ${it.name}")
+                }
+            }
+
             val a = min(share.rangeBegin, share.range) - share.rangeMin
             val b = share.rangeMax - max(share.rangeBegin, share.range)
+
+            if(share.totalPrice > sharePre.totalPrice && share.range > 0 && share.nowPrice > share.beginPrice) {
+                it.label2 = "yes"
+            }
 
 
             it.totalRange = (share.nowPrice - it.price) / it.price * 100
@@ -1028,7 +1096,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             mTypeFangLiangTv?.visibility = View.GONE
             mTypeYinXianTv?.visibility = View.GONE
 
-           // mAvgP?.text = "${String.format("%.2f",info.avgP / 100000000)}亿"
+           mAvgP?.text = "${info.range}"
 
             mFenShiIv?.visibility = View.GONE
         }
@@ -1172,11 +1240,11 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
     override fun shiShiRefresh() {
         mRefreshCount ++
-        (activity as SelfSelectionActivity).notifyData(2, Line20Tab.TAG, mRefreshCount)
+        (activity as SelfSelectionActivity).notifyData(2, XinGaoTab.TAG, mRefreshCount)
         LogUtil.i(TAG, "mRefreshCount: $mRefreshCount")
         if(mRefreshCount == mTempData.size) {
             mAdapter?.setData(mTempData)
-            (activity as SelfSelectionActivity).notifyData(3, Line20Tab.TAG, 0)
+            (activity as SelfSelectionActivity).notifyData(3, XinGaoTab.TAG, 0)
             resetSortUI()
         }
     }
