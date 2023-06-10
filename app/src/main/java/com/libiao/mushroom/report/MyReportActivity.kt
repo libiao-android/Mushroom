@@ -39,6 +39,11 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.setOnlySeeDelete(isChecked)
         }
         reportViewModel.setConditionOne(cb_three_yang.isChecked)
+
+        cb_fanbao_again.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setFanbaoAgain(isChecked)
+        }
+
         cb_three_yang.setOnCheckedChangeListener { buttonView, isChecked ->
             reportViewModel.setConditionOne(isChecked)
         }

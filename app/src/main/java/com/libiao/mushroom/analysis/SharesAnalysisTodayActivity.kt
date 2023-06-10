@@ -197,6 +197,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
         mModeList.add(FanBaoMode())
         mModeList.add(MayFanBaoMode())
+        mModeList.add(FanBaoAgainMode())
 
 
 

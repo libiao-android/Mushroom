@@ -72,6 +72,30 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                             val lines = reader.readLines()
                             val share_pre = SharesRecordActivity.ShareInfo(lines.last())
+                            if(lines.size >= 20) {
+                                val a = lines.size - 19
+                                var total_5 = 0.00
+                                var total_10 = 0.00
+                                var total_20 = 0.00
+
+                                for(i in a until lines.size) {
+                                    val item = SharesRecordActivity.ShareInfo(lines[i])
+                                    total_20 += item.nowPrice
+                                    if(i >= lines.size - 9) {
+                                        total_10 += item.nowPrice
+                                    }
+                                    if(i >= lines.size - 4) {
+                                        total_5 += item.nowPrice
+                                    }
+                                }
+                                total_20 += share.nowPrice
+                                total_10 += share.nowPrice
+                                total_5 += share.nowPrice
+                                share.line_20 = String.format("%.2f", total_20 / 20).toDouble()
+                                share.line_10 = String.format("%.2f", total_10 / 10).toDouble()
+                                share.line_5 = String.format("%.2f", total_5 / 5).toDouble()
+                                //LogUtil.i(TAG, "line_5: ${share.line_5}, line_10: ${share.line_10}, line_20: ${share.line_20}")
+                            }
                             val index = it.candleEntryList?.size ?: 0
                             if(share.beginPrice == 0.00) {
                                 it.candleEntryList?.add(CandleEntry((index).toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat(), share.nowPrice.toFloat()))
@@ -83,6 +107,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             it.barEntryList?.add(BarEntry(index.toFloat(), p))
 
                             it.colorsList?.add(Color.GRAY)
+
+                            it.values_5.add(Entry(index.toFloat(), share.line_5.toFloat()))
+                            it.values_10.add(Entry(index.toFloat(), share.line_10.toFloat()))
+                            it.values_20.add(Entry(index.toFloat(), share.line_20.toFloat()))
 
                             updateCurrentData(it, share, share_pre)
                         }
@@ -460,6 +488,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         val list = ArrayList<SharesRecordActivity.ShareInfo>()
                         //it.youOne = true
                         it.youOne = false
+                        it.youThree = true
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
@@ -541,6 +570,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                                }
 //                            }
 
+                            if(tempItem != null && tempItem!!.beginPrice > tempItem!!.nowPrice && item.beginPrice > item.nowPrice) {
+                                it.youThree = false
+                            }
+
 
                             if(tempItem == null) {
                                 tempItem = item
@@ -586,7 +619,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
                             if(item.totalPrice == maxLiang && item.nowPrice > item.beginPrice) {
                                 colorEntrys.add(Color.GRAY)
-                                if(maxLiangIndex == index - 1) {
+                                if(maxLiangIndex == index - 1 && index > 3) {
                                     it.youOne = true
                                 }
                                 maxLiangIndex = index
@@ -603,6 +636,15 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                     }
                                 }
                             }
+
+//                            if(index == records.size - yang_yin_et_count.text.toString().toInt()) {
+//                                it.youTwo = false
+//                                if(item.line_20 > 0.00) {
+//                                    if(item.beginPrice < item.line_20 && item.nowPrice > item.line_20) {
+//                                        it.youTwo = true
+//                                    }
+//                                }
+//                            }
                         }
                         it.yangYin = yang.toDouble() / (yang + yin)
                         val tMaxItem = SharesRecordActivity.ShareInfo(records[itemIn])
@@ -617,7 +659,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         list.sortByDescending { it.totalPrice }
                        // LogUtil.i(TAG, "最大：${list[0].totalPrice}")
                        // LogUtil.i(TAG, "最小：${list.last().totalPrice}")
-                        it.youThree = false
+
 
                         var minP = one.nowPrice
                         if(minP == 0.00) minP = two.yesterdayPrice
@@ -633,6 +675,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             it.label2 = "新高"
                             it.maxCount = xinGaoCount
                         }
+
+
                     }
                     it.price = one.nowPrice
                     val info = lines.get(lines.size - 1)
@@ -644,15 +688,15 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     }
                     it.shareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
-                    it.youTwo = false
+                    //it.youTwo = false
 
-                    if(share.totalPrice > share_pre.totalPrice
-                        && share.nowPrice > share.beginPrice
-                        && share_pre.nowPrice > share_pre.beginPrice
-                        && share.range > share_pre.range
-                    ) {
-                        it.youThree = true
-                    }
+//                    if(share.totalPrice > share_pre.totalPrice
+//                        && share.nowPrice > share.beginPrice
+//                        && share_pre.nowPrice > share_pre.beginPrice
+//                        && share.range > share_pre.range
+//                    ) {
+//                        it.youThree = true
+//                    }
 
 
 
@@ -678,9 +722,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                            it.youOne = true
 //                        }
 
-                        if(ten3.range < 0 && ten2.range < 0 && ten1.nowPrice > ten1.beginPrice) {
-                            it.youTwo = true
-                        }
+//                        if(ten3.range < 0 && ten2.range < 0 && ten1.nowPrice > ten1.beginPrice) {
+//                            it.youTwo = true
+//                        }
                     }
 
                     updateCurrentData(it, share, share_pre)
@@ -806,6 +850,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             } else {
                 it.yinXianLength = 0.00
             }
+
+            it.youTwo = false
+            if(share.line_20 > 0.00) {
+                if(share.beginPrice < share.line_20 && share.nowPrice > share.line_20) {
+                    it.youTwo = true
+                }
+            }
+
             it.totalRange = (share.nowPrice - it.price) / it.price * 100
             it.todayRange = share.range
             it.todayMaxRange = share.rangeMax

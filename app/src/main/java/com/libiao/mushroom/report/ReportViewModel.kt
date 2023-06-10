@@ -31,15 +31,22 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     var maxLiang: Boolean = false
     var threeYang: Boolean = false
 
+    var fanbao: Boolean = false
+
     private val client = OkHttpClient()
 
 
     fun fetchInfo(month: Int) {
-        if(month == 4) {
-           // ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteTest("3")
+        if(month == 6) {
+            //ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteByExt("3")
         }
         withState {
-            val dataOrign = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("2")
+            val dataOrign =
+                if(fanbao) {
+                    ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("3")
+                } else {
+                    ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("2")
+                }
             val data = dataOrign?.filter {
                 true
             }
@@ -168,29 +175,33 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                             it.moreInfo = "${current!!.rangeBegin}, ${current!!.rangeMin}, ${current!!.rangeMax}, ${current!!.range}, $liangBi"
 
-                            if(maxLiang) {
+                            if(fanbao) {
                                 dataTime.add(it)
                             } else {
-                                if(threeYang) {
-                                    val max = Math.max(pre!!.beginPrice, pre!!.nowPrice)
-                                    if(current!!.nowPrice < max) {
-                                        dataTime.add(it)
-                                    }
+                                if(maxLiang) {
+                                    dataTime.add(it)
                                 } else {
-                                    if(post1 != null) {
-                                        if(post1!!.nowPrice > current!!.nowPrice && post1!!.maxPrice > current!!.maxPrice) {
+                                    if(threeYang) {
+                                        val max = Math.max(pre!!.beginPrice, pre!!.nowPrice)
+                                        if(current!!.nowPrice < max) {
                                             dataTime.add(it)
-                                            it.moreInfo2 = "${post1!!.range}"
-                                        } else {
-                                            if(post2 != null) {
-                                                if(post2!!.nowPrice > current!!.nowPrice && post2!!.maxPrice > current!!.maxPrice) {
-                                                    dataTime.add(it)
-                                                    it.moreInfo2 = "${post1!!.range}, ${post2!!.range}"
-                                                }
-                                            }
                                         }
                                     } else {
-                                        dataTime.add(it)
+                                        if(post1 != null) {
+                                            if(post1!!.nowPrice > current!!.nowPrice && post1!!.maxPrice > current!!.maxPrice) {
+                                                dataTime.add(it)
+                                                it.moreInfo2 = "${post1!!.range}"
+                                            } else {
+                                                if(post2 != null) {
+                                                    if(post2!!.nowPrice > current!!.nowPrice && post2!!.maxPrice > current!!.maxPrice) {
+                                                        dataTime.add(it)
+                                                        it.moreInfo2 = "${post1!!.range}, ${post2!!.range}"
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            dataTime.add(it)
+                                        }
                                     }
                                 }
                             }
@@ -414,5 +425,9 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 }
             }
         })
+    }
+
+    fun setFanbaoAgain(checked: Boolean) {
+        fanbao = checked
     }
 }

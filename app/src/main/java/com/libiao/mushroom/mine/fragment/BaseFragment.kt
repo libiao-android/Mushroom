@@ -44,7 +44,7 @@ open class BaseFragment(resLayout: Int): Fragment(resLayout) {
                         val strs = value.split("~")
                         if(strs.size > 45) {
                             val share = ShareParseUtil.parseFromNetwork(code, strs)
-                            LogUtil.i(TAG, "share: $share")
+                            //LogUtil.i(TAG, "share: $share")
                             result(share)
                         }
                     } else {

@@ -483,7 +483,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                         var yang = 0
                         var yin = 0
 
-
+                        it.next = false
 
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
@@ -565,6 +565,12 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                                 }
                             }
 
+                            if(index == blackIndex + 1) {
+                                if(item.range > 0) {
+                                    it.next = true
+                                }
+                            }
+
 
                             if(index == blackIndex) {
                                 colorEntrys.add(Color.BLACK)
@@ -639,7 +645,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 //            if(heartChecked && !info.heart) {
 //                continue
 //            }
-            if(xinGaoCount && info.maxCount <= 1) {
+            if(xinGaoCount && !info.next) {
                 continue
             }
             if(tuPoChecked && !info.tuPo) {
