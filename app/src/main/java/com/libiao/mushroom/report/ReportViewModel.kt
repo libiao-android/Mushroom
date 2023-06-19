@@ -45,7 +45,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 if(fanbao) {
                     ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("3")
                 } else {
-                    ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("2")
+                    ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("4")
                 }
             val data = dataOrign?.filter {
                 true
@@ -76,23 +76,28 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                         var startIndex = 0
                         var recordIndex = 0
 
+                        var realRecordIndex = 0
+
                         lines.forEachIndexed{ind, line ->
                             if(it.time != null && line.startsWith(it.time!!)) {
                                 recordIndex = ind
                                 return@forEachIndexed
                             }
                         }
-                        startIndex = recordIndex - it.dayCount
+                        val daycount = 20
+                        startIndex = recordIndex - daycount
 
                         //LogUtil.i(TAG, "aaa: $aaa")
                         if(it.candleEntryList == null) {
 
-                            var a: Int = startIndex - 1
-
-                            if(a < 0) a = 0
+                            realRecordIndex = daycount
+                            if(startIndex < 0) {
+                                realRecordIndex = daycount + startIndex
+                                startIndex = 0
+                            }
                             var b = recordIndex + 10
                             if(lines.size < b) b = lines.size
-                            val records = lines.subList(a, b)
+                            val records = lines.subList(startIndex, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
                             val barEntrys = java.util.ArrayList<BarEntry>()
                             val colorEntrys = java.util.ArrayList<Int>()
@@ -100,10 +105,14 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             val values_10 = java.util.ArrayList<Entry>()
                             val values_20 = java.util.ArrayList<Entry>()
 
-                            var pre: SharesRecordActivity.ShareInfo? = null
+                            var pre1: SharesRecordActivity.ShareInfo? = null
+                            var pre2: SharesRecordActivity.ShareInfo? = null
+                            var pre3: SharesRecordActivity.ShareInfo? = null
                             var current: SharesRecordActivity.ShareInfo? = null
                             var post1: SharesRecordActivity.ShareInfo? = null
                             var post2: SharesRecordActivity.ShareInfo? = null
+
+                            LogUtil.i(TAG, "realRecordIndex: $realRecordIndex, startIndex: $startIndex")
 
 
                             records.forEachIndexed { index, s ->
@@ -131,17 +140,23 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
 
-                                if(index == it.dayCount) {
-                                    pre = item
+                                if(index == realRecordIndex - 1) {
+                                    pre3 = item
                                 }
-                                if(index == it.dayCount + 1) {
+                                if(index == realRecordIndex - 2) {
+                                    pre2 = item
+                                }
+                                if(index == realRecordIndex - 3) {
+                                    pre1 = item
+                                }
+                                if(index == realRecordIndex) {
                                     colorEntrys.add(Color.BLACK)
                                     current = item
                                 }else {
-                                    if(index == it.dayCount + 2) {
+                                    if(index == realRecordIndex + 1) {
                                         post1 = item
                                     }
-                                    if(index == it.dayCount + 3) {
+                                    if(index == realRecordIndex + 2) {
                                         post2 = item
                                     }
                                     val green = "#28FF28"
@@ -171,7 +186,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             it.values_20 = values_20
 
 
-                            val liangBi = baoLiuXiaoShu(current!!.totalPrice / pre!!.totalPrice)
+                            val liangBi = baoLiuXiaoShu(current!!.totalPrice / pre3!!.totalPrice)
 
                             it.moreInfo = "${current!!.rangeBegin}, ${current!!.rangeMin}, ${current!!.rangeMax}, ${current!!.range}, $liangBi"
 
@@ -181,27 +196,15 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 if(maxLiang) {
                                     dataTime.add(it)
                                 } else {
-                                    if(threeYang) {
-                                        val max = Math.max(pre!!.beginPrice, pre!!.nowPrice)
-                                        if(current!!.nowPrice < max) {
-                                            dataTime.add(it)
-                                        }
-                                    } else {
-                                        if(post1 != null) {
-                                            if(post1!!.nowPrice > current!!.nowPrice && post1!!.maxPrice > current!!.maxPrice) {
-                                                dataTime.add(it)
-                                                it.moreInfo2 = "${post1!!.range}"
-                                            } else {
-                                                if(post2 != null) {
-                                                    if(post2!!.nowPrice > current!!.nowPrice && post2!!.maxPrice > current!!.maxPrice) {
-                                                        dataTime.add(it)
-                                                        it.moreInfo2 = "${post1!!.range}, ${post2!!.range}"
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            dataTime.add(it)
-                                        }
+                                    it.moreInfo2 = "${pre1!!.range}, ${pre2!!.range}, ${pre3!!.range}, ${current!!.range}"
+                                    if (pre2!!.range > 2 && current!!.range > 2) {
+//                                        if(current!!.totalPrice > pre3!!.totalPrice && pre2!!.totalPrice > pre1!!.totalPrice && current!!.totalPrice > pre2!!.totalPrice) {
+//                                            if(liangBi.toDouble() < 2.5 && liangBi.toDouble() > 1.5) {
+//
+//                                            }
+//
+//                                        }
+                                        dataTime.add(it)
                                     }
                                 }
                             }

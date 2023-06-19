@@ -31,21 +31,30 @@ class FanBaoMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 2
+        mDeviationValue = day - 4
         if(mDeviationValue >  0) {
 
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
-            if(one.range < -5 && two.maxPrice > one.maxPrice) {
-                Log.i(TAG, "${two.brieflyInfo()}")
-                mFitModeList.add(Pair(two.range, two))
+            val three = shares[mDeviationValue + 2]
+            val four = shares[mDeviationValue + 3]
+
+            val a = one.range < 0
+            val b = two.range > 0 && two.beginPrice < two.nowPrice && two.maxPrice > one.maxPrice
+            val c = three.range < 0 && three.minPrice > one.minPrice
+            val d = four.range > 0 && four.beginPrice < four.nowPrice && four.maxPrice > three.maxPrice
+
+
+            if(a && b && c && d) {
+                Log.i(TAG, "${four.brieflyInfo()}")
+                mFitModeList.add(Pair(four.range, four))
 
                 val report = ReportShareInfo()
-                report.code = two.code
-                report.time = two.time
-                report.name = two.name
+                report.code = four.code
+                report.time = four.time
+                report.name = four.name
                 report.dayCount = 10
-                report.ext5 = "2"
+                report.ext5 = "4"
                 ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(report)
             }
         }

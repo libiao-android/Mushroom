@@ -24,6 +24,7 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.fanbao.FanBaoShiShiManager
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
 import com.libiao.mushroom.mine.tab.FanBaoTab
@@ -688,6 +689,7 @@ class TryFanBaoFragment: BaseFragment(R.layout.try_fan_bao_fragment), ICommand {
             temp.add(info)
         }
         mTempData = temp
+        //FanBaoShiShiManager.setData(context, temp)
         mAdapter?.setData(mTempData)
     }
 

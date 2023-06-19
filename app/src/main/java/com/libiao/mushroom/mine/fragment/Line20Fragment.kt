@@ -489,6 +489,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         //it.youOne = true
                         it.youOne = false
                         it.youThree = true
+                        var maxIndex = 0
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
@@ -617,9 +618,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             val green = "#28FF28"
                             val red = "#FF0000"
 
-                            if(item.totalPrice == maxLiang && item.nowPrice > item.beginPrice) {
+                            if(item.totalPrice == maxLiang && item.nowPrice > item.beginPrice && index > 1) {
                                 colorEntrys.add(Color.GRAY)
-                                if(maxLiangIndex == index - 1 && index > 3) {
+                                maxIndex++
+                                if(maxIndex >= 2) {
                                     it.youOne = true
                                 }
                                 maxLiangIndex = index
