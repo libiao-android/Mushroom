@@ -53,6 +53,7 @@ class KLineActivity : AppCompatActivity() {
 
     private var code: String? = null
     private var name: String? = null
+    private var time: String? = null
 
     private var collected = false
 
@@ -64,6 +65,7 @@ class KLineActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
 
         code = intent.getStringExtra("code")
+        time = intent.getStringExtra("time")
         Log.i("libiao", "code: $code")
         val f = File(file_2023, code)
         if(f.exists()) {
@@ -79,7 +81,26 @@ class KLineActivity : AppCompatActivity() {
             val stream = FileInputStream(f)
             val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
             val lines = reader.readLines()
-            lines.forEachIndexed { index, s ->
+
+            var updateIndex = 0
+            time?.also {
+                lines.forEachIndexed{ index, line ->
+                    if(line.startsWith(it)) {
+                        updateIndex = index
+                        return@forEachIndexed
+                    }
+                }
+            }
+
+            var a = updateIndex - 20
+            if(a < 0) a = 0
+
+            var b = lines.size
+
+
+            val records = lines.subList(a, b)
+
+            records.forEachIndexed { index, s ->
                 val info = SharesRecordActivity.ShareInfo(s)
                 if(name == null) name = info.name
                 infos.add(info)
@@ -101,18 +122,21 @@ class KLineActivity : AppCompatActivity() {
                 values_10.add(Entry(index.toFloat(), line10.toFloat()))
                 values_20.add(Entry(index.toFloat(), line20.toFloat()))
 
-
                 val p = info.totalPrice.toFloat() / 100000000
                 values_liang_neng.add(BarEntry(index.toFloat(), p))
-                if(info.beginPrice > info.nowPrice) {
-                    colors_liang_neng.add(Color.GREEN)
-                } else if(info.beginPrice < info.nowPrice) {
-                    colors_liang_neng.add(Color.RED)
+                if(time != null && index == 20) {
+                    colors_liang_neng.add(Color.BLACK)
                 } else {
-                    if(info.range >= 0) {
+                    if(info.beginPrice > info.nowPrice) {
+                        colors_liang_neng.add(Color.GREEN)
+                    } else if(info.beginPrice < info.nowPrice) {
                         colors_liang_neng.add(Color.RED)
                     } else {
-                        colors_liang_neng.add(Color.GREEN)
+                        if(info.range >= 0) {
+                            colors_liang_neng.add(Color.RED)
+                        } else {
+                            colors_liang_neng.add(Color.GREEN)
+                        }
                     }
                 }
             }

@@ -180,7 +180,7 @@ class JiGouViewModel(initial: JiGouState): MavericksViewModel<JiGouState>(initia
                 return time.startsWith("2023-6") || time.startsWith("2023-06")
             }
             7 -> {
-                return time.startsWith("2022-7") || time.startsWith("2022-07")
+                return time.startsWith("2023-7") || time.startsWith("2023-07")
             }
             8 -> {
                 return time.startsWith("2022-8") || time.startsWith("2022-08")

@@ -23,4 +23,10 @@ interface TestShareDao {
 
     @Query("SELECT * FROM TestShareInfo WHERE ext5 = 3")
     fun getXinGao2Shares(): MutableList<TestShareInfo>
+
+    @Query("SELECT * FROM TestShareInfo WHERE ext5 = 7")
+    fun getMineTestShares(): MutableList<TestShareInfo>
+
+    @Query("SELECT * FROM TestShareInfo WHERE ext5 = 4")
+    fun getXindiShares(): MutableList<TestShareInfo>
 }

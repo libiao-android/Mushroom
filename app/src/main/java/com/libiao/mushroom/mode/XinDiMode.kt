@@ -48,6 +48,7 @@ class XinDiMode : BaseMode {
                     minPrices.add(Pair(one.minPrice, i))
                 }
             }
+            if (maxPrices.size == 0 || minPrices.size == 0) return
             maxPrices.sortByDescending { it.first }
             minPrices.sortBy { it.first }
             val minst  = minPrices[0]

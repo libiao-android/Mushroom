@@ -1,0 +1,237 @@
+package com.libiao.mushroom.mode
+
+import android.content.Context
+import android.os.Environment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.Target
+import com.libiao.mushroom.MushRoomApplication
+import com.libiao.mushroom.SharesRecordActivity
+import com.libiao.mushroom.room.*
+import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.room.report.ReportShareInfo
+import com.libiao.mushroom.thread.ThreadPoolUtil
+import com.libiao.mushroom.utils.Constant
+import com.libiao.mushroom.utils.FileUtil
+import com.libiao.mushroom.utils.LogUtil
+import com.libiao.mushroom.utils.LogUtil.i
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import kotlin.math.max
+import kotlin.math.min
+
+class MineTestMode : BaseMode {
+
+    companion object {
+        const val KEY = "MineTestMode"
+    }
+
+    constructor(): super() {
+    }
+    constructor(showTime: Boolean): super(showTime) {
+    }
+
+    private val poolMap = HashMap<String, MineShareInfo>()
+
+    init {
+        val mineShares = MineTestShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
+        mineShares?.forEach {
+            //LogUtil.i(TAG, "getMineShares: ${it.code}")
+            poolMap[it.code!!] = it
+        }
+        LogUtil.i(TAG, "init: ${poolMap.size}")
+    }
+
+    override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
+        val size = shares.size
+        mDeviationValue = day - 2
+        if(mDeviationValue >= 20) {
+            val zero = shares[mDeviationValue]
+            val one = shares[mDeviationValue + 1]
+            if(poolMap.contains(one.code)) {
+                i(TAG, "contains: ${one.code}")
+                val info = poolMap[one.code]
+                if(info?.updateTime == one.time) {
+                    i(TAG, "重复记录")
+                    return
+                }
+                if(one.nowPrice < one.line_20) {
+                    info?.also {
+                        if(it.delete) {
+                            i(TAG, "delete: ${one.code}")
+                            MineTestShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
+                            poolMap.remove(one.code)
+                            mFitModeList.add(Pair(one.range, one))
+                        } else {
+                            it.updateTime = one.time
+                            it.dayCount = it.dayCount + 1
+
+                            if(it.dayCount < 3) {
+                                if(one.maxPrice > it.maxPrice) {
+                                    it.maxPrice = one.maxPrice
+                                }
+                            } else {
+                                if(one.maxPrice > it.maxPrice * 1.01) {
+                                    it.maxPrice = one.maxPrice
+                                    if(it.label2 == null) {
+                                        it.label2 = "新高"
+                                        it.maxCount = 0
+                                    }
+                                    it.maxCount ++
+                                }
+                            }
+
+                            it.nowPrice = one.nowPrice
+                            it.delete = true
+                            if(one.minPrice <= it.duanCengPrice) {
+                                it.duanCeng = false
+                            }
+                            MineTestShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+                        }
+                        //reportXiaYinXian(one, it.time)
+                    }
+                } else {
+                    info?.also {
+                        if(info.updateTime == one.time) {
+                            i(TAG, "重复记录")
+                        } else {
+                            if(one.beginPrice > one.nowPrice && zero.nowPrice > zero.beginPrice && one.totalPrice > zero.totalPrice) {
+                                it.youXuan = false
+                            }
+                            i(TAG, "更新记录")
+                            it.updateTime = one.time
+                            it.dayCount = it.dayCount + 1
+                            if(one.totalPrice > it.label3!!.toDouble()) {
+                                it.label3 = one.totalPrice.toString()
+                                if(one.range > 0 && one.nowPrice > one.beginPrice && it.dayCount > 1 && zero.range < 3) {
+                                    val info = TestShareInfo()
+                                    info.code = one.code
+                                    info.time = one.time
+                                    info.name = one.name
+                                    info.updateTime = one.time
+                                    info.ext5 = "7"
+                                    info.dayCount = it.dayCount
+                                    TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
+                                }
+                            }
+                            if(it.dayCount < 3) {
+                                if(one.maxPrice > it.maxPrice) {
+                                    it.maxPrice = one.maxPrice
+                                }
+                            } else {
+                                if(one.maxPrice > it.maxPrice * 1.01) {
+                                    it.maxPrice = one.maxPrice
+                                    if(it.label2 == null) {
+                                        it.label2 = "新高"
+                                        it.maxCount = 0
+                                    }
+                                    it.maxCount ++
+                                }
+                            }
+                            it.nowPrice = one.nowPrice
+                            it.delete = false
+                            if(one.minPrice <= it.duanCengPrice) {
+                                it.duanCeng = false
+                            }
+                            MineTestShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+
+                            //reportXiaYinXian(one, it.time)
+
+
+                            if(one.totalPrice > zero.totalPrice
+                                && one.nowPrice > one.beginPrice
+                                && zero.nowPrice > zero.beginPrice
+                                && one.range > zero.range
+                            ) {
+                                val report = ReportShareInfo()
+                                report.code = one.code
+                                report.time = one.time
+                                report.name = one.name
+                                report.dayCount = it.dayCount
+                                //ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(report)
+                            }
+//                            if(!zhangTing(one) && one.totalPrice < 100000000) {
+//                                MineTestShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
+//                            } else {
+//
+//                            }
+                        }
+                    }
+                }
+            } else {
+                if(one.range >= 8 || zero.range + one.range > 8) {
+                    val info = MineShareInfo()
+                    info.time = one.time
+                    info.code = one.code
+                    info.name = one.name
+                    info.price = one.nowPrice
+                    info.nowPrice = one.nowPrice
+                    info.updateTime = one.time
+                    info.maxPrice = one.maxPrice
+                    info.youXuan = true
+                    info.duanCeng = false
+                    info.delete = false
+                    info.label3 = one.totalPrice.toString()
+                    if(one.minPrice > zero.maxPrice) {
+                        info.duanCeng = true
+                        info.duanCengPrice = zero.maxPrice
+                    }
+                    val id = MineTestShareDatabase.getInstance()?.getMineShareDao()?.insert(info)
+                    info.id = id?.toInt() ?: 0
+                    poolMap.put(one.code!!, info)
+                    i(TAG, "${one.brieflyInfo()}")
+                }
+            }
+        }
+    }
+
+    private fun reportXiaYinXian(one: SharesRecordActivity.ShareInfo, startTime: String?) {
+        val a = min(one.rangeBegin, one.range) - one.rangeMin
+        if(one.range < 5 && one.range > -5 && a > 2.5) {
+            val info = ReportShareInfo()
+            info.code = one.code
+            info.time = one.time
+            info.name = one.name
+            info.label1 = startTime
+            info.yinXianLength = a
+            ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
+            ThreadPoolUtil.execute {
+                //i("HomeActivity", "load 111")
+                val sourceFile = Glide.with(MushRoomApplication.sApplication)
+                    .load("https://image.sinajs.cn/newchart/min/n/${one.code}.gif")
+                    .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                    .get()
+                i(TAG, "load 222: ${sourceFile.path}")
+                val appDir = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/fenshi")
+                if(!appDir.exists()) {
+                    appDir.mkdirs()
+                }
+                val fileName = "${one.code}-${one.time}.jpg"
+                val destFile = File(appDir, fileName)
+                FileUtil.copy(sourceFile, destFile)
+            }
+        }
+    }
+
+    override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
+        val size = shares.size
+        mDeviationValue = size - Constant.PRE
+
+        analysis(mDeviationValue, shares)
+
+//        if(Constant.PRE == 0) {
+//            analysis(mDeviationValue, shares)
+//        } else {
+//            i(TAG, "只记录当天")
+//        }
+    }
+
+    override fun shouldAnalysis(context: Context): Boolean {
+        return true
+    }
+
+    override fun des(): String {
+        return "我的Test"
+    }
+}

@@ -174,6 +174,8 @@ class TestItemView @JvmOverloads constructor(
             test_item_more_info.text = info.moreInfo
         }
 
+        test_item_more_info2.text = "${info.lastShareInfo?.rangeBegin}, ${info.lastShareInfo?.rangeMin}, ${info.lastShareInfo?.rangeMax}, ${info.lastShareInfo?.range}"
+
         test_item_more_info.visibility = View.VISIBLE
         test_item_more_info.text = "${info.moreInfo}"
 
@@ -284,6 +286,9 @@ class TestItemView @JvmOverloads constructor(
             callback?.invoke(it)
         }
         test_item_code.setOnClickListener {
+            callback?.invoke(it)
+        }
+        test_item_name.setOnClickListener {
             callback?.invoke(it)
         }
     }

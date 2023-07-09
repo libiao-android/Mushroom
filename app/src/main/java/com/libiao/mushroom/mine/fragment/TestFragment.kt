@@ -6,27 +6,23 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.AdapterView
-import android.widget.Toast
 import com.airbnb.epoxy.TypedEpoxyController
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.UniqueOnly
 import com.airbnb.mvrx.fragmentViewModel
 import com.libiao.mushroom.R
 import com.libiao.mushroom.kline.KLineActivity
-import com.libiao.mushroom.mine.ICommand
-import com.libiao.mushroom.mine.MoreDialog
-import com.libiao.mushroom.mine.SelfSelectionActivity
+import com.libiao.mushroom.mine.*
 import com.libiao.mushroom.mine.tab.TestTab
 import com.libiao.mushroom.mine.test.TestState
 import com.libiao.mushroom.mine.test.TestViewModel
 import com.libiao.mushroom.mine.test.testItemView
-import com.libiao.mushroom.mine.timeItemView
 import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.test.TestShareDatabase2
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
-import kotlinx.android.synthetic.main.fang_liang_fragment.*
 import kotlinx.android.synthetic.main.test_fragment.*
+import kotlinx.android.synthetic.main.test_item_view.view.*
 import java.util.*
 
 class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, ICommand {
@@ -178,28 +174,19 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
             testViewModel.setLessPricechecked(isChecked)
         }
         cb_xin_gao_test.setOnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked) {
-                needTime = true
-                cb_fang_liang_test.isChecked = false
-                cb_xin_gao_2.isChecked = false
-                month1.visibility = View.VISIBLE
-                month2.visibility = View.VISIBLE
-                xin_gao2_sub_view.visibility = View.GONE
-            }
-            testViewModel.setXinGaoChecked(isChecked)
-            xin_gao_sub_view.visibility = if(isChecked) View.VISIBLE else View.GONE
+//            if(isChecked) {
+//                needTime = true
+//                cb_fang_liang_test.isChecked = false
+//                cb_xin_gao_2.isChecked = false
+//                month1.visibility = View.VISIBLE
+//                month2.visibility = View.VISIBLE
+//                xin_gao2_sub_view.visibility = View.GONE
+//            }
+            testViewModel.setAllChecked(isChecked)
+          //  xin_gao_sub_view.visibility = if(isChecked) View.VISIBLE else View.GONE
         }
         cb_fang_liang_test.setOnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked) {
-                needTime = true
-                cb_xin_gao_test.isChecked = false
-                cb_xin_gao_2.isChecked = false
-                month1.visibility = View.VISIBLE
-                month2.visibility = View.VISIBLE
-                xin_gao2_sub_view.visibility = View.GONE
-            }
             testViewModel.setFangLiangChecked(isChecked)
-            fang_liang_sub_view.visibility = if(isChecked) View.VISIBLE else View.GONE
         }
 
         cb_max_price.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -316,6 +303,9 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
                             when(id) {
                                 R.id.test_item_code -> {
                                     ClipboardUtil.clip(context!!, it.code)
+                                }
+                                R.id.test_item_name -> {
+                                    FenShiDialog(context!!, it.code!!, it.time).show()
                                 }
                                 else -> {
                                     val intent = Intent(context, KLineActivity::class.java)

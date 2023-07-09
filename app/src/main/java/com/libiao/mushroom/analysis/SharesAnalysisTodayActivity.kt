@@ -195,6 +195,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(XinGao2Mode())
         mModeList.add(XinDiMode())
 
+        mModeList.add(MineTestMode())
+
         mModeList.add(FanBaoMode())
 
         mModeList.add(MayFanBaoMode())
@@ -326,7 +328,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
             val lines = reader.readLines()
             //Log.i("libiao", "$lines")
             val shares = ArrayList<SharesRecordActivity.ShareInfo>()
-            var begin = lines.size - 365
+            var begin = lines.size - 200
             if(begin < 0) begin = 0
 
             for(i in begin until lines.size) {
@@ -484,6 +486,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
                 val intent = Intent(context, KLineActivity::class.java)
                 intent.putExtra("code", itemInfo?.code)
                 intent.putExtra("info", "${itemInfo?.time}  ${itemInfo?.code}  ${itemInfo?.name}")
+                intent.putExtra("time", "${itemInfo?.time}")
                 context.startActivity(intent)
             }
 

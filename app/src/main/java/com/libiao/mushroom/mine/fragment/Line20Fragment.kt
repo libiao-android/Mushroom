@@ -458,6 +458,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     var itemIn = 0
                     var maxLiang = 0.00
                     var maxLiangIndex = -9
+                    val maxList = arrayListOf<Int>()
+                    var threePre = false
                     if(it.candleEntryList == null || reload) {
                         var begin = lines.size - it.dayCount - 2
                         if(begin < 0) begin = 0
@@ -490,6 +492,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         it.youOne = false
                         it.youThree = true
                         var maxIndex = 0
+
+                        var youOneIndex = 0
+
+                        var lastMaxIndex = -1
+
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
@@ -577,14 +584,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
 
                             if(tempItem == null) {
-                                tempItem = item
+
                             } else {
                                 if(greenLittle) {
                                     if(item.beginPrice > item.nowPrice && tempItem!!.nowPrice >= tempItem!!.beginPrice && item.totalPrice > tempItem!!.totalPrice * 1.1) {
                                         greenLittle = false
                                     }
                                 }
-                                tempItem = item
+
                             }
 
                             if(item.totalPrice > totalP) {
@@ -618,12 +625,29 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             val green = "#28FF28"
                             val red = "#FF0000"
 
-                            if(item.totalPrice == maxLiang && item.nowPrice > item.beginPrice && index > 1) {
-                                colorEntrys.add(Color.GRAY)
-                                maxIndex++
-                                if(maxIndex >= 2) {
-                                    it.youOne = true
+                            if(item.totalPrice == maxLiang && item.nowPrice > item.beginPrice && index > 2) {
+
+                                if(index - lastMaxIndex == 1) {
+                                    //it.youOne = true
                                 }
+                                lastMaxIndex = index
+
+                                if(tempItem!!.range < 3 && item.totalPrice > 150000000) {
+                                    it.youOne = true
+                                    youOneIndex = index
+                                    colorEntrys.add(Color.BLACK)
+                                } else {
+                                    colorEntrys.add(Color.GRAY)
+                                }
+
+                                maxList.add(index)
+                                if(index == records.size - 3) {
+                                    threePre = true
+                                }
+                                maxIndex++
+//                                if(maxIndex >= 2) {
+//                                    it.youOne = true
+//                                }
                                 maxLiangIndex = index
                             } else {
                                 if(item.beginPrice > item.nowPrice) {
@@ -647,6 +671,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                                    }
 //                                }
 //                            }
+                            tempItem = item
                         }
                         it.yangYin = yang.toDouble() / (yang + yin)
                         val tMaxItem = SharesRecordActivity.ShareInfo(records[itemIn])
@@ -677,7 +702,10 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             it.label2 = "新高"
                             it.maxCount = xinGaoCount
                         }
-
+                        it.youTwo = false
+                        if(youOneIndex == (records.size - 1) && it.youOne) {
+                            it.youTwo = true
+                        }
 
                     }
                     it.price = one.nowPrice
@@ -700,7 +728,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                        it.youThree = true
 //                    }
 
-
+                    //it.youTwo = false
 
                     if(it.dayCount >= 4) {
 
@@ -718,6 +746,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         tM = Math.max(tM, ten3.totalPrice)
                         tM = Math.max(tM, ten2.totalPrice)
                         tM = Math.max(tM, ten1.totalPrice)
+
+
+
+//                        if (threePre) {
+//                            if(ten2.totalPrice < ten3.totalPrice && ten1.totalPrice < ten2.totalPrice) {
+//                                it.youTwo = true
+//                            }
+//                        }
 
 //                        if(ten1.range < 0 && ten2.range < 0 && ten1.totalPrice < ten2.totalPrice && ten1.maxPrice < ten2.maxPrice && tM > maxLiang * 0.75
 //                        ) {
@@ -853,12 +889,12 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 it.yinXianLength = 0.00
             }
 
-            it.youTwo = false
-            if(share.line_20 > 0.00) {
-                if(share.beginPrice < share.line_20 && share.nowPrice > share.line_20) {
-                    it.youTwo = true
-                }
-            }
+            //it.youTwo = false
+//            if(share.line_20 > 0.00) {
+//                if(share.beginPrice < share.line_20 && share.nowPrice > share.line_20) {
+//                    it.youTwo = true
+//                }
+//            }
 
             it.totalRange = (share.nowPrice - it.price) / it.price * 100
             it.todayRange = share.range

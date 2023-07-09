@@ -15,15 +15,17 @@
             android:id="@+id/cb_xin_gao_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="新高"/>
+            android:text="全部"/>
         <CheckBox
+            android:visibility="visible"
             android:textSize="13dp"
             android:id="@+id/cb_fang_liang_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="放量"/>
+            android:text="更强"/>
 
         <CheckBox
+            android:visibility="gone"
             android:textSize="13dp"
             android:id="@+id/cb_120"
             android:layout_width="wrap_content"
@@ -37,12 +39,14 @@
             android:layout_height="wrap_content"
             android:text="新高2"/>
         <CheckBox
+            android:visibility="visible"
             android:textSize="13dp"
             android:id="@+id/cb_xin_di"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="新低"/>
         <CheckBox
+            android:visibility="gone"
             android:textSize="13dp"
             android:id="@+id/cb_wen_liang"
             android:layout_width="wrap_content"
