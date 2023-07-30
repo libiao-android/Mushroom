@@ -303,6 +303,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                                 if(itemBlack!!.rangeMax - itemBlack!!.range < itemBlack!!.range) {
                                     if(!ShareParseUtil.zhangTing(itemBlack!!) && !ShareParseUtil.zhangTingMax(itemBlack!!) && itemBlack!!.rangeMax > 7) {
+                                        if(!zhuanChencked && !kuiChecked) {
+                                            dataT.add(it)
+                                        }
                                         if(itemBlackPost != null) {
                                             LogUtil.i(TAG, "${itemBlackPost!!.code}, ${itemBlackPost!!.range}")
                                             totalRange += itemBlackPost!!.range
