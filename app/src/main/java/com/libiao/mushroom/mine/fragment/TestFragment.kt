@@ -22,7 +22,6 @@ import com.libiao.mushroom.room.test.TestShareDatabase2
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
 import kotlinx.android.synthetic.main.test_fragment.*
-import kotlinx.android.synthetic.main.test_item_view.view.*
 import java.util.*
 
 class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, ICommand {
@@ -107,63 +106,87 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
 
         one_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(1)
+            testViewModel.fetchInfo(1) {
+                more_info.text = it
+            }
             tv_month.text = "1"
         }
         two_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(2)
+            testViewModel.fetchInfo(2) {
+                more_info.text = it
+            }
             tv_month.text = "2"
         }
         three_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(3)
+            testViewModel.fetchInfo(3) {
+                more_info.text = it
+            }
             tv_month.text = "3"
         }
         four_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(4)
+            testViewModel.fetchInfo(4) {
+                more_info.text = it
+            }
             tv_month.text = "4"
         }
         five_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(5)
+            testViewModel.fetchInfo(5) {
+                more_info.text = it
+            }
             tv_month.text = "5"
         }
         six_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(6)
+            testViewModel.fetchInfo(6) {
+                more_info.text = it
+            }
             tv_month.text = "6"
         }
         seven_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(7)
+            testViewModel.fetchInfo(7) {
+                more_info.text = it
+            }
             tv_month.text = "7"
         }
         eight_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(8)
+            testViewModel.fetchInfo(8) {
+                more_info.text = it
+            }
             tv_month.text = "8"
         }
         nine_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(9)
+            testViewModel.fetchInfo(9) {
+                more_info.text = it
+            }
             tv_month.text = "9"
         }
         ten_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(10)
+            testViewModel.fetchInfo(10) {
+                more_info.text = it
+            }
             tv_month.text = "10"
         }
 
         eleven_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(11)
+            testViewModel.fetchInfo(11) {
+                more_info.text = it
+            }
             tv_month.text = "11"
         }
         twelve_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(12)
+            testViewModel.fetchInfo(12) {
+                more_info.text = it
+            }
             tv_month.text = "12"
         }
 
@@ -185,8 +208,12 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
             testViewModel.setAllChecked(isChecked)
           //  xin_gao_sub_view.visibility = if(isChecked) View.VISIBLE else View.GONE
         }
-        cb_fang_liang_test.setOnCheckedChangeListener { buttonView, isChecked ->
-            testViewModel.setFangLiangChecked(isChecked)
+        cb_zhuan.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setZhuanCheck(isChecked)
+        }
+
+        cb_kui.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setKuiCheck(isChecked)
         }
 
         cb_max_price.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -204,7 +231,7 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
             testViewModel.setXinGao2Checked(isChecked)
             if(isChecked) {
                 cb_xin_gao_test.isChecked = false
-                cb_fang_liang_test.isChecked = false
+                cb_zhuan.isChecked = false
                 month1.visibility = View.GONE
                 month2.visibility = View.GONE
                 xin_gao2_sub_view.visibility = View.VISIBLE
@@ -242,7 +269,9 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
 
         }
         load.setOnClickListener {
-            testViewModel.fetchInfo(1)
+            testViewModel.fetchInfo(1){
+
+            }
         }
 
         gao2_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {

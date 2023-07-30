@@ -153,7 +153,6 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
         mModeList.add(TestMode2())
         mModeList.add(FiveRedMode())
-        mModeList.add(MoreMoreMode())
 
 
         //mModeList.add(ChuangYeBanTouJiMode())
@@ -189,18 +188,24 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(MineMode())
 
 
-        mModeList.add(TestMode())
-        mModeList.add(XinGaoMode())
-        mModeList.add(XinLiangMode())
+
         mModeList.add(XinGao2Mode())
         mModeList.add(XinDiMode())
+        mModeList.add(MineTest2Mode())
 
-        mModeList.add(MineTestMode())
+        // mModeList.add(LianBanChuang2TestMode())
+        // mModeList.add(MoreMoreMode())
 
-        mModeList.add(FanBaoMode())
 
-        mModeList.add(MayFanBaoMode())
-        mModeList.add(FanBaoAgainMode())
+
+        //mModeList.add(TestMode())
+        //mModeList.add(XinGaoMode())
+        // mModeList.add(XinLiangMode())
+       // mModeList.add(MineTestMode())
+       // mModeList.add(FanBaoMode())
+       // mModeList.add(MayFanBaoMode())
+       // mModeList.add(FanBaoAgainMode())
+        //mModeList.add(LianBan2TestMode())
 
 
 

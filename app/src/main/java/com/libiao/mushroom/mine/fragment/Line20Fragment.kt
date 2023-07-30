@@ -28,8 +28,8 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
 import com.libiao.mushroom.mine.tab.Line20Tab
-import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.MineShareInfo
+import com.libiao.mushroom.room.MineTest2ShareDatabase
 import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
@@ -166,7 +166,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun initData() {
-        val data = MineShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
+        val data = MineTest2ShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
         data?.also {
             mData = it
             mTempData = it
@@ -633,7 +633,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                 lastMaxIndex = index
 
                                 if(tempItem!!.range < 3 && item.totalPrice > 150000000) {
-                                    it.youOne = true
+                                    //it.youOne = true
                                     youOneIndex = index
                                     colorEntrys.add(Color.BLACK)
                                 } else {
@@ -880,6 +880,23 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         sharePre: SharesRecordActivity.ShareInfo
     ) {
         if(it.price > 0) {
+
+            it.youOne = false
+
+            if(it.dayCount >= 2
+                && share.totalPrice >= it.label3!!.toDouble() * 0.95
+                && share.rangeMax > 7
+                && share.totalPrice > sharePre.totalPrice * 1.8 * 0.95
+                && !ShareParseUtil.zhangTing(share)
+                && !ShareParseUtil.zhangTingMax(share)
+                && share.range > 0
+                && share.nowPrice > share.beginPrice
+                && sharePre.range < 5
+            ) {
+                it.youOne = true
+            }
+
+
             val a = min(share.rangeBegin, share.range) - share.rangeMin
             val b = share.rangeMax - max(share.rangeBegin, share.range)
 
@@ -911,7 +928,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             if(sharePre.totalPrice > 0) {
                 liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
             }
-            it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}"
+            it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}, ${String.format("%.2f",it.label3!!.toDouble() / 100000000)}亿"
         }
     }
 
@@ -1042,7 +1059,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     when(it.id) {
                         R.id.btn_dialog_delete -> {
                             mineShareInfo?.code?.also {
-                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(it)
+                                MineTest2ShareDatabase.getInstance()?.getMineShareDao()?.delete(it)
                                 deleteItem(mineShareInfo)
                             }
                         }
@@ -1083,7 +1100,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 heart = !heart
                 mineShareInfo?.heart = heart
                 mineShareInfo?.also {
-                    MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+                    MineTest2ShareDatabase.getInstance()?.getMineShareDao()?.update(it)
                 }
                 if(heart) {
                     heartIv?.setImageResource(R.mipmap.heart_selected)

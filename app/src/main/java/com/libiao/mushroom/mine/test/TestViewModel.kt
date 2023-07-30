@@ -2,6 +2,8 @@ package com.libiao.mushroom.mine.test
 
 import android.graphics.Color
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
@@ -31,6 +33,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     private val file_2023 = File(Environment.getExternalStorageDirectory(), "A_SharesInfo/2023")
 
     var localList = mutableListOf<TestShareInfo>()
+    val handler = Handler(Looper.getMainLooper())
 
     var isMorePrice = false
     var isLessPrice = false
@@ -61,15 +64,22 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
     val day1 = 60
 
-    fun fetchInfo(month: Int) {
+    var twoLianBan = false
+
+    var kuiChecked = false
+    var zhuanChencked = false
+
+    fun fetchInfo(month: Int, result: (info: String)->Unit) {
 
         withState {
 
             if(month == 6) {
-               // TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("5")
+               //TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("8")
             }
             val data: MutableList<TestShareInfo>?
-            if(xinDi) {
+            if (twoLianBan) {
+                data = TestShareDatabase.getInstance()?.getTestShareDao()?.getTwoLianBanShares()
+            } else if(xinDi) {
                 data = TestShareDatabase.getInstance()?.getTestShareDao()?.getXindiShares()
             } else {
                 data = TestShareDatabase.getInstance()?.getTestShareDao()?.getMineTestShares()
@@ -77,7 +87,14 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<TestShareInfo>()
-
+            var totalRange = 0.00
+            var totalRangeZhuan = 0.00
+            var totalRangeKui = 0.00
+            var zhuan = 0
+            var kui = 0
+            var fanbao = 0
+            var fanBaokui = 0.00
+            var fanBaozhuan = 0.00
             data?.forEach {
                 if(it.dayCount >= 0 && isFit(month, it.time!!)) {
                     val f = File(file_2023, it.code)
@@ -199,9 +216,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 if(index == blackIndex) {
                                     colorEntrys.add(Color.BLACK)
                                     itemBlack = item
-                                } else if(!all && index == blackIndex + 1){
+                                } else if(!twoLianBan && !all && index == blackIndex + 1){
                                     colorEntrys.add(Color.BLACK)
-                                } else if(index > 1 && item.totalPrice > maxLiang && item.nowPrice > item.beginPrice){
+                                } else if(index > 1 && item.totalPrice > maxLiang && item.nowPrice > item.beginPrice && !twoLianBan){
                                     colorEntrys.add(Color.GRAY)
                                 } else {
                                     val green = "#28FF28"
@@ -251,6 +268,23 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             it.values_10 = values_10
                             it.values_20 = values_20
 
+                            if(twoLianBan) {
+                                if(itemBlack?.code?.startsWith("sh688") != true) {
+                                    if(itemBlack!!.totalPrice > itemBlackPre!!.totalPrice) {
+                                        if(itemBlackPost != null && itemBlackPost2 != null) {
+                                            val r = itemBlackPost!!.range - itemBlackPost!!.rangeBegin + itemBlackPost2!!.range
+                                            if(r > 0) {
+                                                zhuan ++
+                                            } else {
+                                                kui++
+                                            }
+                                            totalRange += r
+                                        }
+                                        dataT.add(it)
+                                    }
+                                }
+                                return@forEach
+                            }
 
                             if(xinDi) {
                                 val aa = "${itemBlack!!.range}, ${huanSuanYi(itemBlack!!.totalPrice)}"
@@ -264,30 +298,54 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 return@forEach
                             }
 
-
-
-
                             if(all) {
                                 it.moreInfo = "${itemBlack?.range}, ${huanSuanYi(itemBlack?.totalPrice ?: 0.00)}"
-                                dataT.add(it)
-                            } else {
-                                if(itemBlackPost != null && itemBlackPost!!.totalPrice > itemBlack!!.totalPrice * 0.96 && itemBlackPost!!.nowPrice > itemBlackPost!!.beginPrice) {
-                                    it.moreInfo = "${itemBlack?.range}, ${huanSuanYi(itemBlack?.totalPrice ?: 0.00)}, ${itemBlackPost?.range}, ${huanSuanYi(itemBlackPost?.totalPrice ?: 0.00)}"
-                                    if(gengQiang) {
-                                        if(itemBlackPost!!.range > itemBlack!!.range) {
-                                            dataT.add(it)
-                                        }
-                                    } else {
-                                        dataT.add(it)
-                                    }
 
+                                if(itemBlack!!.rangeMax - itemBlack!!.range < itemBlack!!.range) {
+                                    if(!ShareParseUtil.zhangTing(itemBlack!!) && !ShareParseUtil.zhangTingMax(itemBlack!!) && itemBlack!!.rangeMax > 7) {
+                                        if(itemBlackPost != null) {
+                                            LogUtil.i(TAG, "${itemBlackPost!!.code}, ${itemBlackPost!!.range}")
+                                            totalRange += itemBlackPost!!.range
+                                            it.moreInfo += " / ${itemBlackPost?.range}, ${itemBlackPost?.rangeMax}"
+                                            if(itemBlackPost!!.range > 0) {
+                                                if(zhuanChencked) {
+                                                    dataT.add(it)
+                                                }
+                                                zhuan++
+                                                totalRangeZhuan += itemBlackPost!!.range
+                                            } else {
+                                                kui++
+                                                if(kuiChecked) {
+                                                    dataT.add(it)
+                                                }
+                                                totalRangeKui += itemBlackPost!!.range
+                                                if(itemBlackPost2 != null) {
+                                                    if(itemBlackPost2!!.range > 0) {
+                                                        fanbao ++
+                                                        fanBaozhuan += itemBlackPost2!!.range
+                                                    } else {
+                                                        fanBaokui += itemBlackPost2!!.range
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+
+
+                            } else {
+                                dataT.add(it)
                             }
                         }
                     }
                 }
 
             }
+            handler.post {
+                result("赚${zhuan}, 亏${kui}, 赚${baoLiuXiaoShu(totalRangeZhuan)}, 亏${baoLiuXiaoShu(totalRangeKui)}, 总${baoLiuXiaoShu(totalRange)}," +
+                        "\n反包${fanbao}, ${baoLiuXiaoShu(fanBaozhuan)}, ${baoLiuXiaoShu(fanBaokui)}")
+            }
+            LogUtil.i(TAG, "totalRange: $totalRange")
             dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
 
             oneDayCount(dataT)
@@ -511,8 +569,11 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         all = checked
     }
 
-    fun setFangLiangChecked(checked: Boolean) {
-        gengQiang = checked
+    fun setZhuanCheck(checked: Boolean) {
+        zhuanChencked = checked
+    }
+    fun setKuiCheck(checked: Boolean) {
+        kuiChecked = checked
     }
 
     fun setMaxPriceChecked(checked: Boolean) {

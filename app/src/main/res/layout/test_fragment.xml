@@ -19,10 +19,17 @@
         <CheckBox
             android:visibility="visible"
             android:textSize="13dp"
-            android:id="@+id/cb_fang_liang_test"
+            android:id="@+id/cb_zhuan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="更强"/>
+            android:text="赚"/>
+        <CheckBox
+            android:visibility="visible"
+            android:textSize="13dp"
+            android:id="@+id/cb_kui"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="亏"/>
 
         <CheckBox
             android:visibility="gone"
@@ -265,6 +272,11 @@
             android:layout_width="55dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/more_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
     <com.airbnb.epoxy.EpoxyRecyclerView
         android:layout_marginTop="5dp"

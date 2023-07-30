@@ -118,19 +118,23 @@ abstract class BaseMode {
         return code?.startsWith("sz3") ?: false
     }
 
+    fun isKeChuang(code: String?): Boolean {
+        return code?.startsWith("sh688") ?: false
+    }
+
     fun zhangTing(info: SharesRecordActivity.ShareInfo): Boolean {
         var maxRange = 1.1
-        if(info.code?.startsWith("sz3") == true) {
+        if(info.code?.startsWith("sz3") == true || info.code?.startsWith("sh688") == true) {
             maxRange = 1.2
         }
-        var zhangTingPrice = info.yesterdayPrice * maxRange - 0.05
+        var zhangTingPrice = info.yesterdayPrice * maxRange - 0.005
         zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
         return info.nowPrice > 0 && info.nowPrice >= zhangTingPrice && zhangTingPrice > 0 && info.range > 9
     }
 
     fun dieTing(info: SharesRecordActivity.ShareInfo): Boolean {
         var maxRange = 0.9
-        if(info.code?.startsWith("sz3") == true) {
+        if(info.code?.startsWith("sz3") == true || info.code?.startsWith("sh688") == true) {
             maxRange = 0.8
         }
         var dieTing = info.yesterdayPrice * maxRange + 0.005

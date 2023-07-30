@@ -378,7 +378,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         i(TAG, "deleteTuiShiData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20230101&end=20230325")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20230101&end=20230722")
             .build()
 
         val call = client.newCall(request)
@@ -419,7 +419,7 @@ class UpdateStockPoolActivity : AppCompatActivity() {
         //i(TAG, "getHistoryData: $code, $name")
         //https://q.stock.sohu.com/hisHq?code=cn_601012&start=20210601&end=20210625
         val request = Request.Builder()
-            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20210601&end=20230325")
+            .url("https://q.stock.sohu.com/hisHq?code=cn_${code.substring(2)}&start=20230101&end=20230722")
             .build()
 
         val call = client.newCall(request)

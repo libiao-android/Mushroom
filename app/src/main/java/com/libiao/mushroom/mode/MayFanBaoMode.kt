@@ -53,7 +53,7 @@ class MayFanBaoMode : BaseMode {
     }
 
     override fun shouldAnalysis(context: Context): Boolean {
-        return true
+        return false
     }
 
     override fun des(): String {

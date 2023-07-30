@@ -13,183 +13,48 @@ class MoreMoreMode : BaseMode() {
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = size - 7 - Constant.PRE
+        mDeviationValue = size - 12 - Constant.PRE
 
-        if(mDeviationValue >  0) {
-            val zero = shares[mDeviationValue - 1]
+        if(mDeviationValue >= 10) {
             val one = shares[mDeviationValue + 0]
+            if (!isChuang(one.code) && !isKeChuang(one.code)) return
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
             val four = shares[mDeviationValue + 3]
             val five = shares[mDeviationValue + 4]
             val six = shares[mDeviationValue + 5]
             val seven = shares[mDeviationValue + 6]
-            var a = 0
-            val list = ArrayList<SharesRecordActivity.ShareInfo>()
+            val eight = shares[mDeviationValue + 7]
+            val nine = shares[mDeviationValue + 8]
+            val ten = shares[mDeviationValue + 9]
+            val ten1 = shares[mDeviationValue + 10]
+            val ten2 = shares[mDeviationValue + 11]
 
-            list.add(one)
-            list.add(two)
-            list.add(three)
-            list.add(four)
-            list.add(five)
-            list.add(six)
-            list.add(seven)
+            var maxTemp = one.totalPrice
+            if(two.totalPrice > maxTemp) maxTemp = two.totalPrice
+            if(three.totalPrice > maxTemp) maxTemp = three.totalPrice
+            if(four.totalPrice > maxTemp) maxTemp = four.totalPrice
+            if(five.totalPrice > maxTemp) maxTemp = five.totalPrice
+            if(six.totalPrice > maxTemp) maxTemp = six.totalPrice
+            if(seven.totalPrice > maxTemp) maxTemp = seven.totalPrice
+            if(eight.totalPrice > maxTemp) maxTemp = eight.totalPrice
 
-            val indexList = ArrayList<Int>()
-            val pList = ArrayList<Double>()
+            val a = nine.totalPrice > maxTemp
+            val b = nine.totalPrice > eight.totalPrice * 2
+            val c = nine.range > 0 && nine.nowPrice >= nine.beginPrice && nine.rangeMax > 7
+            val d = ten.totalPrice > nine.totalPrice
+            val e = ten.range > 0 && ten.nowPrice >= ten.beginPrice
+            val f = ten.maxPrice > nine.maxPrice
 
-            if(yang(seven)) {
-                indexList.add(7)
-                pList.add(seven.totalPrice)
-            } else {
-                return
-            }
-            if(yang(six)) {
-                indexList.add(6)
-                pList.add(six.totalPrice)
-            }
-            if(yang(five)) {
-                indexList.add(5)
-                pList.add(five.totalPrice)
-            }
-            if(pList.size == 3) return
-
-            if(yang(four)) {
-                indexList.add(4)
-                pList.add(four.totalPrice)
-
-                if(pList.size == 3) {
-                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
-                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
-                    val m = four.totalPrice > three.totalPrice
-                    val n = four.totalPrice > five.totalPrice
-
-                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
-                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
-                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
-                    val z = q > w && w > e
-
-                    if(x && y && m && n && z) {
-                        i(TAG, "${four.brieflyInfo()}")
-                        mFitModeList.add(Pair(seven.range, seven))
-                        record(four)
-                    }
-                    return
-                }
-            }
+            val g = ten.rangeMax - ten.range < ten.range
 
 
 
-            if(yang(three)) {
-                indexList.add(3)
-                pList.add(three.totalPrice)
+            if(a && b && c && d && e && f && g) {
+                i(TAG, "${ten.brieflyInfo()}")
+                ten.post1 = (ten1.range - ten1.rangeBegin + ten2.range).toString()
+                mFitModeList.add(Pair(ten.range + nine.range, ten))
 
-                if(pList.size == 3) {
-
-                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
-                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
-                    val m = three.totalPrice > two.totalPrice
-
-                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
-                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
-                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
-                    val z = q > w && w > e
-
-                    if(x && y && m && z) {
-                        var yangT = three
-                        for(i in 4 .. 7) {
-                            val t = list[i-1]
-                            if(yang(t)) {
-                                yangT = t
-                            } else {
-                                if(t.totalPrice > yangT.totalPrice) {
-                                    return
-                                }
-                            }
-                        }
-                        i(TAG, "${three.brieflyInfo()}")
-                        mFitModeList.add(Pair(seven.range, seven))
-                        record(three)
-                    }
-                    return
-                }
-            }
-
-
-
-            if(yang(two)) {
-                indexList.add(2)
-                pList.add(two.totalPrice)
-
-                if(pList.size == 3) {
-
-                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
-                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
-                    val m = two.totalPrice > one.totalPrice
-
-                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
-                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
-                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
-                    val z = q > w && w > e
-
-                    if(x && y && m && z) {
-                        var yangT = two
-                        for(i in 3 .. 7) {
-                            val t = list[i-1]
-                            if(yang(t)) {
-                                yangT = t
-                            } else {
-                                if(t.totalPrice > yangT.totalPrice) {
-                                    return
-                                }
-                            }
-                        }
-                        i(TAG, "${two.brieflyInfo()}")
-                        mFitModeList.add(Pair(seven.range, seven))
-                        record(two)
-                    }
-
-
-                    return
-                }
-            }
-
-
-
-            if(yang(one)) {
-                indexList.add(1)
-                pList.add(one.totalPrice)
-
-                if(pList.size == 3) {
-
-                    val x = indexList[0] - indexList[1] > 1 && indexList[1] - indexList[2] > 1
-                    val y = pList[0] > pList[1] * 1.1 && pList[1] > pList[2] * 1.1
-                    val m = one.totalPrice > zero.totalPrice
-
-                    val q = (list[indexList[0]-1].beginPrice + list[indexList[0]-1].nowPrice) / 2
-                    val w = (list[indexList[1]-1].beginPrice + list[indexList[1]-1].nowPrice) / 2
-                    val e = (list[indexList[2]-1].beginPrice + list[indexList[2]-1].nowPrice) / 2
-                    val z = q > w && w > e
-
-                    if(x && y && m && z) {
-                        var yangT = one
-                        for(i in 2 .. 7) {
-                            val t = list[i-1]
-                            if(yang(t)) {
-                                yangT = t
-                            } else {
-                                if(t.totalPrice > yangT.totalPrice) {
-                                    return
-                                }
-                            }
-                        }
-                        i(TAG, "${one.brieflyInfo()}")
-                        mFitModeList.add(Pair(seven.range, seven))
-                        record(one)
-                    }
-
-                    return
-                }
             }
         }
     }
@@ -209,7 +74,7 @@ class MoreMoreMode : BaseMode() {
     }
 
     override fun shouldAnalysis(context: Context): Boolean {
-        return false
+        return true
     }
 
     override fun des(): String {
