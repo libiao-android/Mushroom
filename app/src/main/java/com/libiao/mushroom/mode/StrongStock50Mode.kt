@@ -51,10 +51,16 @@ class StrongStock50Mode : BaseMode {
                     if(info.updateTime == day6.time) {
                         i(TAG, "重复记录")
                     } else {
-                        i(TAG, "更新记录")
-                        it.updateTime = day6.time
-                        it.dayCount = it.dayCount + 1
-                        Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.update(it)
+
+
+                        if(it.dayCount > 100) {
+                            Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.delete(it.code!!)
+                        } else {
+                            i(TAG, "更新记录")
+                            it.updateTime = day6.time
+                            it.dayCount = it.dayCount + 1
+                            Up50ShareDatabase.getInstance()?.getUp50ShareDao()?.update(it)
+                        }
                     }
                 }
                 return

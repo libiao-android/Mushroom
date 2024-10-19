@@ -18,7 +18,7 @@ class MineShareInfo {
     var time: String? = null
     var code: String? = null
     var name: String? = null
-    var price: Double = 0.00
+    var price: Double = 0.00 // minPrice
     var nowPrice: Double = 0.00
     var dayCount: Int = 0
     var updateTime: String? = null

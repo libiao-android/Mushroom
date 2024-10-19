@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/self_item_name"/>
         <TextView
-            android:textSize="15dp"
+            android:textSize="12dp"
             android:gravity="center"
             android:layout_weight="1.6"
             android:layout_width="0dp"

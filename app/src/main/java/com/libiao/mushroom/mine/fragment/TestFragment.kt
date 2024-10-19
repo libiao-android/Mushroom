@@ -240,9 +240,11 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
         cb_xin_di.setOnCheckedChangeListener { buttonView, isChecked ->
             testViewModel.setXindi(isChecked)
         }
-        cb_wen_liang.setOnCheckedChangeListener { buttonView, isChecked ->
-            testViewModel.setWenLiang(isChecked)
+        cb_da_zhang.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setDaZhang(isChecked)
         }
+
+        cb_da_zhang.isChecked = true
 
 //        cb_fang_liang_test.isChecked = true
 //        cb_more_price.isChecked = true
@@ -340,6 +342,7 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
                                     val intent = Intent(context, KLineActivity::class.java)
                                     intent.putExtra("code", it.code)
                                     intent.putExtra("info", it.toString())
+                                    intent.putExtra("time", it.time)
                                     context?.startActivity(intent)
                                 }
                             }

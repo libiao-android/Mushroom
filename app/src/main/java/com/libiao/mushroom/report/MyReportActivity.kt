@@ -13,8 +13,10 @@ import com.libiao.mushroom.mine.FenShiDialog
 import com.libiao.mushroom.mine.MoreDialog
 import com.libiao.mushroom.mine.timeItemView
 import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
+import com.libiao.mushroom.utils.baoLiuXiaoShu
 import kotlinx.android.synthetic.main.report_activity.*
 import java.util.*
 
@@ -40,8 +42,11 @@ class MyReportActivity: BaseActivity(), MavericksView {
         }
         reportViewModel.setConditionOne(cb_three_yang.isChecked)
 
-        cb_fanbao_again.setOnCheckedChangeListener { buttonView, isChecked ->
-            reportViewModel.setFanbaoAgain(isChecked)
+        cb_fang_liang.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setFangLiang(isChecked)
+        }
+        cb_xin_gao.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setXinGaoChecked(isChecked)
         }
 
         cb_three_yang.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -56,54 +61,102 @@ class MyReportActivity: BaseActivity(), MavericksView {
             controller.setData(it)
         }
         seven_test.setOnClickListener {
-            reportViewModel.fetchInfo(7)
+            reportViewModel.fetchInfo(7) {
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "7"
         }
         eight_test.setOnClickListener {
-            reportViewModel.fetchInfo(8)
+            reportViewModel.fetchInfo(8) {
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "8"
         }
 
         nine_test.setOnClickListener {
-            reportViewModel.fetchInfo(9)
+            reportViewModel.fetchInfo(9){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "9"
         }
         ten_test.setOnClickListener {
-            reportViewModel.fetchInfo(10)
+            reportViewModel.fetchInfo(10){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "10"
         }
         eleven_test.setOnClickListener {
-            reportViewModel.fetchInfo(11)
+            reportViewModel.fetchInfo(11){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "11"
         }
         twelve_test.setOnClickListener {
-            reportViewModel.fetchInfo(12)
+            reportViewModel.fetchInfo(12){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "12"
         }
 
         one_test.setOnClickListener {
-            reportViewModel.fetchInfo(1)
+            reportViewModel.fetchInfo(1){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "1"
         }
 
         two_test.setOnClickListener {
-            reportViewModel.fetchInfo(2)
+            reportViewModel.fetchInfo(2){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "2"
         }
         three_test.setOnClickListener {
-            reportViewModel.fetchInfo(3)
+            reportViewModel.fetchInfo(3){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "3"
         }
         four_test.setOnClickListener {
-            reportViewModel.fetchInfo(4)
+            reportViewModel.fetchInfo(4){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "4"
         }
         five_test.setOnClickListener {
-            reportViewModel.fetchInfo(5)
+            reportViewModel.fetchInfo(5){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "5"
         }
         six_test.setOnClickListener {
-            reportViewModel.fetchInfo(6)
+            reportViewModel.fetchInfo(6){
+                ThreadPoolUtil.executeUI {
+                    tv_total_range.text = baoLiuXiaoShu(it)
+                }
+            }
             tv_month.text = "6"
         }
     }
@@ -154,6 +207,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
                                     val intent = Intent(this@MyReportActivity, KLineActivity::class.java)
                                     intent.putExtra("code", it.code)
                                     intent.putExtra("info", it.toString())
+                                    intent.putExtra("time", it.time)
                                     this@MyReportActivity.startActivity(intent)
                                 }
                             }

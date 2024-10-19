@@ -26,6 +26,8 @@ data class TestShareInfo(
     var collect: Int = 0, // 0 未收藏  1 收藏
     var maxPrice: Double = 0.00,
     var maxCount: Int = 0,
+    var rangePre: Double = 0.00,
+    var maxTP: Double = 0.00,
     var label1: String? = null,
     var label2: String? = null,
     var label3: String? = null,
@@ -43,6 +45,9 @@ data class TestShareInfo(
     var ext5: String? = null, //类型 1新高 2新量 3新高two 4新低 5主升 6记录突破
     @Ignore
     var moreInfo: String? = null,
+
+    @Ignore
+    var moreInfo3: String? = null,
 
     @Ignore
     var expand: Boolean = true,

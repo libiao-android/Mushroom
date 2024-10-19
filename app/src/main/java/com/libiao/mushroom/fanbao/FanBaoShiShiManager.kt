@@ -73,7 +73,7 @@ object FanBaoShiShiManager {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                                     val notificationChannel = NotificationChannel(
                                         "mushroom",
-                                        "fanbao",
+                                        "fangliang",
                                         NotificationManager.IMPORTANCE_HIGH
                                     )
                                     noticeManager?.createNotificationChannel(notificationChannel)

@@ -218,19 +218,19 @@ class TestViewModel2(initial: TestState): MavericksViewModel<TestState>(initial)
                 return time.startsWith("2023-7") || time.startsWith("2023-07")
             }
             8 -> {
-                return time.startsWith("2022-8") || time.startsWith("2022-08")
+                return time.startsWith("2024-8") || time.startsWith("2024-08")
             }
             9 -> {
-                return time.startsWith("2022-9") || time.startsWith("2022-09")
+                return time.startsWith("2024-9") || time.startsWith("2024-09")
             }
             10 -> {
-                return time.startsWith("2022-10")
+                return time.startsWith("2024-10")
             }
             11 -> {
-                return time.startsWith("2022-11")
+                return time.startsWith("2023-11")
             }
             12 -> {
-                return time.startsWith("2022-12")
+                return time.startsWith("2023-12")
             }
         }
         return false

@@ -94,8 +94,13 @@ class KLineActivity : AppCompatActivity() {
 
             var a = updateIndex - 20
             if(a < 0) a = 0
-
-            var b = lines.size
+            var b: Int
+            if (updateIndex > 0) {
+                b = updateIndex + 20
+                if (b > lines.size) b = lines.size
+            } else {
+                b = lines.size
+            }
 
 
             val records = lines.subList(a, b)

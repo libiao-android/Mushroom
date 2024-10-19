@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.charts.BarChart
@@ -26,27 +25,24 @@ import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
+import com.libiao.mushroom.mine.fangliang.FangLiangSettingBean
+import com.libiao.mushroom.mine.fangliang.FangLiangSettingDialog
 import com.libiao.mushroom.mine.tab.XinGaoTab
-import com.libiao.mushroom.room.TestShareDatabase
-import com.libiao.mushroom.room.TestShareInfo
-import com.libiao.mushroom.room.report.ReportShareDatabase
-import com.libiao.mushroom.room.report.ReportShareInfo
-import com.libiao.mushroom.room.test.TestShareDatabase2
+import com.libiao.mushroom.room.FangLiangShareDatabase2
+import com.libiao.mushroom.room.FangLiangShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.xin_gao_fragment.*
 import java.io.*
 import java.nio.charset.Charset
 import kotlin.collections.ArrayList
-import kotlin.math.max
-import kotlin.math.min
 
 class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
     override fun order(type: Int, data: Any?) {
         when(type) {
             ICommand.SETTING -> {
-                //settingDialog?.show()
+                settingDialog?.show()
             }
             ICommand.HEART -> {
                 heartChecked = data as Boolean
@@ -124,24 +120,25 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
     private var isYangYinOne = false
     private var firstXinGaoChecked = false
 
-    private var mData: List<TestShareInfo> = ArrayList()
-    private var mTempData: List<TestShareInfo> = ArrayList()
+    private var mData: List<FangLiangShareInfo> = ArrayList()
+    private var mTempData: List<FangLiangShareInfo> = ArrayList()
 
-    private var settingDialog: SelfSettingDialog? = null
-    private var settingBean: SelfSettingBean? = SelfSettingBean()
+    private var settingDialog: FangLiangSettingDialog? = null
+    private var settingBean: FangLiangSettingBean? = FangLiangSettingBean()
 
     private var currentCb = 1
 
-    private var dayCount = 20
+    private var dayCount = 17
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         LogUtil.i(TAG, "onViewCreated")
+        settingBean?.timeValue = 4
         initView()
     }
 
     private fun initData() {
-        val data = TestShareDatabase2.getInstance()?.getTestShareDao()?.getShares()
+        val data = FangLiangShareDatabase2.getInstance()?.getFangLiangShareDao()?.getFangLiangShares()
         data?.also {
             mData = it
             mTempData = it
@@ -161,13 +158,11 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             }
 
         }
-        cb_xin_gao_count.setOnCheckedChangeListener { buttonView, isChecked ->
+        cb_xin_gao_liang_bi.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 2
-                tv_ke_xuan.text = "新高"
+                tv_ke_xuan.text = "最大量"
                 mAdapter?.changeCurrentCb(currentCb)
-                yin_xian_child_view.visibility = View.VISIBLE
-                yang_yin_child_view.visibility = View.GONE
             }
         }
         cb_yin_xian_one.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -182,13 +177,11 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             resetSortUI()
             refreshCount()
         }
-        cb_fang_liang.setOnCheckedChangeListener { buttonView, isChecked ->
+        cb_today_liang.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 3
-                tv_ke_xuan.text = "放量"
+                tv_ke_xuan.text = "当天量"
                 mAdapter?.changeCurrentCb(currentCb)
-                yin_xian_child_view.visibility = View.GONE
-                yang_yin_child_view.visibility = View.GONE
             }
         }
         cb_yang_yin.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -196,8 +189,6 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                 currentCb = 4
                 tv_ke_xuan.text = "阳阴"
                 mAdapter?.changeCurrentCb(currentCb)
-                yin_xian_child_view.visibility = View.GONE
-                yang_yin_child_view.visibility = View.VISIBLE
             }
         }
         cb_yang_yin_one.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -206,14 +197,25 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             resetSortUI()
             refreshCount()
         }
-        cb_line_20.setOnCheckedChangeListener { buttonView, isChecked ->
+        cb_max_price_count.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 5
-                tv_ke_xuan.text = "线差"
+                tv_ke_xuan.text = "次数"
                 mAdapter?.changeCurrentCb(currentCb)
-                yin_xian_child_view.visibility = View.GONE
-                yang_yin_child_view.visibility = View.GONE
             }
+        }
+
+        cb_liang_bi.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked) {
+                currentCb = 6
+                tv_ke_xuan.text = "量比"
+                mAdapter?.changeCurrentCb(currentCb)
+            }
+        }
+        cb_shou_hong_day.setOnCheckedChangeListener { buttonView, isChecked ->
+            refreshTempData()
+            resetSortUI()
+            refreshCount()
         }
 
         cb_first_xin_gao.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -225,29 +227,14 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             }
         }
 
-        tv_id?.setOnClickListener {
-            mAdapter?.changeShiTu()
+        cb_you_xuan.setOnCheckedChangeListener { buttonView, isChecked ->
+            refreshTempData()
+            resetSortUI()
+            refreshCount()
         }
 
-        record_tu_po.setOnClickListener {
-            if(!recordTuPo && cb_tu_po.isChecked) {
-                recordTuPo = true
-                mTempData.forEach {
-                    val info = ReportShareInfo()
-                    info.time = it.time
-                    info.code = it.code
-                    info.name = it.name
-                    info.dayCount = it.dayCount
-                    info.updateTime = it.updateTime
-                    info.maxPrice = it.maxPrice
-                    info.maxCount = it.maxCount
-                    info.startIndex = it.startIndex
-                    info.ext5 = "6"
-                    LogUtil.i(TAG, "新增: ${info.code}")
-                    ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
-                }
-                Toast.makeText(context, "记录完成", Toast.LENGTH_SHORT).show()
-            }
+        tv_id?.setOnClickListener {
+            mAdapter?.changeShiTu()
         }
 
         self_selection_rv?.layoutManager = LinearLayoutManager(context)
@@ -266,10 +253,11 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                     //为什么不用temp， 主要考虑删除时要保持顺序
                     when(currentCb) {
                         1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount})
-                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
-                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxPrice})
+                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.todayLiang })
+                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinYang })
                         5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        6 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -279,10 +267,11 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                     //低-高
                     when(currentCb) {
                         1 -> mTempData = ArrayList(mTempData.sortedBy { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
-                        3 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
-                        4 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
+                        2 -> mTempData = ArrayList(mTempData.sortedBy { it.maxPrice })
+                        3 -> mTempData = ArrayList(mTempData.sortedBy { it.todayLiang })
+                        4 -> mTempData = ArrayList(mTempData.sortedBy { it.yinYang })
                         5 -> mTempData = ArrayList(mTempData.sortedBy { it.maxCount })
+                        6 -> mTempData = ArrayList(mTempData.sortedBy { it.liangBi })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -292,10 +281,11 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                     //高-低
                     when(currentCb) {
                         1 -> mTempData = ArrayList(mTempData.sortedByDescending { it.totalRange })
-                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
-                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
-                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        2 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxPrice })
+                        3 -> mTempData = ArrayList(mTempData.sortedByDescending { it.todayLiang })
+                        4 -> mTempData = ArrayList(mTempData.sortedByDescending { it.yinYang })
                         5 -> mTempData = ArrayList(mTempData.sortedByDescending { it.maxCount })
+                        6 -> mTempData = ArrayList(mTempData.sortedByDescending { it.liangBi })
                     }
                     mAdapter?.setData(mTempData)
                 }
@@ -369,67 +359,27 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             iv_self_today.setImageResource(R.mipmap.sort_normal)
         }
 
-        settingDialog = SelfSettingDialog(context!!) {
+        settingDialog = FangLiangSettingDialog(context!!) {
             LogUtil.i(TAG, "$it")
-            if(it.type == 1) {
-                LogUtil.i(TAG, "mTempData.size: ${mTempData.size}")
-
-                val dataOld = ReportShareDatabase.getInstance()?.getReportShareDao()?.getShares()
-                LogUtil.i(TAG, "fetchReportInfo: ${dataOld?.size}")
-
-                mTempData.forEach {
-                    val code = it.code
-
-                    val info = ReportShareInfo()
-                    info.code = it.code
-                    info.time = it.time
-                    info.name = it.name
-                    info.updateTime = it.updateTime
-                    LogUtil.i(TAG, "新增: ${info.code}")
-                    ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
-
-//                    if(!isContain(dataOld, code)) {
-//
-//                    }
-                }
-
-//                dataOld?.forEach {
-//                    if(!isContain2(mTempData, it.code)) {
-//                        it.delete = 1
-//                        LogUtil.i(TAG, "标记删除: ${it.code}")
-//                        ReportShareDatabase.getInstance()?.getReportShareDao()?.update(it)
-//                    }
-//                }
-
-            } else if(it.type == 2){
-                mTempData.forEach {
-                    val code = it.code
-                    val info = ReportShareInfo()
-                    info.code = it.code
-                    info.time = it.time
-                    info.name = it.name
-                    info.updateTime = it.updateTime
-                    info.ext5 = "1"
-                    LogUtil.i(TAG, "新增: ${info.code}")
-                    ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
-                }
-            } else {
-                settingBean = it
-                refreshTempData()
-                refreshCount()
-                resetSortUI()
-            }
+            settingBean = it
+            refreshTempData()
+            refreshCount()
+            resetSortUI()
         }
 
         btn_start.setOnClickListener {
-            btn_start.visibility = View.GONE
+            qian_zhi_view.visibility = View.GONE
             initData()
         }
     }
 
-    private fun refreshLocalData(data: List<TestShareInfo>, reload: Boolean = false) {
+    private fun refreshLocalData(data: List<FangLiangShareInfo>, reload: Boolean = false) {
         //(activity as SelfSelectionActivity).showLoading()
         loadingStatus = 1
+        val preference = context?.getSharedPreferences("record_fang_liang", Context.MODE_PRIVATE)
+        val edit = preference?.edit()
+        var hasRecord = false
+        var first = false
         ThreadPoolUtil.execute(Runnable {
             data.forEach {
                 val f = File(file_2023, it.code)
@@ -442,6 +392,15 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
                     var begin = 0
 
+                    var totalP1 = 0.00
+                    var countP1 = 0
+                    var totalP2 = 0.00
+                    var countP2 = 0
+                    var avgP1 = 0.00
+                    var avgP2 = 0.00
+
+                    var add = true
+
                     lines.forEachIndexed{index, s ->
                         if(s.startsWith(it.time!!)) {
                             begin = index
@@ -449,16 +408,6 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                         }
                     }
 
-                    var maxPrice = 9999.99
-                    var maxNowPrice = 9999.99
-                    val xinGaoList = ArrayList<String>()
-                    val xinGaoIndexList = ArrayList<Int>()
-                    var black = false
-
-                    var lastOne = false
-                    var lastTwo = false
-
-                    var lastOneMaxNowPrice = false
 
                     if(it.candleEntryList == null || reload) {
                         var blackIndex = dayCount
@@ -467,8 +416,9 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                             start = 0
                             blackIndex = begin
                         }
-                        it.startIndex = blackIndex
-                        val records = lines.subList(start, lines.size)
+                        var end = lines.size
+                        if (cb_not_include_today.isChecked) end--
+                        val records = lines.subList(start, end)
                         val entrys = java.util.ArrayList<CandleEntry>()
                         val barEntrys = java.util.ArrayList<BarEntry>()
                         val colorEntrys = java.util.ArrayList<Int>()
@@ -483,16 +433,19 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                         var yang = 0
                         var yin = 0
 
-                        it.next = false
+                        var maxLiang = 0.00
+                        var maxPrice = 0.00
+                        var firstMax = true
+                        var firstIndex = -1
+                        var maxIndex = -1
+                        var maxPriceCount = 0
+
+                        var noXinGaoDay = 0
 
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
 
-                            if(index > 0) {
-                                if(item.totalPrice > 0) {
-                                    allPrice += item.totalPrice
-                                    allDay ++
-                                }
+                            if(index > blackIndex) {
                                 if(item.beginPrice > 0.00) {
                                     if(item.nowPrice > item.beginPrice) {
                                         yang++
@@ -544,46 +497,54 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                             val green = "#28FF28"
                             val red = "#FF0000"
 
-                            if(item.maxPrice > maxPrice) {
-                                maxPrice = item.maxPrice
-                                if(index == records.size - 2) {
-                                    lastTwo = true
+                            if(index < blackIndex - 2) {
+                                totalP1 += item.totalPrice
+                                countP1++
+                                if (index == blackIndex - 3) {
+                                    avgP1 = totalP1 / countP1
                                 }
-                                if(index == records.size - 1) {
-                                    lastOne = true
-                                }
-                                black = true
                             } else {
-                                black = false
-                            }
-
-                            if(item.nowPrice > maxNowPrice) {
-                                maxNowPrice = item.nowPrice
-
-                                if(index == records.size - 1) {
-                                    lastOneMaxNowPrice = true
+                                totalP2 += item.totalPrice
+                                countP2++
+                                if (!ShareParseUtil.zhangTing(item) && !ShareParseUtil.dieTing(item) && item.totalPrice < avgP1 * 3) {
+                                    add = false
                                 }
                             }
 
-                            if(index == blackIndex + 1) {
-                                if(item.range > 0) {
-                                    it.next = true
+                            if(index <= blackIndex) {
+                                if (item.totalPrice > maxLiang) {
+                                    maxLiang = item.totalPrice
+                                }
+                                if (item.maxPrice > maxPrice) {
+                                    maxPrice = item.maxPrice
                                 }
                             }
-
+                            if (index > blackIndex) {
+                                if (item.totalPrice > maxLiang) {
+                                    if (firstMax) {
+                                        firstMax = false
+                                        firstIndex = index
+                                    }
+                                    maxIndex = index
+                                    maxPriceCount++
+                                    maxLiang = item.totalPrice
+                                    noXinGaoDay = 0
+                                } else {
+                                    noXinGaoDay++
+                                }
+                                if (item.maxPrice >= maxPrice) {
+                                    noXinGaoDay = 0
+                                    maxPrice = item.maxPrice
+                                }
+                            }
+                            if (ShareParseUtil.zhangTing(item)) {
+                                noXinGaoDay = 0
+                            }
 
                             if(index == blackIndex) {
                                 colorEntrys.add(Color.BLACK)
-                                it.price = item.nowPrice
-                                it.range = item.range
-                                maxPrice = item.maxPrice
-                                maxNowPrice = item.nowPrice
-                                xinGaoList.add(item.time!!)
-                                xinGaoIndexList.add(records.size - index)
-                            } else if(black){
+                            } else if (index == maxIndex) {
                                 colorEntrys.add(Color.GRAY)
-                                xinGaoList.add(item.time!!)
-                                xinGaoIndexList.add(records.size - index)
                             } else {
                                 if(item.beginPrice > item.nowPrice) {
                                     colorEntrys.add(Color.parseColor(green))
@@ -599,31 +560,110 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                             }
                         }
 
+                        it.todayMax = firstIndex == records.size - 1
+                        it.maxCount = maxPriceCount
+                        it.noXinGaoDay = noXinGaoDay
+
                         it.candleEntryList = entrys
                         it.barEntryList = barEntrys
                         it.colorsList = colorEntrys
                         it.values_5 = values_5
                         it.values_10 = values_10
                         it.values_20 = values_20
+                        it.yinYang = yang - yin
+                        it.add = add
+
+                        avgP1 = totalP1 / countP1
+                        avgP2 = totalP2 / countP2
+
+                        it.liangBi = avgP2 / avgP1
 
                     }
 
-                    it.tuPo = false
-                    if(lastOneMaxNowPrice && lastOne && !lastTwo) {
-                        it.tuPo = true
-                    }
-                    it.maxPriceH = maxPrice
-                    it.maxNowPriceH = maxNowPrice
-                    it.xinGaoList = xinGaoList
-                    it.xinGaoIndexList = xinGaoIndexList
+                    var today = lines.size - 1
+                    if (cb_not_include_today.isChecked) today--
 
-                    val info = lines.get(lines.size - 1)
-                    val info_pre = lines.get(lines.size - 2)
+                    val info = lines.get(today)
+                    val info_pre = lines.get(today - 1)
+                    val info_pre2 = lines.get(today - 2)
 
                     val share = SharesRecordActivity.ShareInfo(info)
 
+                    it.shouRed = share.nowPrice >= share.beginPrice
+
                     it.lastShareInfo = share
                     val share_pre = SharesRecordActivity.ShareInfo(info_pre)
+                    val share_pre2 = SharesRecordActivity.ShareInfo(info_pre2)
+
+                    val time = share.time
+
+                    if (!first) {
+                        hasRecord = preference?.getBoolean(time, false) ?: false
+                        LogUtil.i(TAG, "time: $time, hasRecord: $hasRecord")
+                        first = true
+                        if(!hasRecord) {
+                            edit?.putBoolean(time, true)
+                            edit?.commit()
+                        }
+                    }
+
+                    val zuiDaLiang = share.range > 0 && share.totalPrice >= it.maxPrice
+                    it.zuiDaLiang = zuiDaLiang
+
+                    val fangLiang = share.range > 0 && share.totalPrice > share_pre.totalPrice
+                    it.fangLiang = fangLiang
+
+                    //val a = share_pre.totalPrice > share_pre2.totalPrice  &&  share_pre.range > 0 && share_pre.nowPrice >= share_pre.beginPrice
+                    val b = share.totalPrice > share_pre.totalPrice && share.range > 0 && share.nowPrice >= share.beginPrice
+
+                    it.youXuan =  b
+
+                    it.weekOne = it.label1 == "1"
+                    it.weekTwo = it.label2 == "1"
+                    it.weekThree = it.label3 == "1"
+                    it.weekFour = it.label4 == "1"
+                    it.weekFive = it.label5 == "1"
+
+                    if (!hasRecord) {
+
+                        time?.also { t ->
+                            if(t.endsWith("1")) {
+                                if (zuiDaLiang) {
+                                    it.label1 = "1"
+                                } else {
+                                    it.label1 = "0"
+                                }
+                            } else if (t.endsWith("2")) {
+                                if (zuiDaLiang) {
+                                    it.label2 = "1"
+                                } else {
+                                    it.label2 = "0"
+                                }
+                            } else if (t.endsWith("3")) {
+                                if (zuiDaLiang) {
+                                    it.label3 = "1"
+                                } else {
+                                    it.label3 = "0"
+                                }
+                            } else if (t.endsWith("4")) {
+                                if (zuiDaLiang) {
+                                    it.label4 = "1"
+                                } else {
+                                    it.label4 = "0"
+                                }
+                            } else if (t.endsWith("5")) {
+                                if (zuiDaLiang) {
+                                    it.label5 = "1"
+                                } else {
+                                    it.label5 = "0"
+                                }
+                            }
+                        }
+                        FangLiangShareDatabase2.getInstance()?.getFangLiangShareDao()?.update(it)
+                    }
+
+
+                    it.totalRange = ((share.nowPrice) - it.beginPrice) / it.beginPrice * 100
 
                     updateCurrentData(it, share, share_pre)
 
@@ -639,91 +679,71 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
     }
 
     private fun refreshTempData() {
-        val temp  = ArrayList<TestShareInfo>()
+        val temp  = ArrayList<FangLiangShareInfo>()
         for (info in mData) {
 
-//            if(heartChecked && !info.heart) {
+//            if(info.dayCount <= 2) {
 //                continue
 //            }
-            if(xinGaoCount && !info.next) {
-                continue
-            }
-            if(tuPoChecked && !info.tuPo) {
-                continue
-            }
 
-            if(firstXinGaoChecked) {
-                val num = et_first_xin_gao.text.toString().toInt()
-//                if (info.xinGaoIndexList?.first() != num) {
-//                    continue
-//                }
-                if (info.range < 7) {
-                    continue
+
+            if (cb_you_xuan.isChecked || cb_shou_hong_day.isChecked) {
+                if (cb_you_xuan.isChecked && cb_shou_hong_day.isChecked.not()) {
+                    if (info.youXuan.not()) continue
+                } else if (cb_you_xuan.isChecked.not() && cb_shou_hong_day.isChecked) {
+                    if (info.shouRed.not()) continue
+                } else {
+                    if(info.youXuan.not() && info.shouRed.not()) continue
                 }
             }
-//            if(isYangYinOne && info.yangYin < yang_yin_et_count.text.toString().toInt()) {
-//                continue
-//            }
+
             val selfSettingBean = settingBean
             if(selfSettingBean?.timeChecked == true && (info.dayCount < selfSettingBean.timeValue || info.dayCount > selfSettingBean.timeValue2)) {
                 continue
             }
 
-            if(selfSettingBean?.rangeLeftChecked == true && info.todayRange < selfSettingBean.rangeLeftValue) {
+            if(selfSettingBean?.zuiDaLiang == true && !info.zuiDaLiang) {
+                continue
+            }
+            if(selfSettingBean?.fangLiang == true && !info.fangLiang) {
+                continue
+            }
+            if(selfSettingBean?.weekOne == true && !info.weekOne) {
+                continue
+            }
+            if(selfSettingBean?.weekTwo == true && !info.weekTwo) {
+                continue
+            }
+            if(selfSettingBean?.weekThree == true && !info.weekThree) {
+                continue
+            }
+            if(selfSettingBean?.weekFour == true && !info.weekFour) {
+                continue
+            }
+            if(selfSettingBean?.weekFive == true && !info.weekFive) {
+                continue
+            }
+            if(selfSettingBean?.firstMax == true && !info.todayMax) {
                 continue
             }
 
-            if(selfSettingBean?.rangeRightChecked == true && info.todayRange > selfSettingBean.rangeRightValue) {
-                continue
-            }
-
-            if(selfSettingBean?.liangLeftChecked == true && info.todayLiang < selfSettingBean.liangLeftValue) {
-                continue
-            }
-
-            if(selfSettingBean?.liangRightChecked == true && info.todayLiang > selfSettingBean.liangRightValue) {
-                continue
-            }
+//
+//            if(selfSettingBean?.rangeRightChecked == true && info.todayRange > selfSettingBean.rangeRightValue) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.liangLeftChecked == true && info.todayLiang < selfSettingBean.liangLeftValue) {
+//                continue
+//            }
+//
+//            if(selfSettingBean?.liangRightChecked == true && info.todayLiang > selfSettingBean.liangRightValue) {
+//                continue
+//            }
 
 //            if(selfSettingBean?.redLine == true && !info.redLine) {
 //                continue
 //            }
 //
-//            if(selfSettingBean?.youXuan == true && !info.youXuan) {
-//                continue
-//            }
-
-//            if(selfSettingBean?.maxRangChecked == true && info.yinXianLength < selfSettingBean.maxRangValue) {
-//                continue
-//            }
-//
-//            if(selfSettingBean?.zhiDie == true && !info.zhiDie) {
-//                continue
-//            }
-//
-//            if(selfSettingBean?.duan_ceng_Checked == true && !info.duanCeng) {
-//                continue
-//            }
-
-            if(selfSettingBean?.xin_gao == true && (info.label2 == null)) {
-                continue
-            }
-
-//            if(selfSettingBean?.you_one == true && !info.youOne) {
-//                continue
-//            }
-//
-//            if(selfSettingBean?.you_two == true && !info.youTwo) {
-//                continue
-//            }
-//
-//            if(selfSettingBean?.you_three == true && !info.youThree) {
-//                continue
-//            }
-//
-//            if(selfSettingBean?.maxLiang == true && !info.maxLiang) {
-//                continue
-//            }
 
             temp.add(info)
         }
@@ -731,7 +751,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
         mAdapter?.setData(mTempData)
     }
 
-    private fun deleteItem(mineShareInfo: TestShareInfo?) {
+    private fun deleteItem(mineShareInfo: FangLiangShareInfo?) {
         (mData as ArrayList).remove(mineShareInfo)
         (mTempData as ArrayList).remove(mineShareInfo)
         mAdapter?.setData(mTempData)
@@ -743,44 +763,22 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
     }
 
     private fun updateCurrentData(
-        it: TestShareInfo,
+        it: FangLiangShareInfo,
         share: SharesRecordActivity.ShareInfo,
         sharePre: SharesRecordActivity.ShareInfo,
         oneline: Boolean = false
     ) {
-        if(it.price > 0) {
+        it.todayRange = share.range
+        it.todayMaxRange = share.rangeMax
 
-            if(oneline) {
-                val maxB = share.maxPrice > it.maxPriceH && share.nowPrice > it.maxNowPriceH
-                it.tuPo = maxB && !it.xinGaoList!!.contains(sharePre.time)
-                if(it.tuPo) {
-                    LogUtil.i(TAG, "tupo: ${it.name}")
-                }
-            }
+        it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
 
-            val a = min(share.rangeBegin, share.range) - share.rangeMin
-            val b = share.rangeMax - max(share.rangeBegin, share.range)
-
-            if(share.totalPrice > sharePre.totalPrice && share.range > 0 && share.nowPrice > share.beginPrice) {
-                it.label2 = "yes"
-            }
-
-
-            it.totalRange = (share.nowPrice - it.price) / it.price * 100
-            it.todayRange = share.range
-            it.todayMaxRange = share.rangeMax
-
-            it.todayLiang = String.format("%.2f",share.totalPrice / 100000000).toDouble()
-            if(sharePre.totalPrice > 0) {
-                it.liangBi = share.totalPrice / sharePre.totalPrice
-            }
-
-            var liangBi = "0"
-            if(sharePre.totalPrice > 0) {
-                liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
-            }
-            it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}"
+        var liangBi = "0"
+        if(sharePre.totalPrice > 0) {
+            liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
         }
+        it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}"
+
     }
 
     private fun resetSortUI() {
@@ -794,12 +792,12 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
     inner class MyPoolInfoAdater(val context: Context) : RecyclerView.Adapter<MyPoolHolder>() {
 
-        private var mSharesInfoList: List<TestShareInfo> = ArrayList()
+        private var mSharesInfoList: List<FangLiangShareInfo> = ArrayList()
 
         private var showFenShi = false
 
 
-        fun setData(sharesInfoList: List<TestShareInfo>) {
+        fun setData(sharesInfoList: List<FangLiangShareInfo>) {
             mSharesInfoList = sharesInfoList
             notifyDataSetChanged()
         }
@@ -807,7 +805,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyPoolHolder {
             return MyPoolHolder(context,
                 LayoutInflater.from(context).inflate(
-                    R.layout.self_selection_item,
+                    R.layout.self_selection_item_fang_liang,
                     null
                 )
             )
@@ -849,7 +847,7 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
         private var moreInfoTv: TextView? = null
         private var heartIv: ImageView? = null
 
-        private var mineShareInfo: TestShareInfo? = null
+        private var mineShareInfo: FangLiangShareInfo? = null
         private var chart: CandleStickChart? = null
         private var combinedChart: CombinedChart? = null
         private var bar: BarChart? = null
@@ -857,16 +855,13 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
 
         private var heart: Boolean = false
 
-        private var mTypeXinGaoTv: TextView? = null
-        private var mTypeMaxRangeTv: TextView? = null
-        private var mTypeYinYangTv: TextView? = null
-        private var mTypeFangLiangTv: TextView? = null
-        private var mTypeYinXianTv: TextView? = null
-        private var mTypeZhiDieTv: TextView? = null
-
-        private var mAvgP: TextView? = null
-
         private var mFenShiIv: ImageView? = null
+
+        private var tiCaiView: View? = null
+        private var addTiCaiIv: ImageView? = null
+        private var tiCaiTv: TextView? = null
+
+        private var otherInfoTv: TextView? = null
 
 
         init {
@@ -876,13 +871,13 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             mCodeTv = view.findViewById(R.id.self_item_code)
             mRangeTv = view.findViewById(R.id.self_item_range)
             mTodayTv = view.findViewById(R.id.self_item_today)
-            mTypeXinGaoTv = view.findViewById(R.id.tv_type_xin_gao)
-            mTypeMaxRangeTv = view.findViewById(R.id.tv_type_max_rang)
-            mTypeYinYangTv = view.findViewById(R.id.tv_type_yin_yang)
-            mTypeFangLiangTv = view.findViewById(R.id.tv_type_fang_liang)
-            mTypeYinXianTv = view.findViewById(R.id.tv_type_yin_xian)
-            mTypeZhiDieTv = view.findViewById(R.id.tv_type_zhi_die)
-            mAvgP = view.findViewById(R.id.tv_type_avg_p)
+
+            tiCaiView = view.findViewById(R.id.ti_cai_view)
+            addTiCaiIv = view.findViewById(R.id.iv_add_ti_cai)
+            tiCaiTv = view.findViewById(R.id.tv_ti_cai)
+
+            otherInfoTv = view.findViewById(R.id.other_info)
+
 
             mFenShiIv = view.findViewById(R.id.iv_fen_shi)
 
@@ -910,13 +905,25 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                     when(it.id) {
                         R.id.btn_dialog_delete -> {
                             mineShareInfo?.code?.also {
-                                TestShareDatabase2.getInstance()?.getTestShareDao()?.delete(it)
+                                FangLiangShareDatabase2.getInstance()?.getFangLiangShareDao()?.delete(it)
                                 deleteItem(mineShareInfo)
                             }
                         }
                     }
                 }.show()
                 true
+            }
+
+            tiCaiView?.setOnClickListener {
+                AddTiCaiDialog(context, mineShareInfo?.tiCai) {
+                    if (it.isNotEmpty()) {
+                        mineShareInfo?.also { info ->
+                            info.tiCai = it
+                            FangLiangShareDatabase2.getInstance()?.getFangLiangShareDao()?.update(info)
+                            refreshTiCaiView(info)
+                        }
+                    }
+                }.show()
             }
 
 //            mIdTv?.setOnClickListener {
@@ -1010,17 +1017,32 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             }
         }
 
-        fun bindData(position: Int, info: TestShareInfo) {
+        fun bindData(position: Int, info: FangLiangShareInfo) {
             //LogUtil.i(TAG, "bindData: ${info.code}, ${info.candleEntryList?.size}")
             this.mineShareInfo = info
             mIdTv?.text = position.toString()
             mTimeTv?.text = info.time?.substring(5) + "(${info.dayCount})"
             mNameTv?.text = info.name
+            if (info.delete == 1) {
+                mIdTv?.alpha = 0.4f
+                mTimeTv?.alpha = 0.4f
+                mNameTv?.alpha = 0.4f
+                mCodeTv?.alpha = 0.4f
+            } else {
+                mIdTv?.alpha = 1f
+                mTimeTv?.alpha = 1f
+                mNameTv?.alpha = 1f
+                mCodeTv?.alpha = 1f
+            }
+
             mCodeTv?.text = info.code?.substring(2)
+
+            otherInfoTv?.text = "${huanSuanYi(info.maxPrice)}, ${info.maxCount}, ${huanSuanYi(info.preAvg)}, ${info.noXinGaoDay}"
 
 
 
             if(info.currentCb == 1) {
+                //LogUtil.i(TAG, "bindData: ${info.name}, ${info.lastShareInfo?.nowPrice}, ${info.beginPrice}")
                 mRangeTv?.text = baoLiuXiaoShu(info.totalRange)
                 if(info.totalRange >= 0) {
                     mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
@@ -1029,8 +1051,8 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                 }
             }
             if(info.currentCb == 2) {
-                mRangeTv?.text = "${info.maxCount}"
-                if(info.maxCount >= 10) {
+                mRangeTv?.text = huanSuanYi(info.maxPrice)
+                if(info.maxPrice >= 500000000) {
                     mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
                 } else {
                     mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
@@ -1038,33 +1060,28 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
             }
 
             if(info.currentCb == 3) {
-//                mRangeTv?.text = baoLiuXiaoShu(info.liangBi)
-//                if(info.liangBi >= 0) {
-//                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-//                } else {
-//                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
-//                }
+                mRangeTv?.text = baoLiuXiaoShu(info.todayLiang)
+                mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
             }
 
             if(info.currentCb == 4) {
-//                mRangeTv?.text = "${info.yangYin}"
-//                if(info.yangYin >= 0) {
-//                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-//                } else {
-//                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
-//                }
+                mRangeTv?.text = "${info.yinYang}"
+                if(info.yinYang >= 0) {
+                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+                } else {
+                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
+                }
             }
 
             if(info.currentCb == 5) {
-//                mRangeTv?.text = baoLiuXiaoShu(info.cha_20 * 100)
-//                if(info.cha_20 >= 0) {
-//                    mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
-//                } else {
-//                    mRangeTv?.setTextColor(Color.parseColor("#7fb80e"))
-//                }
+                mRangeTv?.text = "${info.maxCount}"
+                mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
             }
 
-
+            if(info.currentCb == 6) {
+                mRangeTv?.text = baoLiuXiaoShu(info.liangBi)
+                mRangeTv?.setTextColor(Color.parseColor("#f15b6c"))
+            }
 
             mTodayTv?.text = info.todayRange.toString()
 
@@ -1084,27 +1101,20 @@ class XinGaoFragment: BaseFragment(R.layout.xin_gao_fragment), ICommand {
                 heartIv?.setImageResource(R.mipmap.heart)
             }
 
-//            if(info.zhiDie) {
-//                mTypeZhiDieTv?.visibility = View.VISIBLE
-//            } else {
-//                mTypeZhiDieTv?.visibility = View.GONE
-//            }
-
-            if(info.label2 == "新高") {
-                mTypeXinGaoTv?.visibility = View.VISIBLE
-                mTypeXinGaoTv?.text = "新高 ${info.maxCount}"
-            } else {
-                mTypeXinGaoTv?.visibility = View.GONE
-            }
-
-            mTypeMaxRangeTv?.visibility = View.GONE
-            mTypeYinYangTv?.visibility = View.GONE
-            mTypeFangLiangTv?.visibility = View.GONE
-            mTypeYinXianTv?.visibility = View.GONE
-
-           mAvgP?.text = "${info.range}"
+            refreshTiCaiView(info)
 
             mFenShiIv?.visibility = View.GONE
+        }
+
+        private fun refreshTiCaiView(info: FangLiangShareInfo) {
+            if (info.tiCai.isEmpty()) {
+                tiCaiTv?.visibility = View.GONE
+                addTiCaiIv?.visibility = View.VISIBLE
+            } else {
+                tiCaiTv?.visibility = View.VISIBLE
+                addTiCaiIv?.visibility = View.GONE
+                tiCaiTv?.text = info.tiCai
+            }
         }
 
         private fun refreshChart(index: Int) {

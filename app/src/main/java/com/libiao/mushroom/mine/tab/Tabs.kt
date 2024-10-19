@@ -7,11 +7,19 @@ class Tabs {
     init {
 
         tabInfos.add(TestTab())
+        tabInfos.add(ChuangTab())
 
-        tabInfos.add(Line20Tab())
-
-        tabInfos.add(FanBaoTab())
         tabInfos.add(XinGaoTab())
+        tabInfos.add(Line20Tab())
+        tabInfos.add(FangLiang3Tab())
+
+
+
+
+
+
+        //tabInfos.add(FanBaoTab())
+
 
 
 

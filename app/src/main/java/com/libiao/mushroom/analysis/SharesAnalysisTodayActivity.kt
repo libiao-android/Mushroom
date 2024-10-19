@@ -19,6 +19,8 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mode.*
 import com.libiao.mushroom.setting.SettingActivity
+import com.libiao.mushroom.test.TestOneMode
+import com.libiao.mushroom.test.TestThreeMode
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import java.io.BufferedReader
@@ -130,45 +132,8 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
     private fun initData() {
 
 
-//        mModeList.add(MoreShizixingMode())
-//        mModeList.add(MoreMildMode())
-//        mModeList.add(HorizontalPlateMode())
-
-        //mModeList.add(CloseToLine10Mode())
-//        mModeList.add(CloseToLine20Mode())
-
-
-//        mModeList.add(ShangYinXian2FitMode())
-
-//        mModeList.add(MoreMoreMode3())
-
-//        mModeList.add(MoreMoreMode5())
-
-//        mModeList.add(UpLine5Mode())
-//        mModeList.add(UpLine10Mode())
-
-
-        //mModeList.add(DuanCengMode())
-
-
-        mModeList.add(TestMode2())
-        mModeList.add(FiveRedMode())
-
-
-        //mModeList.add(ChuangYeBanTouJiMode())
-        //        mModeList.add(StrongStock10Mode())
-        //mModeList.add(StrongStockMode2())
-        //mModeList.add(MoreMoreMode4())
-
-
-        //mModeList.add(LeaderMode())
         mModeList.add(StrongStock50Mode())
-        mModeList.add(Strong20Mode())
-        mModeList.add(StrongStock10Mode())
-        mModeList.add(YiZiBanMode())
-        mModeList.add(MoreMore3Mode())
-        mModeList.add(Difference2FitMode())
-        mModeList.add(UpLine10Mode())
+
         mModeList.add(LianBan1Mode())
         mModeList.add(LianBan2Mode())
         mModeList.add(LianBan3Mode())
@@ -178,34 +143,36 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(LianBanChuang1Mode())
         mModeList.add(LianBanChuang2Mode())
         mModeList.add(LianBanChuang3Mode())
-        mModeList.add(LianBan2StrongMode())
-        mModeList.add(LianBan3StrongMode())
-        mModeList.add(LianBanChuang1StrongMode())
-        mModeList.add(LianBan1StrongMode())
-
-        mModeList.add(MoreMore4Mode())
 
         mModeList.add(MineMode())
 
 
+        mModeList.add(MoreMore2Mode())
 
-        mModeList.add(XinGao2Mode())
-        mModeList.add(XinDiMode())
+
+        mModeList.add(MoreMore3Mode())
+        mModeList.add(MoreMore4Mode())
+
+        mModeList.add(TestMode())
+
+
+        mModeList.add(MineTestMode())
+
+        mModeList.add(ChuangMode())
+        mModeList.add(ChuangTestMode())
+
+
+
         mModeList.add(MineTest2Mode())
 
-        // mModeList.add(LianBanChuang2TestMode())
-        // mModeList.add(MoreMoreMode())
 
 
 
-        //mModeList.add(TestMode())
-        //mModeList.add(XinGaoMode())
-        // mModeList.add(XinLiangMode())
-       // mModeList.add(MineTestMode())
-       // mModeList.add(FanBaoMode())
-       // mModeList.add(MayFanBaoMode())
-       // mModeList.add(FanBaoAgainMode())
-        //mModeList.add(LianBan2TestMode())
+        mModeList.add(TestOneMode())
+
+        mModeList.add(TestThreeMode())
+
+
 
 
 
@@ -352,7 +319,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
             i(TAG, "${lines.size}")
             val shares = ArrayList<SharesRecordActivity.ShareInfo>()
             lines.forEachIndexed { index, s ->
-                i(TAG, "$index, $s")
+              //  i(TAG, "$index, $s")
                 shares.add(SharesRecordActivity.ShareInfo(s))
             }
             mModeList.forEach {
@@ -402,11 +369,11 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        //test()
+       // test()
     }
 
     private fun test() {
-        analysis("sz301215")
+        analysis("sz000625")
     }
 
     class SharesInfoAdater(val context: Context) : RecyclerView.Adapter<SharesInfoHolder>() {

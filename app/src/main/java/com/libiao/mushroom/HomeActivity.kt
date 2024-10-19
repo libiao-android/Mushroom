@@ -15,6 +15,7 @@ import com.libiao.mushroom.mine.SelfSelectionActivity
 import com.libiao.mushroom.mine.jigou.JiGouInfoRecordActivity
 import com.libiao.mushroom.report.MyReportActivity
 import com.libiao.mushroom.review.MyReviewActivity
+import com.libiao.mushroom.test.SharesAnalysisTestActivity
 import com.libiao.mushroom.utils.CodeUtil
 import com.libiao.mushroom.utils.LogUtil
 import com.permissionx.guolindev.PermissionX
@@ -119,6 +120,11 @@ class HomeActivity : AppCompatActivity() {
 
     fun jiGou(v: View) {
         val intent = Intent(this, JiGouInfoRecordActivity::class.java)
+        startActivity(intent)
+    }
+
+    fun myTest(v: View) {
+        val intent = Intent(this, SharesAnalysisTestActivity::class.java)
         startActivity(intent)
     }
 

@@ -5,6 +5,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import java.util.ArrayList
 
@@ -17,11 +18,17 @@ data class FangLiangShareInfo(
     var code: String? = null,
     var name: String? = null,
     var beginPrice: Double = 0.00,
+    var minBeiShu: Double = 0.00,
     var preAvg: Double = 0.00, //平均量能
+    var maxTemp: Double = 0.00, //放量前最大量能
+    var maxPrice: Double = 0.00, //最大量能
+    var minPrice: Double = 0.00, //最小量能
     var dayCount: Int = 0,
     var updateTime: String? = null,
     var result: Int = 0, // 0 初始  1 成功  2失败
     var collect: Int = 0, // 0 未收藏  1 收藏
+    var delete: Int = 0,
+    var tiCai: String = "",
     var label1: String? = null,
     var label2: String? = null,
     var label3: String? = null,
@@ -50,7 +57,56 @@ data class FangLiangShareInfo(
     @Ignore
     var colorsList: ArrayList<Int>? = null,
     @Ignore
-    var lastShareInfo: SharesRecordActivity.ShareInfo? = null
+    var lastShareInfo: SharesRecordActivity.ShareInfo? = null,
+
+    @Ignore
+    var values_5: ArrayList<Entry>? = null,
+    @Ignore
+    var values_10: ArrayList<Entry>? = null,
+    @Ignore
+    var values_20: ArrayList<Entry>? = null,
+
+    @Ignore
+    var totalRange: Double = 0.00, //记录后至今日涨幅
+    @Ignore
+    var todayRange: Double = 0.00, //今日涨幅
+    @Ignore
+    var todayMaxRange: Double = 0.00, //今日最大涨幅
+    @Ignore
+    var todayLiang: Double = 0.00, //今日量能
+    @Ignore
+    var currentCb: Int = 1,
+    @Ignore
+    var zuiDaLiang: Boolean = false,
+    @Ignore
+    var fangLiang: Boolean = false,
+    @Ignore
+    var youXuan: Boolean = false,
+    @Ignore
+    var weekOne: Boolean = false,
+    @Ignore
+    var weekTwo: Boolean = false,
+    @Ignore
+    var weekThree: Boolean = false,
+    @Ignore
+    var weekFour: Boolean = false,
+    @Ignore
+    var weekFive: Boolean = false,
+    @Ignore
+    var todayMax: Boolean = false,
+    @Ignore
+    var maxCount: Int = 0,
+    @Ignore
+    var yinYang: Int = 0,
+    @Ignore
+    var liangBi: Double = 0.00,
+    @Ignore
+    var add: Boolean = true,
+    @Ignore
+    var noXinGaoDay: Int = 0,
+    @Ignore
+    var shouRed: Boolean = false
+
 ) {
 
 

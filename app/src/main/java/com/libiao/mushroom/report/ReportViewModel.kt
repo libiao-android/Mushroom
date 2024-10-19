@@ -8,6 +8,7 @@ import com.github.mikephil.charting.data.CandleEntry
 import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
+import com.libiao.mushroom.room.XinGaoShareDatabase
 import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
@@ -31,32 +32,33 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     var maxLiang: Boolean = false
     var threeYang: Boolean = false
 
-    var fanbao: Boolean = false
+    var fangliang: Boolean = false
+    var xinGao: Boolean = false
 
     private val client = OkHttpClient()
 
 
-    fun fetchInfo(month: Int) {
+    fun fetchInfo(month: Int, back: (range: Double) -> Unit) {
         if(month == 6) {
             //ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteByExt("3")
         }
         withState {
-            val dataOrign =
-                if(fanbao) {
-                    ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("3")
-                } else {
-                    ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("4")
-                }
-            val data = dataOrign?.filter {
-                true
-            }
+
+            //val data = XinGaoShareDatabase.getInstance()?.getReportShareDao()?.getShares()
+
+
+            val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("111")
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<ReportShareInfo>()
             val dataTime = ArrayList<ReportShareInfo>()
 
             var time = ""
             var rangeCount = 0.00
+            var totalRange = 0.00
             data?.forEach {
+                if (it.code?.startsWith("sh688") == true) return@forEach
+                if (it.name?.contains("st", ignoreCase = true) == true) return@forEach
+
                 if(isFit(month, it.time!!)) {
                     if(it.time == time) {
 
@@ -84,6 +86,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 return@forEachIndexed
                             }
                         }
+
                         val daycount = 20
                         startIndex = recordIndex - daycount
 
@@ -95,7 +98,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 realRecordIndex = daycount + startIndex
                                 startIndex = 0
                             }
-                            var b = recordIndex + 10
+                            var b = recordIndex + 20
                             if(lines.size < b) b = lines.size
                             val records = lines.subList(startIndex, b)
                             val candleEntrys = java.util.ArrayList<CandleEntry>()
@@ -111,10 +114,14 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             var current: SharesRecordActivity.ShareInfo? = null
                             var post1: SharesRecordActivity.ShareInfo? = null
                             var post2: SharesRecordActivity.ShareInfo? = null
+                            var post3: SharesRecordActivity.ShareInfo? = null
 
                             LogUtil.i(TAG, "realRecordIndex: $realRecordIndex, startIndex: $startIndex")
 
-
+                            var maxPTemp = 0.00
+                            var beiShu = 999.00
+                            var qiDongLiang = 0.00
+                            var xiaoYuQiDongLiang = 0
                             records.forEachIndexed { index, s ->
                                 val item = SharesRecordActivity.ShareInfo(s)
                                 if(item.beginPrice == 0.00) {
@@ -137,6 +144,8 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 values_10.add(Entry(index.toFloat(), line10.toFloat()))
                                 values_20.add(Entry(index.toFloat(), line20.toFloat()))
 
+
+
                                 val p = item.totalPrice.toFloat() / 100000000
                                 barEntrys.add(BarEntry(index.toFloat(), p))
 
@@ -152,12 +161,17 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                 if(index == realRecordIndex) {
                                     colorEntrys.add(Color.BLACK)
                                     current = item
-                                }else {
+                                } else if(it.updateTime == item.time) {
+                                    colorEntrys.add(Color.BLACK)
+                                } else {
                                     if(index == realRecordIndex + 1) {
                                         post1 = item
                                     }
                                     if(index == realRecordIndex + 2) {
                                         post2 = item
+                                    }
+                                    if(index == realRecordIndex + 3) {
+                                        post3 = item
                                     }
                                     val green = "#28FF28"
                                     val red = "#FF0000"
@@ -185,36 +199,28 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                             it.values_10 = values_10
                             it.values_20 = values_20
 
-
                             val liangBi = baoLiuXiaoShu(current!!.totalPrice / pre3!!.totalPrice)
 
-                            it.moreInfo = "${current!!.rangeBegin}, ${current!!.rangeMin}, ${current!!.rangeMax}, ${current!!.range}, $liangBi"
 
-                            if(fanbao) {
-                                dataTime.add(it)
-                            } else {
-                                if(maxLiang) {
-                                    dataTime.add(it)
-                                } else {
-                                    it.moreInfo2 = "${pre1!!.range}, ${pre2!!.range}, ${pre3!!.range}, ${current!!.range}"
-                                    if (pre2!!.range > 2 && current!!.range > 2) {
-//                                        if(current!!.totalPrice > pre3!!.totalPrice && pre2!!.totalPrice > pre1!!.totalPrice && current!!.totalPrice > pre2!!.totalPrice) {
-//                                            if(liangBi.toDouble() < 2.5 && liangBi.toDouble() > 1.5) {
-//
-//                                            }
-//
-//                                        }
-                                        dataTime.add(it)
-                                    }
+                            it.moreInfo = "${post1?.rangeBegin}, ${post1?.range}, ${post2?.range}"
+
+
+                            if (it.code?.startsWith("sz3") == false) {
+                                if (post1 != null && post2 != null) {
+                                    val r = post1!!.range - post1!!.rangeBegin + post2!!.range
+                                    it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                    totalRange += r
                                 }
+                                dataTime.add(it)
                             }
+
                         }
                     }
                 }
-
             }
             LogUtil.i(TAG, "rangeCount: $rangeCount")
             //dataTime.sortByDescending { it.yinXianLength }
+            back(totalRange)
             if(dataTime.size > 0) {
                 dataTime[0].ext1 = "${dataTime.size}"
             }
@@ -241,40 +247,40 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     private fun isFit(month: Int, time: String): Boolean {
         when(month) {
             1 -> {
-                return time.startsWith("2023-1") || time.startsWith("2023-01")
+                return (time.startsWith("2024-1") || time.startsWith("2024-01")) && time.startsWith("2024-10").not()
             }
             2 -> {
-                return time.startsWith("2023-2") || time.startsWith("2023-02")
+                return time.startsWith("2024-2") || time.startsWith("2024-02")
             }
             3 -> {
-                return time.startsWith("2023-3") || time.startsWith("2023-03")
+                return time.startsWith("2024-3") || time.startsWith("2024-03")
             }
             4 -> {
-                return time.startsWith("2023-4") || time.startsWith("2023-04")
+                return time.startsWith("2024-4") || time.startsWith("2024-04")
             }
             5 -> {
-                return time.startsWith("2023-5") || time.startsWith("2023-05")
+                return time.startsWith("2024-5") || time.startsWith("2024-05")
             }
             6 -> {
-                return time.startsWith("2023-6") || time.startsWith("2023-06")
+                return time.startsWith("2024-6") || time.startsWith("2024-06")
             }
             7 -> {
-                return time.startsWith("2023-7") || time.startsWith("2023-07")
+                return time.startsWith("2024-7") || time.startsWith("2024-07")
             }
             8 -> {
-                return time.startsWith("2022-8") || time.startsWith("2022-08")
+                return time.startsWith("2024-8") || time.startsWith("2024-08")
             }
             9 -> {
-                return time.startsWith("2022-9") || time.startsWith("2022-09")
+                return time.startsWith("2024-9") || time.startsWith("2024-09")
             }
             10 -> {
-                return time.startsWith("2022-10")
+                return time.startsWith("2024-10")
             }
             11 -> {
-                return time.startsWith("2022-11")
+                return time.startsWith("2023-11")
             }
             12 -> {
-                return time.startsWith("2022-12")
+                return time.startsWith("2023-12")
             }
         }
         return false
@@ -430,7 +436,10 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
         })
     }
 
-    fun setFanbaoAgain(checked: Boolean) {
-        fanbao = checked
+    fun setFangLiang(checked: Boolean) {
+        fangliang = checked
+    }
+    fun setXinGaoChecked(checked: Boolean) {
+        xinGao = checked
     }
 }

@@ -47,147 +47,100 @@ class MineMode : BaseMode {
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 2
+        mDeviationValue = day - 20
         if(mDeviationValue >= 20) {
-            val zero = shares[mDeviationValue]
-            val one = shares[mDeviationValue + 1]
-            if(poolMap.contains(one.code)) {
-                i(TAG, "contains: ${one.code}")
-                val info = poolMap[one.code]
-                if(info?.updateTime == one.time) {
+            val today = shares[mDeviationValue + 19]
+            if (today.code?.startsWith("sh688") == true || today.name!!.contains("ST")) return
+            if(poolMap.contains(today.code)) {
+                i(TAG, "contains: ${today.code}")
+                val info = poolMap[today.code]
+                if(info?.updateTime == today.time || info == null) {
                     i(TAG, "重复记录")
                     return
                 }
-                if(one.nowPrice < one.line_20) {
-                    info?.also {
-                        if(it.delete) {
-                            i(TAG, "delete: ${one.code}")
-                            MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
-                            poolMap.remove(one.code)
-                            mFitModeList.add(Pair(one.range, one))
-                        } else {
-                            it.updateTime = one.time
-                            it.dayCount = it.dayCount + 1
-
-                            if(it.dayCount < 3) {
-                                if(one.maxPrice > it.maxPrice) {
-                                    it.maxPrice = one.maxPrice
-                                }
-                            } else {
-                                if(one.maxPrice > it.maxPrice * 1.01) {
-                                    it.maxPrice = one.maxPrice
-                                    if(it.label2 == null) {
-                                        it.label2 = "新高"
-                                        it.maxCount = 0
-                                    }
-                                    it.maxCount ++
-                                }
-                            }
-
-                            it.nowPrice = one.nowPrice
-                            it.delete = true
-                            if(one.minPrice <= it.duanCengPrice) {
-                                it.duanCeng = false
-                            }
-                            MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
-                        }
-                        //reportXiaYinXian(one, it.time)
-                    }
+               val d = today.minPrice < info.price
+                if (d) {
+                    MineShareDatabase.getInstance()?.getMineShareDao()?.delete(today.code!!)
+                    poolMap.remove(today.code)
                 } else {
-                    info?.also {
-                        if(info.updateTime == one.time) {
-                            i(TAG, "重复记录")
-                        } else {
-                            if(one.beginPrice > one.nowPrice && zero.nowPrice > zero.beginPrice && one.totalPrice > zero.totalPrice) {
-                                it.youXuan = false
-                            }
-                            i(TAG, "更新记录")
-                            it.updateTime = one.time
-                            it.dayCount = it.dayCount + 1
-                            if(it.dayCount < 3) {
-                                if(one.maxPrice > it.maxPrice) {
-                                    it.maxPrice = one.maxPrice
-                                }
-                            } else {
-                                if(one.maxPrice > it.maxPrice * 1.01) {
-                                    it.maxPrice = one.maxPrice
-                                    if(it.label2 == null) {
-                                        it.label2 = "新高"
-                                        it.maxCount = 0
-                                    }
-                                    it.maxCount ++
-                                }
-                            }
-                            it.nowPrice = one.nowPrice
-                            it.delete = false
-                            if(one.minPrice <= it.duanCengPrice) {
-                                it.duanCeng = false
-                            }
-                            MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
-
-                            //reportXiaYinXian(one, it.time)
-
-
-                            if(one.totalPrice > zero.totalPrice
-                                && one.nowPrice > one.beginPrice
-                                && zero.nowPrice > zero.beginPrice
-                                && one.range > zero.range
-                            ) {
-                                val report = ReportShareInfo()
-                                report.code = one.code
-                                report.time = one.time
-                                report.name = one.name
-                                report.dayCount = it.dayCount
-                                ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(report)
-                            }
-//                            if(!zhangTing(one) && one.totalPrice < 100000000) {
-//                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(one.code!!)
-//                            } else {
-//
-//                            }
-                        }
+                    info.updateTime = today.time
+                    info.dayCount = info.dayCount + 1
+                    info.nowPrice = today.nowPrice
+                    if (today.maxPrice > info.maxPrice) {
+                        info.maxPrice = today.maxPrice
                     }
+                    MineShareDatabase.getInstance()?.getMineShareDao()?.update(info)
                 }
             } else {
-                if(one.range >= 8 || zero.range + one.range > 8) {
+
+                val one = shares[mDeviationValue + 0]
+                val minList = mutableListOf<Double>()
+                minList.add(one.minPrice)
+                val maxList = mutableListOf<Double>()
+                maxList.add(one.maxPrice)
+
+                val maxPList = mutableListOf<Double>()
+                maxPList.add(one.totalPrice)
+                for (i in 1 .. 19) {
+                    val two = shares[mDeviationValue + i]
+                    minList.add(two.minPrice)
+                    maxList.add(two.maxPrice)
+                    maxPList.add(two.totalPrice)
+                }
+
+                minList.sortBy { it }
+                if (one.minPrice != minList[0]) return
+
+                maxList.sortByDescending { it }
+
+                val h = maxList[0]
+                val l = minList[0]
+
+                if (l == 0.00) return
+
+                val a = (h - l) / l * 100
+
+                maxPList.sortByDescending { it }
+
+                val b =maxPList[0] > 100000000
+
+                if (a < 35 && a > 15 && b) {
+                    val now = shares[mDeviationValue + 19]
+
                     val info = MineShareInfo()
-                    info.time = one.time
-                    info.code = one.code
-                    info.name = one.name
-                    info.price = one.nowPrice
-                    info.nowPrice = one.nowPrice
-                    info.updateTime = one.time
-                    info.maxPrice = one.maxPrice
-                    info.youXuan = true
-                    info.duanCeng = false
-                    info.delete = false
-                    if(one.minPrice > zero.maxPrice) {
-                        info.duanCeng = true
-                        info.duanCengPrice = zero.maxPrice
-                    }
+                    info.time = now.time
+                    info.code = now.code
+                    info.name = now.name
+                    info.nowPrice = now.nowPrice
+                    info.price = l
+                    info.dayCount = 1
+                    info.updateTime = now.time
+                    info.maxPrice = h
+
                     val id = MineShareDatabase.getInstance()?.getMineShareDao()?.insert(info)
                     info.id = id?.toInt() ?: 0
-                    poolMap.put(one.code!!, info)
-                    i(TAG, "${one.brieflyInfo()}")
+                    poolMap.put(now.code!!, info)
+                    mFitModeList.add(Pair(now.range, now))
+                    i(TAG, "${now.brieflyInfo()}")
                 }
             }
         }
     }
 
-    private fun reportXiaYinXian(one: SharesRecordActivity.ShareInfo, startTime: String?) {
-        val a = min(one.rangeBegin, one.range) - one.rangeMin
-        if(one.range < 5 && one.range > -5 && a > 2.5) {
+    private fun reportXiaYinXian(six: SharesRecordActivity.ShareInfo, startTime: String?) {
+        val a = min(six.rangeBegin, six.range) - six.rangeMin
+        if(six.range < 5 && six.range > -5 && a > 2.5) {
             val info = ReportShareInfo()
-            info.code = one.code
-            info.time = one.time
-            info.name = one.name
+            info.code = six.code
+            info.time = six.time
+            info.name = six.name
             info.label1 = startTime
             info.yinXianLength = a
             ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
             ThreadPoolUtil.execute {
                 //i("HomeActivity", "load 111")
                 val sourceFile = Glide.with(MushRoomApplication.sApplication)
-                    .load("https://image.sinajs.cn/newchart/min/n/${one.code}.gif")
+                    .load("https://image.sinajs.cn/newchart/min/n/${six.code}.gif")
                     .downloadOnly(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                     .get()
                 i(TAG, "load 222: ${sourceFile.path}")
@@ -195,7 +148,7 @@ class MineMode : BaseMode {
                 if(!appDir.exists()) {
                     appDir.mkdirs()
                 }
-                val fileName = "${one.code}-${one.time}.jpg"
+                val fileName = "${six.code}-${six.time}.jpg"
                 val destFile = File(appDir, fileName)
                 FileUtil.copy(sourceFile, destFile)
             }
@@ -206,13 +159,17 @@ class MineMode : BaseMode {
         val size = shares.size
         mDeviationValue = size - Constant.PRE
 
-        //analysis(mDeviationValue, shares)
+        analysis(mDeviationValue, shares)
 
-        if(Constant.PRE == 0) {
-            analysis(mDeviationValue, shares)
-        } else {
-            i(TAG, "只记录当天")
-        }
+//        if(Constant.PRE == 0) {
+//            analysis(mDeviationValue, shares)
+//        } else {
+//            i(TAG, "只记录当天")
+//        }
+    }
+
+    private fun upLine5(info: SharesRecordActivity.ShareInfo): Boolean {
+        return info.totalPrice > 0 && info.nowPrice >= info.line_5
     }
 
     override fun des(): String {

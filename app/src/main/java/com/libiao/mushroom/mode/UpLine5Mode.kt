@@ -1,5 +1,6 @@
 package com.libiao.mushroom.mode
 
+import android.content.Context
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
@@ -30,11 +31,8 @@ class UpLine5Mode : BaseMode() {
                 && upLine5(day7)
             ) {
                 val r = (day7.nowPrice - day1.beginPrice) / day1.beginPrice * 100
-                if(r > 15 && r < 60) {
+                if(r > 15) {
 
-                    if((day7.beginPrice - day7.nowPrice) / day7.yesterdayPrice > 0.05) {
-                        return
-                    }
                     i(TAG, "涨幅：$r, ${day7.brieflyInfo()}")
                     mFitModeList.add(
                         Pair(
@@ -48,10 +46,15 @@ class UpLine5Mode : BaseMode() {
             }
         }
 
+
+    }
+
+    override fun shouldAnalysis(context: Context): Boolean {
+        return true
     }
 
     private fun upLine5(info: SharesRecordActivity.ShareInfo): Boolean {
-        return info.minPrice >= info.line_5
+        return info.nowPrice >= info.line_5
     }
 
     override fun des(): String {

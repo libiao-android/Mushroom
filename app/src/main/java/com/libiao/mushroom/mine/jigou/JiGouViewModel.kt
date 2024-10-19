@@ -183,7 +183,7 @@ class JiGouViewModel(initial: JiGouState): MavericksViewModel<JiGouState>(initia
                 return time.startsWith("2023-7") || time.startsWith("2023-07")
             }
             8 -> {
-                return time.startsWith("2022-8") || time.startsWith("2022-08")
+                return time.startsWith("2024-8") || time.startsWith("2024-08")
             }
         }
         return false

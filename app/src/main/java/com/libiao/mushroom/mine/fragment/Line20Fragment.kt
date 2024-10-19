@@ -29,7 +29,7 @@ import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
 import com.libiao.mushroom.mine.tab.Line20Tab
 import com.libiao.mushroom.room.MineShareInfo
-import com.libiao.mushroom.room.MineTest2ShareDatabase
+import com.libiao.mushroom.room.MineShareDatabase
 import com.libiao.mushroom.room.report.ReportShareDatabase
 import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
@@ -166,7 +166,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun initData() {
-        val data = MineTest2ShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
+        //val data = MineTestShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
+        val data = MineShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
         data?.also {
             mData = it
             mTempData = it
@@ -175,6 +176,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
     }
 
     private fun initView() {
+        settingBean?.timeValue = 0
         cb_zhang_fu.isChecked = true
         cb_zhang_fu.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
@@ -451,8 +453,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val stream = FileInputStream(f)
                     val reader = BufferedReader(InputStreamReader(stream, Charset.defaultCharset()))
                     val lines = reader.readLines()
-                    val one = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 2])
-                    val two = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 1])
+                    val one = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount - 19])
+                    //val two = SharesRecordActivity.ShareInfo(lines[lines.size - it.dayCount + 1])
                     var allPrice = 0.00
                     var allDay = 0
                     var itemIn = 0
@@ -461,7 +463,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                     val maxList = arrayListOf<Int>()
                     var threePre = false
                     if(it.candleEntryList == null || reload) {
-                        var begin = lines.size - it.dayCount - 2
+                        var begin = lines.size - it.dayCount - 19
                         if(begin < 0) begin = 0
                         val records = lines.subList(begin, lines.size)
                         val entrys = java.util.ArrayList<CandleEntry>()
@@ -546,22 +548,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                                     } else {
                                         yin++
                                     }
-                                }
-                            }
-
-//                            if(shouHong) {
-//                                if(item.nowPrice > item.beginPrice) {
-//                                    it.zhiDie = true
-//                                    it.fangLiangList.add(index)
-//                                }
-//                            }
-//                            shouHong = false
-
-                            if(fangLiang) {
-                                if(item.totalPrice > tempItem!!.totalPrice && item.range > 0) {
-                                    //shouHong = true
-                                    it.zhiDie = true
-                                    it.fangLiangList.add(index)
                                 }
                             }
 
@@ -674,23 +660,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                             tempItem = item
                         }
                         it.yangYin = yang.toDouble() / (yang + yin)
-                        val tMaxItem = SharesRecordActivity.ShareInfo(records[itemIn])
-//                        it.sanLianYin = false
-//                        if(tMaxItem.nowPrice > tMaxItem.beginPrice && greenLittle) {
-//                            it.sanLianYin = true
-//                        }
-//                        if(greenLittle) {
-//                            it.youXuan = true
-//                        }
+
 
                         list.sortByDescending { it.totalPrice }
                        // LogUtil.i(TAG, "最大：${list[0].totalPrice}")
                        // LogUtil.i(TAG, "最小：${list.last().totalPrice}")
 
 
-                        var minP = one.nowPrice
-                        if(minP == 0.00) minP = two.yesterdayPrice
-                        if(minP == 0.00) minP = two.beginPrice
+                        val minP = it.price
                         it.maxRange = (maxPrice - minP) / minP * 100
                         it.candleEntryList = entrys
                         it.barEntryList = barEntrys
@@ -700,7 +677,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         }
                         if(xinGao) {
                             it.label2 = "新高"
-                            it.maxCount = xinGaoCount
                         }
                         it.youTwo = false
                         if(youOneIndex == (records.size - 1) && it.youOne) {
@@ -708,7 +684,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                         }
 
                     }
-                    it.price = one.nowPrice
+                    //it.price = one.nowPrice
                     val info = lines.get(lines.size - 1)
                     val info_pre = lines.get(lines.size - 2)
 
@@ -727,43 +703,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                    ) {
 //                        it.youThree = true
 //                    }
-
-                    //it.youTwo = false
-
-                    if(it.dayCount >= 4) {
-
-                        val ten1 = share
-                        val ten2 = share_pre
-
-                        val info_pre2 = lines.get(lines.size - 3)
-                        val info_pre3 = lines.get(lines.size - 4)
-                        val info_pre4 = lines.get(lines.size - 5)
-                        val ten3 = SharesRecordActivity.ShareInfo(info_pre2)
-                        val ten4 = SharesRecordActivity.ShareInfo(info_pre3)
-                        val ten5 = SharesRecordActivity.ShareInfo(info_pre4)
-
-                        var tM = Math.max(ten4.totalPrice, ten5.totalPrice)
-                        tM = Math.max(tM, ten3.totalPrice)
-                        tM = Math.max(tM, ten2.totalPrice)
-                        tM = Math.max(tM, ten1.totalPrice)
-
-
-
-//                        if (threePre) {
-//                            if(ten2.totalPrice < ten3.totalPrice && ten1.totalPrice < ten2.totalPrice) {
-//                                it.youTwo = true
-//                            }
-//                        }
-
-//                        if(ten1.range < 0 && ten2.range < 0 && ten1.totalPrice < ten2.totalPrice && ten1.maxPrice < ten2.maxPrice && tM > maxLiang * 0.75
-//                        ) {
-//                            it.youOne = true
-//                        }
-
-//                        if(ten3.range < 0 && ten2.range < 0 && ten1.nowPrice > ten1.beginPrice) {
-//                            it.youTwo = true
-//                        }
-                    }
 
                     updateCurrentData(it, share, share_pre)
 
@@ -784,9 +723,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         val temp  = ArrayList<MineShareInfo>()
         for (info in mData) {
 
-            if(heartChecked && !info.heart) {
-                continue
-            }
+
             if(isYinXianOne && info.todayMaxRange > 3) {
                 continue
             }
@@ -821,19 +758,11 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 continue
             }
 
-            if(selfSettingBean?.youXuan == true && !info.youXuan) {
-                continue
-            }
-
             if(selfSettingBean?.maxRangChecked == true && info.yinXianLength < selfSettingBean.maxRangValue) {
                 continue
             }
 
             if(selfSettingBean?.zhiDie == true && !info.zhiDie) {
-                continue
-            }
-
-            if(selfSettingBean?.duan_ceng_Checked == true && !info.duanCeng) {
                 continue
             }
 
@@ -863,9 +792,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         mAdapter?.setData(mTempData)
     }
 
-    private fun deleteItem(mineShareInfo: MineShareInfo?) {
-        (mData as ArrayList).remove(mineShareInfo)
-        (mTempData as ArrayList).remove(mineShareInfo)
+    private fun deleteItem(MineShareInfo: MineShareInfo?) {
+        (mData as ArrayList).remove(MineShareInfo)
+        (mTempData as ArrayList).remove(MineShareInfo)
         mAdapter?.setData(mTempData)
         refreshCount()
     }
@@ -882,19 +811,6 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         if(it.price > 0) {
 
             it.youOne = false
-
-            if(it.dayCount >= 2
-                && share.totalPrice >= it.label3!!.toDouble() * 0.95
-                && share.rangeMax > 7
-                && share.totalPrice > sharePre.totalPrice * 1.8 * 0.95
-                && !ShareParseUtil.zhangTing(share)
-                && !ShareParseUtil.zhangTingMax(share)
-                && share.range > 0
-                && share.nowPrice > share.beginPrice
-                && sharePre.range < 5
-            ) {
-                it.youOne = true
-            }
 
 
             val a = min(share.rangeBegin, share.range) - share.rangeMin
@@ -922,13 +838,14 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 it.liangBi = share.totalPrice / sharePre.totalPrice
             }
 
-            it.redLine = sharePre.nowPrice < sharePre.beginPrice && share.nowPrice < share.beginPrice && sharePre.range < 0 && share.range < 0
+            it.redLine = share.nowPrice > share.beginPrice
+            it.zhiDie = sharePre.beginPrice > sharePre.nowPrice && it.redLine
 
             var liangBi = "0"
             if(sharePre.totalPrice > 0) {
                 liangBi = baoLiuXiaoShu(share.totalPrice / sharePre.totalPrice)
             }
-            it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}, ${String.format("%.2f",it.label3!!.toDouble() / 100000000)}亿"
+            it.moreInfo = "${share.rangeBegin},  ${share.rangeMin},  ${share.rangeMax},  ${String.format("%.2f",share.totalPrice / 100000000)}亿,  ${liangBi}"
         }
     }
 
@@ -998,7 +915,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
         private var moreInfoTv: TextView? = null
         private var heartIv: ImageView? = null
 
-        private var mineShareInfo: MineShareInfo? = null
+        private var MineShareInfo: MineShareInfo? = null
         private var chart: CandleStickChart? = null
         private var combinedChart: CombinedChart? = null
         private var bar: BarChart? = null
@@ -1048,8 +965,8 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
             view.setOnClickListener {
                 val intent = Intent(context, KLineActivity::class.java)
-                intent.putExtra("code", mineShareInfo?.code)
-                intent.putExtra("info", mineShareInfo.toString())
+                intent.putExtra("code", MineShareInfo?.code)
+                intent.putExtra("info", MineShareInfo.toString())
                 context.startActivity(intent)
             }
 
@@ -1058,9 +975,9 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 MoreDialog(context){
                     when(it.id) {
                         R.id.btn_dialog_delete -> {
-                            mineShareInfo?.code?.also {
-                                MineTest2ShareDatabase.getInstance()?.getMineShareDao()?.delete(it)
-                                deleteItem(mineShareInfo)
+                            MineShareInfo?.code?.also {
+                                MineShareDatabase.getInstance()?.getMineShareDao()?.delete(it)
+                                deleteItem(MineShareInfo)
                             }
                         }
                     }
@@ -1069,13 +986,13 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
             }
 
 //            mIdTv?.setOnClickListener {
-//                mineShareInfo!!.showFenShi = !mineShareInfo!!.showFenShi
-//                if(mineShareInfo!!.showFenShi) {
+//                MineShareInfo!!.showFenShi = !MineShareInfo!!.showFenShi
+//                if(MineShareInfo!!.showFenShi) {
 //                    mFenShiIv?.visibility = View.VISIBLE
 //                    combinedChart?.visibility = View.GONE
 //                    bar?.visibility = View.GONE
 //                    divideView?.visibility = View.GONE
-//                    Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${mineShareInfo!!.code}.gif")
+//                    Glide.with(context).load("https://image.sinajs.cn/newchart/min/n/${MineShareInfo!!.code}.gif")
 //                        .asGif()
 //                        .skipMemoryCache(true)
 //                        .diskCacheStrategy(DiskCacheStrategy.NONE)
@@ -1088,19 +1005,18 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 //                }
 //            }
             mCodeTv?.setOnClickListener {
-                ClipboardUtil.clip(context, mineShareInfo?.code)
+                ClipboardUtil.clip(context, MineShareInfo?.code)
             }
 
             mTimeTv?.setOnClickListener {
                 //http://image.sinajs.cn/newchart/min/n/sh000001.gif
-                FenShiDialog(context, mineShareInfo?.code!!).show()
+                FenShiDialog(context, MineShareInfo?.code!!).show()
             }
 
             heartIv?.setOnClickListener {
                 heart = !heart
-                mineShareInfo?.heart = heart
-                mineShareInfo?.also {
-                    MineTest2ShareDatabase.getInstance()?.getMineShareDao()?.update(it)
+                MineShareInfo?.also {
+                    MineShareDatabase.getInstance()?.getMineShareDao()?.update(it)
                 }
                 if(heart) {
                     heartIv?.setImageResource(R.mipmap.heart_selected)
@@ -1161,7 +1077,7 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
 
         fun bindData(position: Int, info: MineShareInfo) {
             //LogUtil.i(TAG, "bindData: ${info.code}, ${info.candleEntryList?.size}")
-            this.mineShareInfo = info
+            this.MineShareInfo = info
             mIdTv?.text = position.toString()
             mTimeTv?.text = info.time?.substring(5) + "(${info.dayCount})"
             mNameTv?.text = info.name
@@ -1267,22 +1183,16 @@ class Line20Fragment: BaseFragment(R.layout.line_20_fragment), ICommand {
                 bar?.invalidate()
             }
 
-            heart = info.heart
             if(heart) {
                 heartIv?.setImageResource(R.mipmap.heart_selected)
             } else {
                 heartIv?.setImageResource(R.mipmap.heart)
             }
 
-//            if(info.zhiDie) {
-//                mTypeZhiDieTv?.visibility = View.VISIBLE
-//            } else {
-//                mTypeZhiDieTv?.visibility = View.GONE
-//            }
 
             if(info.label2 == "新高") {
                 mTypeXinGaoTv?.visibility = View.VISIBLE
-                mTypeXinGaoTv?.text = "新高 ${info.maxCount}"
+                mTypeXinGaoTv?.text = "新高"
             } else {
                 mTypeXinGaoTv?.visibility = View.GONE
             }

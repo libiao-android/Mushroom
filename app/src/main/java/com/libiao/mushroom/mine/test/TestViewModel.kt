@@ -12,9 +12,7 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
-import com.libiao.mushroom.room.test.TestShareDatabase2
 import com.libiao.mushroom.utils.LogUtil
-import com.libiao.mushroom.utils.ShareParseUtil
 import com.libiao.mushroom.utils.baoLiuXiaoShu
 import com.libiao.mushroom.utils.huanSuanYi
 import java.io.BufferedReader
@@ -22,7 +20,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.Charset
-import kotlin.math.max
 
 class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) {
 
@@ -43,9 +40,9 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     var xingao2 = false
     var gengQiang = false
 
-    var xinDi = false
+    var zhenDang = false
 
-    var test = false
+    var dazhangcheck = false
 
     var maxPrice = false
     var xinGaoAgain = false
@@ -73,19 +70,13 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
         withState {
 
-            if(month == 6) {
-               //TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("8")
+            if(month == 11) {
+               //TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("444")
             }
             val data: MutableList<TestShareInfo>?
-            if (twoLianBan) {
-                data = TestShareDatabase.getInstance()?.getTestShareDao()?.getTwoLianBanShares()
-            } else if(xinDi) {
-                data = TestShareDatabase.getInstance()?.getTestShareDao()?.getXindiShares()
-            } else {
-                data = TestShareDatabase.getInstance()?.getTestShareDao()?.getMineTestShares()
-            }
+            data = TestShareDatabase.getInstance()?.getTestShareDao()?.getZhenDang()
 
-            LogUtil.i(TAG, "fetchInfo: ${data?.size}")
+            LogUtil.i(TAG, "fetchInfo: ${data?.size}, $kuiChecked")
             val dataT = ArrayList<TestShareInfo>()
             var totalRange = 0.00
             var totalRangeZhuan = 0.00
@@ -95,6 +86,10 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
             var fanbao = 0
             var fanBaokui = 0.00
             var fanBaozhuan = 0.00
+
+
+            var zhang = 0.00
+
             data?.forEach {
                 if(it.dayCount >= 0 && isFit(month, it.time!!)) {
                     val f = File(file_2023, it.code)
@@ -114,7 +109,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 
                         if(it.candleEntryList == null) {
 
-                            var blackIndex = it.dayCount + 1
+                            var blackIndex = 20
                             var a = updateIndex - blackIndex
                             if(a < 0) {
                                 a = 0
@@ -132,7 +127,6 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             val values_20 = java.util.ArrayList<Entry>()
 
                             var itemBlack: SharesRecordActivity.ShareInfo? = null
-                            var itemBlack2: SharesRecordActivity.ShareInfo? = null
                             var itemBlackPost: SharesRecordActivity.ShareInfo? = null
                             var itemBlackPost2: SharesRecordActivity.ShareInfo? = null
                             var itemBlackPost3: SharesRecordActivity.ShareInfo? = null
@@ -208,7 +202,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                     itemBlackPost2 = item
                                 }
 
-                                if(index == 123) {
+                                if(index == blackIndex + 3) {
                                     itemBlackPost3 = item
                                 }
 
@@ -216,10 +210,6 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 if(index == blackIndex) {
                                     colorEntrys.add(Color.BLACK)
                                     itemBlack = item
-                                } else if(!twoLianBan && !all && index == blackIndex + 1){
-                                    colorEntrys.add(Color.BLACK)
-                                } else if(index > 1 && item.totalPrice > maxLiang && item.nowPrice > item.beginPrice && !twoLianBan){
-                                    colorEntrys.add(Color.GRAY)
                                 } else {
                                     val green = "#28FF28"
                                     val red = "#FF0000"
@@ -268,85 +258,44 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                             it.values_10 = values_10
                             it.values_20 = values_20
 
-                            if(twoLianBan) {
-                                if(itemBlack?.code?.startsWith("sh688") != true) {
-                                    if(itemBlack!!.totalPrice > itemBlackPre!!.totalPrice) {
-                                        if(itemBlackPost != null && itemBlackPost2 != null) {
-                                            val r = itemBlackPost!!.range - itemBlackPost!!.rangeBegin + itemBlackPost2!!.range
-                                            if(r > 0) {
-                                                zhuan ++
-                                            } else {
-                                                kui++
-                                            }
-                                            totalRange += r
-                                        }
-                                        dataT.add(it)
-                                    }
-                                }
-                                return@forEach
+
+                            it.moreInfo = "${itemBlack?.rangeBegin}, ${itemBlack?.rangeMin}, ${itemBlack?.rangeMax}, ${itemBlack?.range}, ${huanSuanYi(itemBlack?.totalPrice ?: 0.00)}"
+
+                            if (itemBlackPost != null) {
+                                it.moreInfo3 = "${baoLiuXiaoShu(itemBlackPost!!.rangeBegin)}, ${baoLiuXiaoShu(itemBlackPost!!.range)}"
                             }
 
-                            if(xinDi) {
-                                val aa = "${itemBlack!!.range}, ${huanSuanYi(itemBlack!!.totalPrice)}"
-                                it.moreInfo = "$aa, ${it.ext4}"
-                                if(itemBlackPost != null &&
-                                    (itemBlackPost!!.totalPrice > itemBlack!!.totalPrice || itemBlackPost!!.nowPrice > itemBlack!!.nowPrice)) {
-                                    if(itemBlack!!.range >= 7.5) {
-                                        dataT.add(it)
-                                    }
-                                }
-                                return@forEach
-                            }
+                            val aa = itemBlack!!.totalPrice < itemBlackPre!!.totalPrice && itemBlack!!.maxPrice < itemBlackPre!!.maxPrice
+                            val bb = itemBlack!!.rangeMax - itemBlack!!.range > itemBlack!!.range - itemBlack!!.rangeBegin
 
-                            if(all) {
-                                it.moreInfo = "${itemBlack?.range}, ${huanSuanYi(itemBlack?.totalPrice ?: 0.00)}"
-
-                                if(itemBlack!!.rangeMax - itemBlack!!.range < itemBlack!!.range) {
-                                    if(!ShareParseUtil.zhangTing(itemBlack!!) && !ShareParseUtil.zhangTingMax(itemBlack!!) && itemBlack!!.rangeMax > 7) {
-                                        if(!zhuanChencked && !kuiChecked) {
-                                            dataT.add(it)
-                                        }
-                                        if(itemBlackPost != null) {
-                                            LogUtil.i(TAG, "${itemBlackPost!!.code}, ${itemBlackPost!!.range}")
-                                            totalRange += itemBlackPost!!.range
-                                            it.moreInfo += " / ${itemBlackPost?.range}, ${itemBlackPost?.rangeMax}"
-                                            if(itemBlackPost!!.range > 0) {
-                                                if(zhuanChencked) {
-                                                    dataT.add(it)
-                                                }
-                                                zhuan++
-                                                totalRangeZhuan += itemBlackPost!!.range
-                                            } else {
-                                                kui++
-                                                if(kuiChecked) {
-                                                    dataT.add(it)
-                                                }
-                                                totalRangeKui += itemBlackPost!!.range
-                                                if(itemBlackPost2 != null) {
-                                                    if(itemBlackPost2!!.range > 0) {
-                                                        fanbao ++
-                                                        fanBaozhuan += itemBlackPost2!!.range
-                                                    } else {
-                                                        fanBaokui += itemBlackPost2!!.range
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-
+                            if (aa || bb) {
+                                // dataT.add(it)
                             } else {
-                                dataT.add(it)
+                                if (it.code?.startsWith("sz3") == true) {
+                                    dataT.add(it)
+                                    if(itemBlackPost != null && itemBlackPost2 != null) {
+                                        val r = itemBlackPost!!.range - itemBlackPost!!.rangeBegin + itemBlackPost2!!.range
+                                        zhang += r
+                                    }
+                                }
+
                             }
+
+//                            itemBlackPre2?.also { pre2 ->
+//                                val a = itemBlackPre!!.rangeMax - itemBlackPre!!.rangeMin < 7
+//                                val b = itemBlack!!.rangeMax - itemBlack!!.rangeMin < 7
+//                                if (pre2.nowPrice < pre2.beginPrice && a && b) {
+//
+//                                }
+//                            }
+
                         }
                     }
                 }
 
             }
             handler.post {
-                result("赚${zhuan}, 亏${kui}, 赚${baoLiuXiaoShu(totalRangeZhuan)}, 亏${baoLiuXiaoShu(totalRangeKui)}, 总${baoLiuXiaoShu(totalRange)}," +
-                        "\n反包${fanbao}, ${baoLiuXiaoShu(fanBaozhuan)}, ${baoLiuXiaoShu(fanBaokui)}")
+                result("涨 ${baoLiuXiaoShu(zhang)}")
             }
             LogUtil.i(TAG, "totalRange: $totalRange")
             dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
@@ -360,6 +309,14 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 }
             }
         }
+    }
+
+    fun isChuang(code: String?): Boolean {
+        return code?.startsWith("sz3") ?: false
+    }
+
+    fun isKeChuang(code: String?): Boolean {
+        return code?.startsWith("sh688") ?: false
     }
 
     private fun oneDayCount2(dataT: java.util.ArrayList<TestShareInfo>) {
@@ -418,48 +375,48 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
 //        if(test && ext5 == "5") return true
 //        if(xingao && ext5 == "1") return true
 //        if(fangliang && ext5 == "2") return true
-        if(xinDi && ext5 == "4") return true
-        if(!xinDi && ext5 == "7") return true
+        if(zhenDang && ext5 == "4") return true
+        if(!zhenDang && ext5 == "7") return true
         return false
     }
 
     private fun isFit(month: Int, time: String): Boolean {
         when(month) {
             1 -> {
-                return time.startsWith("2023-1") || time.startsWith("2023-01")
+                return (time.startsWith("2024-1") || time.startsWith("2024-01")) && time.startsWith("2024-10").not()
             }
             2 -> {
-                return time.startsWith("2023-2") || time.startsWith("2023-02")
+                return time.startsWith("2024-2") || time.startsWith("2024-02")
             }
             3 -> {
-                return time.startsWith("2023-3") || time.startsWith("2023-03")
+                return time.startsWith("2024-3") || time.startsWith("2024-03")
             }
             4 -> {
-                return time.startsWith("2023-4") || time.startsWith("2023-04")
+                return time.startsWith("2024-4") || time.startsWith("2024-04")
             }
             5 -> {
-                return time.startsWith("2023-5") || time.startsWith("2023-05")
+                return time.startsWith("2024-5") || time.startsWith("2024-05")
             }
             6 -> {
-                return time.startsWith("2023-6") || time.startsWith("2023-06")
+                return time.startsWith("2024-6") || time.startsWith("2024-06")
             }
             7 -> {
-                return time.startsWith("2023-7") || time.startsWith("2023-07")
+                return time.startsWith("2024-7") || time.startsWith("2024-07")
             }
             8 -> {
-                return time.startsWith("2022-8") || time.startsWith("2022-08")
+                return time.startsWith("2024-8") || time.startsWith("2024-08")
             }
             9 -> {
-                return time.startsWith("2022-9") || time.startsWith("2022-09")
+                return time.startsWith("2024-9") || time.startsWith("2024-09")
             }
             10 -> {
-                return time.startsWith("2022-10")
+                return time.startsWith("2024-10")
             }
             11 -> {
-                return time.startsWith("2022-11")
+                return time.startsWith("2023-11")
             }
             12 -> {
-                return time.startsWith("2022-12")
+                return time.startsWith("2023-12")
             }
         }
         return false
@@ -632,16 +589,10 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     }
 
     fun setXindi(checked: Boolean) {
-        xinDi = checked
+        zhenDang = checked
     }
 
-    fun setWenLiang(checked: Boolean) {
-        test = checked
-        if(test) {
-            xinDi = false
-            gengQiang = false
-            xingao2 = false
-            xingao = false
-        }
+    fun setDaZhang(checked: Boolean) {
+        dazhangcheck = checked
     }
 }

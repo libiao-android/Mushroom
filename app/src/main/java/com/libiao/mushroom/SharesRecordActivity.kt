@@ -111,7 +111,7 @@ class SharesRecordActivity : AppCompatActivity() {
         }
 
         val time = "$mYear-$mMonth-$mDay-$mWay"
-        //val time = "2022-6-13-1"
+        //val time = "2024-2-8-4"
         i(TAG, "time: $time")
         this.time = time
 

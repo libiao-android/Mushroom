@@ -174,10 +174,14 @@ class TestItemView @JvmOverloads constructor(
             test_item_more_info.text = info.moreInfo
         }
 
-        test_item_more_info2.text = "${info.lastShareInfo?.rangeBegin}, ${info.lastShareInfo?.rangeMin}, ${info.lastShareInfo?.rangeMax}, ${info.lastShareInfo?.range}"
+        if(info.moreInfo3 == null) {
+            test_item_more_info3.visibility = View.GONE
+        } else {
+            test_item_more_info3.visibility = View.VISIBLE
+            test_item_more_info3.text = info.moreInfo3
+        }
 
-        test_item_more_info.visibility = View.VISIBLE
-        test_item_more_info.text = "${info.moreInfo}"
+        test_item_more_info2.text = "${info.lastShareInfo?.rangeBegin}, ${info.lastShareInfo?.rangeMin}, ${info.lastShareInfo?.rangeMax}, ${info.lastShareInfo?.range}"
 
         test_item_label_view.removeAllViews()
         if(info.label1 != null) {

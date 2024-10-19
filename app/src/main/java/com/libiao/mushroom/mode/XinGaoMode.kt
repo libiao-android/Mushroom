@@ -6,6 +6,8 @@ import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
 import com.libiao.mushroom.room.ban.BanShareDatabase
 import com.libiao.mushroom.room.ban.one.BanOneShareInfo
+import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 
@@ -22,15 +24,6 @@ class XinGaoMode : BaseMode {
 
     private val poolMap = HashMap<String, TestShareInfo>()
 
-    init {
-        val fangLiangShares = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
-        fangLiangShares?.forEach {
-            //LogUtil.i(TAG, "getMineShares: ${it.code}")
-            poolMap[it.code!!] = it
-        }
-        i(TAG, "init: ${poolMap.size}")
-    }
-
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
         val v = 120 + Constant.PRE
@@ -43,27 +36,24 @@ class XinGaoMode : BaseMode {
             prices.sortByDescending { it.first }
             val first  = prices[0]
             val second  = prices[1]
-            val jianGe = first.second - second.second
-            if(first.second == day - 1 && jianGe > 10) {
-                val two = shares[day - 1]
+            val two = shares[day - 1]
+            if(first.second == day - 1 && two.range > 0 && two.nowPrice > two.beginPrice) {
+
                 i(TAG, "新高：${two.brieflyInfo()}")
                 mFitModeList.add(Pair(two.range, two))
-
-                val info = TestShareInfo()
-                info.time = two.time
-                info.code = two.code
-                info.name = two.name
-                info.dayCount = 120
-                info.updateTime = two.time
-                info.startIndex = day - 120
-                info.ext4 = jianGe.toString()
-                info.ext5 = "1"
-
-                val id = TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
-                info.id = id?.toInt() ?: 0
-                poolMap[two.code!!] = info
+                record(two)
             }
         }
+    }
+
+    private fun record(one: SharesRecordActivity.ShareInfo) {
+        val info = ReportShareInfo()
+        info.code = one.code
+        info.time = one.time
+        info.name = one.name
+        info.updateTime = one.time
+        info.ext5 = "22"
+        ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
     }
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {

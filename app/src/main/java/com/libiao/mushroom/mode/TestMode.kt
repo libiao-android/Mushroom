@@ -2,16 +2,12 @@ package com.libiao.mushroom.mode
 
 import android.content.Context
 import com.libiao.mushroom.SharesRecordActivity
-import com.libiao.mushroom.mine.fragment.Line20Fragment
 import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
-import com.libiao.mushroom.room.report.ReportShareDatabase
-import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.utils.Constant
-import com.libiao.mushroom.utils.LogUtil
-import com.libiao.mushroom.utils.LogUtil.i
-import com.libiao.mushroom.utils.ShareParseUtil
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 class TestMode : BaseMode {
 
@@ -20,56 +16,51 @@ class TestMode : BaseMode {
     constructor(showTime: Boolean): super(showTime) {
     }
 
-    private val poolMap = HashMap<String, TestShareInfo>()
-
     init {
-        val fangLiangShares = TestShareDatabase.getInstance()?.getTestShareDao()?.getShares()
-        fangLiangShares?.forEach {
-            //LogUtil.i(TAG, "getMineShares: ${it.code}")
-            poolMap[it.code!!] = it
-        }
-        i(TAG, "init: ${poolMap.size}")
+
     }
 
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 3
+        mDeviationValue = day - 7
         if(mDeviationValue >= 0) {
-
 
             val one = shares[mDeviationValue + 0]
             val two = shares[mDeviationValue + 1]
             val three = shares[mDeviationValue + 2]
+            val four = shares[mDeviationValue + 3]
+            val five = shares[mDeviationValue + 4]
+            val six = shares[mDeviationValue + 5]
+            val seven = shares[mDeviationValue + 6]
 
-            if(one.totalPrice <= 0 || two.totalPrice <= 0) return
+            val a = one.rangeMax < 9 && two.rangeMax < 9 && three.rangeMax < 9 && four.rangeMax < 9 && five.rangeMax < 9 && six.rangeMax >= 9
+            val b = seven.range - seven.rangeBegin > -0.5
+            val c = seven.maxPrice < six.maxPrice
 
-            val a = two.totalPrice > one.totalPrice && one.totalPrice > 30000000
-            val b = three.totalPrice > two.totalPrice
-           // val c = one.nowPrice > one.line_20
-           // val d = two.nowPrice > two.line_20
-           // val e = three.nowPrice > three.line_20
-            val f = (two.totalPrice - one.totalPrice) / one.totalPrice
-            val g = (three.totalPrice - two.totalPrice) / two.totalPrice
-            val h = abs(f - g) < 0.99 && f > 0.2 && g > 0.2
-            val j = one.nowPrice > one.beginPrice && two.nowPrice > two.beginPrice && three.nowPrice > three.beginPrice
-            val k = three.range > two.range && two.range > one.range
-
-
-            if(a && b && h && j && k) {
-                i(TAG, "${three.brieflyInfo()}")
-                mFitModeList.add(Pair(three.range, three))
+            if(a && b && c) {
+                mFitModeList.add(Pair(six.range, six))
 
                 val info = TestShareInfo()
-                info.code = three.code
-                info.time = three.time
-                info.name = three.name
-                info.updateTime = three.time
-                info.ext5 = "5"
-                info.label1 = "${baoLiuXiaoShu(f)}, ${baoLiuXiaoShu(g)}"
+                info.time = six.time
+                info.code = six.code
+                info.name = six.name
+                info.dayCount = 20
+                info.updateTime = six.time
                 TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
+
             }
         }
+    }
+
+    private fun getTpBeiShu(tp: Double): Double {
+        return 2.0
+    }
+
+    private fun getHuanShouLv(tp: Double): Int {
+        if (tp > 2000000000) return 6
+        if (tp > 1500000000) return 8
+        return 9
     }
 
     override fun analysis(shares: ArrayList<SharesRecordActivity.ShareInfo>) {

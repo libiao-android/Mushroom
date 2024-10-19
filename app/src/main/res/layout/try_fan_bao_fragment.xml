@@ -17,7 +17,7 @@
         <CheckBox
             android:textSize="13dp"
             android:layout_centerVertical="true"
-            android:id="@+id/cb_xin_gao_count"
+            android:id="@+id/cb_xin_gao_liang_bi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="新高次数"/>

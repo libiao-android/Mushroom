@@ -19,7 +19,7 @@ class XinGaoTab: TabItem() {
     }
 
     override fun name(): String {
-        return "新高"
+        return "放量"
     }
 
     override fun tag(): String {

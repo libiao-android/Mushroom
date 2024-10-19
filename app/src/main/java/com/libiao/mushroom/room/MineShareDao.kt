@@ -6,7 +6,7 @@ import androidx.room.*
 @Dao
 interface MineShareDao {
 
-    @Query("SELECT * FROM mineshareinfo")
+    @Query("SELECT * FROM mineshareinfo WHERE maxCount = 0")
     fun getMineShares(): List<MineShareInfo>
 
     @Insert

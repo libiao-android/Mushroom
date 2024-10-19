@@ -24,7 +24,6 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.libiao.mushroom.R
 import com.libiao.mushroom.SharesRecordActivity
-import com.libiao.mushroom.fanbao.FanBaoShiShiManager
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mine.*
 import com.libiao.mushroom.mine.tab.FanBaoTab
@@ -33,13 +32,10 @@ import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.*
 import kotlinx.android.synthetic.main.try_fan_bao_fragment.*
-import kotlinx.android.synthetic.main.xin_gao_fragment.*
 import kotlinx.android.synthetic.main.xin_gao_fragment.btn_start
-import kotlinx.android.synthetic.main.xin_gao_fragment.cb_fang_liang
 import kotlinx.android.synthetic.main.xin_gao_fragment.cb_first_xin_gao
-import kotlinx.android.synthetic.main.xin_gao_fragment.cb_line_20
 import kotlinx.android.synthetic.main.xin_gao_fragment.cb_tu_po
-import kotlinx.android.synthetic.main.xin_gao_fragment.cb_xin_gao_count
+import kotlinx.android.synthetic.main.xin_gao_fragment.cb_xin_gao_liang_bi
 import kotlinx.android.synthetic.main.xin_gao_fragment.cb_yang_yin
 import kotlinx.android.synthetic.main.xin_gao_fragment.cb_yang_yin_one
 import kotlinx.android.synthetic.main.xin_gao_fragment.cb_yin_xian_one
@@ -182,7 +178,7 @@ class TryFanBaoFragment: BaseFragment(R.layout.try_fan_bao_fragment), ICommand {
             }
 
         }
-        cb_xin_gao_count.setOnCheckedChangeListener { buttonView, isChecked ->
+        cb_xin_gao_liang_bi.setOnCheckedChangeListener { buttonView, isChecked ->
             if(isChecked) {
                 currentCb = 2
                 tv_ke_xuan.text = "新高"
