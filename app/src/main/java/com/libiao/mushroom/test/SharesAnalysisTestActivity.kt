@@ -166,7 +166,25 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
 
           //  oneAnalysis(avg, codeList)
 
+            Thread{
+                val data = ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>()
+                for(i in 0 until avg) {
 
+                    count++
+                    if(count % 10 == 0 && count < (avg -100) ) {
+                        val p = (count / (avg.toFloat()) * 100).toInt()
+                        mHandler.post { progressTv?.text = "$p%, ${count * 4}" }
+                    }
+
+                    analysis(codeList[i], data)
+                }
+                mHandler.post {
+                    allData.addAll(data)
+                    progressTv?.text = "$100%, $size, ${++done}"
+                    loadingPb?.visibility = View.GONE
+                    findOutFitMode()
+                }
+            }.start()
 
             Thread{
                 val data = ArrayList<ArrayList<SharesRecordActivity.ShareInfo>>()
