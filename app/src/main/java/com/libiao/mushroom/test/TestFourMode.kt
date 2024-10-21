@@ -70,7 +70,7 @@ class TestFourMode : BaseMode {
         info.time = one.time
         info.name = one.name
         info.updateTime = one.time
-        info.ext5 = "111"
+        info.ext5 = "222"
         ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
     }
 

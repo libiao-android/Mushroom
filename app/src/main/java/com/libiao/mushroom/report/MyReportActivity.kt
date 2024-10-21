@@ -36,22 +36,30 @@ class MyReportActivity: BaseActivity(), MavericksView {
     private val reportViewModel: ReportViewModel by viewModel()
 
     private fun initView() {
-        reportViewModel.setOnlySeeDelete(cb_delete.isChecked)
-        cb_delete.setOnCheckedChangeListener { buttonView, isChecked ->
-            reportViewModel.setOnlySeeDelete(isChecked)
+        reportViewModel.setYear(2024)
+        cb_21.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setYear(2021)
         }
-        reportViewModel.setConditionOne(cb_three_yang.isChecked)
+        cb_22.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setYear(2022)
+        }
+        cb_23.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setYear(2023)
+        }
+        cb_24.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setYear(2024)
+        }
+        cb_all.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setLeiXing("all")
+        }
+        cb_zhu_ban.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setLeiXing("zhuBan")
+        }
+        cb_chuang.setOnCheckedChangeListener { buttonView, isChecked ->
+            reportViewModel.setLeiXing("chuang")
+        }
 
-        cb_fang_liang.setOnCheckedChangeListener { buttonView, isChecked ->
-            reportViewModel.setFangLiang(isChecked)
-        }
-        cb_xin_gao.setOnCheckedChangeListener { buttonView, isChecked ->
-            reportViewModel.setXinGaoChecked(isChecked)
-        }
 
-        cb_three_yang.setOnCheckedChangeListener { buttonView, isChecked ->
-            reportViewModel.setConditionOne(isChecked)
-        }
         btn_online.setOnClickListener {
             reportViewModel.online()
         }

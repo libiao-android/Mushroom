@@ -130,7 +130,7 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
 
     private fun initData() {
 
-        mModeList.add(TestFourMode())
+        //mModeList.add(TestFourMode())
 
         val tempList = ArrayList<BaseMode>()
         mModeList.forEach {

@@ -29,7 +29,8 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
     var localList = mutableListOf<ReportShareInfo>()
 
-    var maxLiang: Boolean = false
+    var yearY: Int = 2024
+    var leiXingY = "all"
     var threeYang: Boolean = false
 
     var fangliang: Boolean = false
@@ -47,7 +48,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             //val data = XinGaoShareDatabase.getInstance()?.getReportShareDao()?.getShares()
 
 
-            val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("111")
+            val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("222")
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<ReportShareInfo>()
             val dataTime = ArrayList<ReportShareInfo>()
@@ -59,7 +60,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 if (it.code?.startsWith("sh688") == true) return@forEach
                 if (it.name?.contains("st", ignoreCase = true) == true) return@forEach
 
-                if(isFit(month, it.time!!)) {
+                if(isFit(month, it.time!!, yearY)) {
                     if(it.time == time) {
 
                     } else {
@@ -204,14 +205,44 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                             it.moreInfo = "${post1?.rangeBegin}, ${post1?.range}, ${post2?.range}"
 
-
-                            if (it.code?.startsWith("sz3") == false) {
-                                if (post1 != null && post2 != null) {
-                                    val r = post1!!.range - post1!!.rangeBegin + post2!!.range
-                                    it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
-                                    totalRange += r
+                            when(leiXingY) {
+                                "all" -> {
+                                    if (post1 != null && post2 != null) {
+                                        val r = post1!!.range - post1!!.rangeBegin + post2!!.range
+                                        it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                        totalRange += r
+                                    }
+                                    dataTime.add(it)
                                 }
-                                dataTime.add(it)
+                                "zhuBan" -> {
+                                    if (it.code?.startsWith("sz3") == false) {
+                                        if (post1 != null && post2 != null) {
+                                            val r = post1!!.range - post1!!.rangeBegin + post2!!.range
+                                            it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                            totalRange += r
+                                        }
+                                        dataTime.add(it)
+                                    }
+
+                                }
+                                "chuang" -> {
+                                    if (it.code?.startsWith("sz3") == true) {
+                                        if (post1 != null && post2 != null) {
+                                            val r = post1!!.range - post1!!.rangeBegin + post2!!.range
+                                            it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                            totalRange += r
+                                        }
+                                        dataTime.add(it)
+                                    }
+                                }
+                                else -> {
+                                    if (post1 != null && post2 != null) {
+                                        val r = post1!!.range - post1!!.rangeBegin + post2!!.range
+                                        it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                        totalRange += r
+                                    }
+                                    dataTime.add(it)
+                                }
                             }
 
                         }
@@ -237,50 +268,43 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
         }
     }
 
-    private fun isOnlyDelete(it: ReportShareInfo): Boolean {
-        if(maxLiang) {
-            return it.delete == 1
-        }
-        return false
-    }
-
-    private fun isFit(month: Int, time: String): Boolean {
+    private fun isFit(month: Int, time: String, year: Int): Boolean {
         when(month) {
             1 -> {
-                return (time.startsWith("2024-1") || time.startsWith("2024-01")) && time.startsWith("2024-10").not()
+                return (time.startsWith("$year-1") || time.startsWith("$year-01")) && time.startsWith("$year-10").not() && time.startsWith("$year-11").not() && time.startsWith("$year-12").not()
             }
             2 -> {
-                return time.startsWith("2024-2") || time.startsWith("2024-02")
+                return time.startsWith("$year-2") || time.startsWith("$year-02")
             }
             3 -> {
-                return time.startsWith("2024-3") || time.startsWith("2024-03")
+                return time.startsWith("$year-3") || time.startsWith("$year-03")
             }
             4 -> {
-                return time.startsWith("2024-4") || time.startsWith("2024-04")
+                return time.startsWith("$year-4") || time.startsWith("$year-04")
             }
             5 -> {
-                return time.startsWith("2024-5") || time.startsWith("2024-05")
+                return time.startsWith("$year-5") || time.startsWith("$year-05")
             }
             6 -> {
-                return time.startsWith("2024-6") || time.startsWith("2024-06")
+                return time.startsWith("$year-6") || time.startsWith("$year-06")
             }
             7 -> {
-                return time.startsWith("2024-7") || time.startsWith("2024-07")
+                return time.startsWith("$year-7") || time.startsWith("$year-07")
             }
             8 -> {
-                return time.startsWith("2024-8") || time.startsWith("2024-08")
+                return time.startsWith("$year-8") || time.startsWith("$year-08")
             }
             9 -> {
-                return time.startsWith("2024-9") || time.startsWith("2024-09")
+                return time.startsWith("$year-9") || time.startsWith("$year-09")
             }
             10 -> {
-                return time.startsWith("2024-10")
+                return time.startsWith("$year-10")
             }
             11 -> {
-                return time.startsWith("2023-11")
+                return time.startsWith("$year-11")
             }
             12 -> {
-                return time.startsWith("2023-12")
+                return time.startsWith("$year-12")
             }
         }
         return false
@@ -338,8 +362,8 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
         }
     }
 
-    fun setOnlySeeDelete(checked: Boolean) {
-        maxLiang = checked
+    fun setYear(y: Int) {
+        yearY = y
     }
 
     fun setConditionOne(checked: Boolean) {
@@ -441,5 +465,9 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     }
     fun setXinGaoChecked(checked: Boolean) {
         xinGao = checked
+    }
+
+    fun setLeiXing(s: String) {
+        leiXingY = s
     }
 }

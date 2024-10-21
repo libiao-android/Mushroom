@@ -16,27 +16,36 @@
 
         <CheckBox
             android:textSize="13dp"
-            android:id="@+id/cb_fang_liang"
+            android:id="@+id/cb_21"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="放量"/>
+            android:text="21"/>
 
         <CheckBox
             android:textSize="13dp"
-            android:id="@+id/cb_delete"
+            android:id="@+id/cb_22"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="max量"/>
+            android:text="22"/>
 
         <CheckBox
             android:checked="false"
             android:visibility="visible"
             android:layout_marginLeft="5dp"
             android:textSize="13dp"
-            android:id="@+id/cb_three_yang"
+            android:id="@+id/cb_23"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3阳"/>
+            android:text="23"/>
+        <CheckBox
+            android:checked="false"
+            android:visibility="visible"
+            android:layout_marginLeft="5dp"
+            android:textSize="13dp"
+            android:id="@+id/cb_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="24"/>
         <Button
             android:layout_marginLeft="5dp"
             android:textSize="13dp"
@@ -54,10 +63,24 @@
 
         <CheckBox
             android:textSize="13dp"
-            android:id="@+id/cb_xin_gao"
+            android:id="@+id/cb_all"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="新高"/>
+            android:text="全部"/>
+
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_zhu_ban"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="主板"/>
+
+        <CheckBox
+            android:textSize="13dp"
+            android:id="@+id/cb_chuang"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="创业"/>
 
         <TextView
             android:layout_marginStart="20dp"

@@ -19,6 +19,7 @@ import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mode.*
 import com.libiao.mushroom.setting.SettingActivity
+import com.libiao.mushroom.test.TestFourMode
 import com.libiao.mushroom.test.TestOneMode
 import com.libiao.mushroom.test.TestThreeMode
 import com.libiao.mushroom.utils.Constant
@@ -173,6 +174,7 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(TestThreeMode())
 
 
+        mModeList.add(TestFourMode())
 
 
 
