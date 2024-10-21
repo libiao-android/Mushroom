@@ -64,6 +64,14 @@ data class ReportShareInfo(
     var fanbao: Boolean = false,
 
     @Ignore
+    var count: String = "0",
+
+    @Ignore
+    var rT: Double = 0.00,
+    @Ignore
+    var oneR: Double = 0.00,
+
+    @Ignore
     var candleEntryList: ArrayList<CandleEntry>? = null,
     @Ignore
     var barEntryList: ArrayList<BarEntry>? = null,

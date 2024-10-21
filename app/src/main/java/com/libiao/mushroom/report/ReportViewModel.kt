@@ -39,7 +39,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
     private val client = OkHttpClient()
 
 
-    fun fetchInfo(month: Int, back: (range: Double) -> Unit) {
+    fun fetchInfo(month: Int, back: (range: String) -> Unit) {
         if(month == 6) {
             //ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteByExt("3")
         }
@@ -210,6 +210,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                     if (post1 != null && post2 != null) {
                                         val r = post1!!.range - post1!!.rangeBegin + post2!!.range
                                         it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                        it.rT = r
                                         totalRange += r
                                     }
                                     dataTime.add(it)
@@ -219,6 +220,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                         if (post1 != null && post2 != null) {
                                             val r = post1!!.range - post1!!.rangeBegin + post2!!.range
                                             it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                            it.rT = r
                                             totalRange += r
                                         }
                                         dataTime.add(it)
@@ -230,6 +232,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                         if (post1 != null && post2 != null) {
                                             val r = post1!!.range - post1!!.rangeBegin + post2!!.range
                                             it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                            it.rT = r
                                             totalRange += r
                                         }
                                         dataTime.add(it)
@@ -239,6 +242,7 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                     if (post1 != null && post2 != null) {
                                         val r = post1!!.range - post1!!.rangeBegin + post2!!.range
                                         it.moreInfo = "${it.moreInfo}, ${baoLiuXiaoShu(r)}"
+                                        it.rT = r
                                         totalRange += r
                                     }
                                     dataTime.add(it)
@@ -251,7 +255,6 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             }
             LogUtil.i(TAG, "rangeCount: $rangeCount")
             //dataTime.sortByDescending { it.yinXianLength }
-            back(totalRange)
             if(dataTime.size > 0) {
                 dataTime[0].ext1 = "${dataTime.size}"
             }
@@ -259,6 +262,8 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
             dataTime.clear()
 
             dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
+            val rt = oneDayCount(dataT)
+            back("${baoLiuXiaoShu(totalRange)}, ${baoLiuXiaoShu(rt)}")
             dataT.also {
                 localList = it
                 setState {
@@ -266,6 +271,44 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                 }
             }
         }
+    }
+
+    private fun oneDayCount(dataT: java.util.ArrayList<ReportShareInfo>): Double {
+        var count = 0
+        var time = ""
+        val dataTime = ArrayList<ReportShareInfo>()
+        var r = 0.00
+        var rT = 0.00
+        dataT.forEach {
+            if(it.updateTime == time) {
+                dataTime.add(it)
+                r += it.rT
+            } else {
+                count = 0
+                time = it.updateTime!!
+                if(dataTime.size > 0) {
+                    dataTime[0].count = "${dataTime.size}"
+                    val s = if (dataTime.size > 4) 4 else dataTime.size
+                    val oneR = (r / dataTime.size * s)
+                    dataTime[0].oneR = oneR
+                    rT += oneR
+                }
+                dataTime.clear()
+                r = 0.00
+                dataTime.add(it)
+                r += it.rT
+            }
+            count++
+        }
+        if(dataTime.size > 0) {
+            dataTime[0].count = "${dataTime.size}"
+            val s = if (dataTime.size > 4) 4 else dataTime.size
+            val oneR = (r / dataTime.size * s)
+            dataTime[0].oneR = oneR
+            rT += oneR
+        }
+        dataTime.clear()
+        return rT
     }
 
     private fun isFit(month: Int, time: String, year: Int): Boolean {

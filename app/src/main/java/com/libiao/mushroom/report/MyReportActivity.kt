@@ -71,7 +71,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         seven_test.setOnClickListener {
             reportViewModel.fetchInfo(7) {
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "7"
@@ -79,7 +79,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         eight_test.setOnClickListener {
             reportViewModel.fetchInfo(8) {
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "8"
@@ -88,7 +88,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         nine_test.setOnClickListener {
             reportViewModel.fetchInfo(9){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "9"
@@ -96,7 +96,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         ten_test.setOnClickListener {
             reportViewModel.fetchInfo(10){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "10"
@@ -104,7 +104,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         eleven_test.setOnClickListener {
             reportViewModel.fetchInfo(11){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "11"
@@ -112,7 +112,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         twelve_test.setOnClickListener {
             reportViewModel.fetchInfo(12){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "12"
@@ -121,7 +121,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         one_test.setOnClickListener {
             reportViewModel.fetchInfo(1){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "1"
@@ -130,7 +130,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         two_test.setOnClickListener {
             reportViewModel.fetchInfo(2){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "2"
@@ -138,7 +138,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         three_test.setOnClickListener {
             reportViewModel.fetchInfo(3){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "3"
@@ -146,7 +146,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         four_test.setOnClickListener {
             reportViewModel.fetchInfo(4){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "4"
@@ -154,7 +154,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         five_test.setOnClickListener {
             reportViewModel.fetchInfo(5){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "5"
@@ -162,7 +162,7 @@ class MyReportActivity: BaseActivity(), MavericksView {
         six_test.setOnClickListener {
             reportViewModel.fetchInfo(6){
                 ThreadPoolUtil.executeUI {
-                    tv_total_range.text = baoLiuXiaoShu(it)
+                    tv_total_range.text = it
                 }
             }
             tv_month.text = "6"
@@ -185,8 +185,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
                     index = 0
                     timeItemView {
                         id(time)
-                        time(it.time)
-                        count(it.ext1)
+                        time("${it.time}, ${baoLiuXiaoShu(it.oneR)}")
+                        count(it.count)
                         expand(it.expand)
                         click { v ->
                             reportViewModel.expand(it.time!!)
