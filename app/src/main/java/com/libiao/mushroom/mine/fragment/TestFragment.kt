@@ -21,6 +21,7 @@ import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.test.TestShareDatabase2
 import com.libiao.mushroom.utils.ClipboardUtil
 import com.libiao.mushroom.utils.LogUtil
+import com.libiao.mushroom.utils.baoLiuXiaoShu
 import kotlinx.android.synthetic.main.test_fragment.*
 import java.util.*
 
@@ -317,7 +318,7 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
                     time = it.time ?: ""
                     timeItemView {
                         id(time)
-                        time(it.time)
+                        time("${it.time}, ${baoLiuXiaoShu(it.oneR)}")
                         count(it.count)
                         expand(it.expand)
                         click {v ->

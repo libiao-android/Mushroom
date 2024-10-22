@@ -59,6 +59,11 @@ data class TestShareInfo(
     var currentCb: Int = 1,
 
     @Ignore
+    var rT: Double = 0.00,
+    @Ignore
+    var oneR: Double = 0.00,
+
+    @Ignore
     var next: Boolean = false,
     @Ignore
     var todayRange: Double = 0.00, //今日涨幅

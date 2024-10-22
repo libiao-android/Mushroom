@@ -265,16 +265,21 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 it.moreInfo3 = "${baoLiuXiaoShu(itemBlackPost!!.rangeBegin)}, ${baoLiuXiaoShu(itemBlackPost!!.range)}"
                             }
 
+                            if (itemBlackPost2 != null) {
+                                it.moreInfo3 = "${baoLiuXiaoShu(itemBlackPost!!.range - itemBlackPost!!.rangeBegin + itemBlackPost2!!.range)}"
+                            }
+
                             val aa = itemBlack!!.totalPrice < itemBlackPre!!.totalPrice && itemBlack!!.maxPrice < itemBlackPre!!.maxPrice
-                            val bb = itemBlack!!.rangeMax - itemBlack!!.range > itemBlack!!.range - itemBlack!!.rangeBegin
+                            val bb = itemBlack!!.rangeMax - itemBlack!!.range > (itemBlack!!.range - itemBlack!!.rangeBegin) * 1.5
 
                             if (aa || bb) {
-                                // dataT.add(it)
+
                             } else {
                                 if (it.code?.startsWith("sz3") == true) {
                                     dataT.add(it)
                                     if(itemBlackPost != null && itemBlackPost2 != null) {
                                         val r = itemBlackPost!!.range - itemBlackPost!!.rangeBegin + itemBlackPost2!!.range
+                                        it.rT = r
                                         zhang += r
                                     }
                                 }
@@ -294,14 +299,15 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 }
 
             }
-            handler.post {
-                result("涨 ${baoLiuXiaoShu(zhang)}")
-            }
+
             LogUtil.i(TAG, "totalRange: $totalRange")
             dataT.sortByDescending { it.time!!.split("-")[2].toInt() }
 
-            oneDayCount(dataT)
+            val r = oneDayCount(dataT)
 
+            handler.post {
+                result("涨 ${baoLiuXiaoShu(zhang)}, ${baoLiuXiaoShu(r)}")
+            }
             dataT.also {
                 localList = it
                 setState {
@@ -309,6 +315,17 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                 }
             }
         }
+    }
+
+    fun zhangBan(info: SharesRecordActivity.ShareInfo): Boolean {
+        var maxRange = 1.1
+        if(info.code?.startsWith("sz3") == true || info.code?.startsWith("sh688") == true) {
+            maxRange = 1.2
+        }
+        var zhangTingPrice = info.yesterdayPrice * maxRange - 0.005
+        zhangTingPrice = String.format("%.2f",zhangTingPrice).toDouble()
+        val a = info.nowPrice > 0 && info.maxPrice >= zhangTingPrice && zhangTingPrice > 0
+        return a
     }
 
     fun isChuang(code: String?): Boolean {
@@ -346,29 +363,43 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         dataTime.clear()
     }
 
-    private fun oneDayCount(dataT: java.util.ArrayList<TestShareInfo>) {
+    private fun oneDayCount(dataT: java.util.ArrayList<TestShareInfo>): Double {
         var count = 0
         var time = ""
         val dataTime = ArrayList<TestShareInfo>()
+        var r = 0.00
+        var rT = 0.00
         dataT.forEach {
             if(it.updateTime == time) {
                 dataTime.add(it)
+                r += it.rT
             } else {
                 count = 0
                 time = it.updateTime!!
                 if(dataTime.size > 0) {
                     dataTime[0].count = "${dataTime.size}"
+                    val s = if (dataTime.size > 4) 4 else dataTime.size
+                    val oneR = (r / dataTime.size * s)
+                    dataTime[0].oneR = oneR
+                    rT += oneR
                 }
                 dataTime.clear()
+                r = 0.00
                 dataTime.add(it)
+                r += it.rT
             }
             count++
             it.index = count
         }
         if(dataTime.size > 0) {
             dataTime[0].count = "${dataTime.size}"
+            val s = if (dataTime.size > 4) 4 else dataTime.size
+            val oneR = (r / dataTime.size * s)
+            dataTime[0].oneR = oneR
+            rT += oneR
         }
         dataTime.clear()
+        return rT
     }
 
     private fun isfitCheck(ext5: String?): Boolean {

@@ -130,7 +130,7 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
 
     private fun initData() {
 
-        //mModeList.add(TestFourMode())
+        mModeList.add(TestThreeMode())
 
         val tempList = ArrayList<BaseMode>()
         mModeList.forEach {
@@ -155,6 +155,7 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
             while (str != null) {
                 //Log.i("libiao", "str: $str, $count")
                 //queryInfo(str.split(",")[0])
+
                 codeList.add(str.split(",")[0])
 
                 str = reader.readLine()
