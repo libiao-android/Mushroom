@@ -163,6 +163,9 @@ data class TestShareInfo(
         info.moreInfo = this.moreInfo
 
         info.index = this.index
+        info.rT = this.rT
+        info.oneR = this.oneR
+        info.moreInfo3 = this.moreInfo3
 
 
         candleEntryList?.also {

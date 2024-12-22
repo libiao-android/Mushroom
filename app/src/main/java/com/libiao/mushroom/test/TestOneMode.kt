@@ -7,6 +7,8 @@ import com.libiao.mushroom.room.TestOneShareDatabase
 import com.libiao.mushroom.room.TestOneShareInfo
 import com.libiao.mushroom.room.TestShareDatabase
 import com.libiao.mushroom.room.TestShareInfo
+import com.libiao.mushroom.room.report.ReportShareDatabase
+import com.libiao.mushroom.room.report.ReportShareInfo
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil
 import java.lang.Double.max
@@ -25,42 +27,49 @@ class TestOneMode : BaseMode {
     private val poolMap = HashMap<String, TestOneShareInfo>()
 
     init {
-        val mineShares = TestOneShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
-        mineShares?.forEach {
-            //LogUtil.i(TAG, "getMineShares: ${it.code}")
-            poolMap[it.code!!] = it
-        }
-        LogUtil.i(TAG, "init: ${poolMap.size}")
+
     }
 
 
     override fun analysis(day: Int, shares: ArrayList<SharesRecordActivity.ShareInfo>) {
         val size = shares.size
-        mDeviationValue = day - 2
+        mDeviationValue = day - 4
         if(mDeviationValue >= 0) {
-
             val one = shares[mDeviationValue + 0]
+            if (isKeChuang(one.code) || one.name!!.contains("ST")) return
             val two = shares[mDeviationValue + 1]
-            if (two.code?.startsWith("sh688") == true || two.name!!.contains("ST")) return
+            val three = shares[mDeviationValue + 2]
+            val four = shares[mDeviationValue + 3]
 
-            val a = zhangTing(one) && zhangTing(two).not() && two.range > 0 && two.nowPrice > two.beginPrice && two.rangeBegin >= 0.0
-
-            if (a) {
-                LogUtil.i(TAG, "${two.brieflyInfo()}")
-                mFitModeList.add(Pair(two.range, two))
-
-                val info = TestShareInfo()
-                info.time = two.time
-                info.code = two.code
-                info.name = two.name
-                info.dayCount = 20
-                info.updateTime = two.time
-                info.ext5 = "111"
-                TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
+            val a = zhangTing(one).not()
+            val b = zhangTing(two)
+            val c = three.range > 0 && three.nowPrice >= three.beginPrice && three.rangeBegin >= 0.0
+            //val c = zhangTing(three) && three.rangeBegin >= 0.0
+            //val d = four.maxPrice > three.maxPrice && four.rangeBegin <= 2 && four.range < 0 && four.rangeMax < 4
+            val d = four.rangeBegin <= 2 && four.maxPrice < three.maxPrice * 1.04 && four.nowPrice < three.maxPrice
+            if (a && b && c && d) {
+                if (mDeviationValue + 5 < size) {
+                    val five = shares[mDeviationValue + 4]
+                    val six = shares[mDeviationValue + 5]
+                    val zhang = five.range - five.rangeBegin + six.range
+                    four.post1 = baoLiuXiaoShu(zhang)
+                }
+                LogUtil.i(TAG, "${four.brieflyInfo()}")
+                mFitModeList.add(Pair(four.range, four))
+                record(four)
             }
         }
     }
 
+    private fun record(one: SharesRecordActivity.ShareInfo) {
+        val info = ReportShareInfo()
+        info.code = one.code
+        info.time = one.time
+        info.name = one.name
+        info.updateTime = one.time
+        info.ext5 = "6666"
+        ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
+    }
     private fun fanBao(
         one: SharesRecordActivity.ShareInfo,
         two: SharesRecordActivity.ShareInfo

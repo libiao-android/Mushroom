@@ -22,6 +22,7 @@ import com.libiao.mushroom.setting.SettingActivity
 import com.libiao.mushroom.test.TestFourMode
 import com.libiao.mushroom.test.TestOneMode
 import com.libiao.mushroom.test.TestThreeMode
+import com.libiao.mushroom.test.TestTwoMode
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import java.io.BufferedReader
@@ -167,14 +168,11 @@ class SharesAnalysisTodayActivity : AppCompatActivity() {
         mModeList.add(MineTest2Mode())
 
 
-
-
-        mModeList.add(TestOneMode())
-
-        mModeList.add(TestThreeMode())
+        mModeList.add(TestTwoMode())
 
 
         mModeList.add(TestFourMode())
+        mModeList.add(TestOneMode())
 
 
 

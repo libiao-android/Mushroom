@@ -5,6 +5,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import java.util.ArrayList
 
@@ -50,8 +51,14 @@ data class Up50ShareInfo(
     @Ignore
     var colorsList: ArrayList<Int>? = null,
     @Ignore
-    var lastShareInfo: SharesRecordActivity.ShareInfo? = null
-) {
+    var lastShareInfo: SharesRecordActivity.ShareInfo? = null,
+    @Ignore
+    var values_5: ArrayList<Entry>? = null,
+    @Ignore
+    var values_10: ArrayList<Entry>? = null,
+    @Ignore
+    var values_20: ArrayList<Entry>? = null
+    ) {
 
 
 
@@ -109,6 +116,23 @@ data class Up50ShareInfo(
             info.colorsList = colors
         }
 
+        values_5?.also {
+            val v = ArrayList<Entry>()
+            v.addAll(it)
+            info.values_5 = v
+        }
+
+        values_10?.also {
+            val v = ArrayList<Entry>()
+            v.addAll(it)
+            info.values_10 = v
+        }
+
+        values_20?.also {
+            val v = ArrayList<Entry>()
+            v.addAll(it)
+            info.values_20 = v
+        }
         info.lastShareInfo = this.lastShareInfo
 
         return info

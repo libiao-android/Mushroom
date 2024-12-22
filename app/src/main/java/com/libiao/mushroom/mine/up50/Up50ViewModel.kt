@@ -5,6 +5,7 @@ import android.os.Environment
 import com.airbnb.mvrx.MavericksViewModel
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.CandleEntry
+import com.github.mikephil.charting.data.Entry
 import com.libiao.mushroom.SharesRecordActivity
 import com.libiao.mushroom.mine.fragment.BaseFragment
 import com.libiao.mushroom.room.Up50ShareDatabase
@@ -46,6 +47,9 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
                         val candleEntrys = java.util.ArrayList<CandleEntry>()
                         val barEntrys = java.util.ArrayList<BarEntry>()
                         val colorEntrys = java.util.ArrayList<Int>()
+                        val values_5 = java.util.ArrayList<Entry>()
+                        val values_10 = java.util.ArrayList<Entry>()
+                        val values_20 = java.util.ArrayList<Entry>()
                         records.forEachIndexed { index, s ->
                             val item = SharesRecordActivity.ShareInfo(s)
                             if(item.beginPrice == 0.00) {
@@ -53,6 +57,17 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
                             } else {
                                 candleEntrys.add(CandleEntry((index).toFloat(), item.maxPrice.toFloat(), item.minPrice.toFloat(), item.beginPrice.toFloat(), item.nowPrice.toFloat()))
                             }
+                            var line5 = item.line_5
+                            if(line5 == 0.00) { line5 = item.beginPrice }
+
+                            var line10 = item.line_10
+                            if(line10 == 0.00) { line10 = item.beginPrice }
+
+                            var line20 = item.line_20
+                            if(line20 == 0.00) { line20 = item.beginPrice }
+                            values_5.add(Entry(index.toFloat(), line5.toFloat()))
+                            values_10.add(Entry(index.toFloat(), line10.toFloat()))
+                            values_20.add(Entry(index.toFloat(), line20.toFloat()))
 
                             val p = item.totalPrice.toFloat() / 100000000
                             barEntrys.add(BarEntry(index.toFloat(), p))
@@ -82,6 +97,10 @@ class Up50ViewModel(initial: Up50State): MavericksViewModel<Up50State>(initial) 
                         it.candleEntryList = candleEntrys
                         it.barEntryList = barEntrys
                         it.colorsList = colorEntrys
+                        it.values_5 = values_5
+                        it.values_10 = values_10
+                        it.values_20 = values_20
+
                     }
                 }
             }

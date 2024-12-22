@@ -66,12 +66,15 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     var kuiChecked = false
     var zhuanChencked = false
 
-    fun fetchInfo(month: Int, result: (info: String)->Unit) {
+
+    var yearY = 2024
+
+    fun fetchInfo(month: Int, dixi: Double, result: (info: String)->Unit) {
 
         withState {
 
             if(month == 11) {
-               //TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("444")
+               // TestShareDatabase.getInstance()?.getTestShareDao()?.deleteTest("8888")
             }
             val data: MutableList<TestShareInfo>?
             data = TestShareDatabase.getInstance()?.getTestShareDao()?.getZhenDang()
@@ -91,7 +94,7 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
             var zhang = 0.00
 
             data?.forEach {
-                if(it.dayCount >= 0 && isFit(month, it.time!!)) {
+                if(it.dayCount >= 0 && isFit(month, it.time!!, yearY)) {
                     val f = File(file_2023, it.code)
                     if(f.exists()) {
                         val stream = FileInputStream(f)
@@ -269,22 +272,19 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
                                 it.moreInfo3 = "${baoLiuXiaoShu(itemBlackPost!!.range - itemBlackPost!!.rangeBegin + itemBlackPost2!!.range)}"
                             }
 
-                            val aa = itemBlack!!.totalPrice < itemBlackPre!!.totalPrice && itemBlack!!.maxPrice < itemBlackPre!!.maxPrice
-                            val bb = itemBlack!!.rangeMax - itemBlack!!.range > (itemBlack!!.range - itemBlack!!.rangeBegin) * 1.5
-
-                            if (aa || bb) {
-
-                            } else {
-                                if (it.code?.startsWith("sz3") == true) {
-                                    dataT.add(it)
-                                    if(itemBlackPost != null && itemBlackPost2 != null) {
-                                        val r = itemBlackPost!!.range - itemBlackPost!!.rangeBegin + itemBlackPost2!!.range
-                                        it.rT = r
-                                        zhang += r
-                                    }
+                            if (itemBlackPost != null) {
+                                dataT.add(it)
+                                if(itemBlackPost != null && itemBlackPost2 != null) {
+                                    val b = itemBlackPost!!.rangeBegin
+                                    val r = itemBlackPost!!.range - b + itemBlackPost2!!.range
+                                    it.rT = r
+                                    zhang += r
                                 }
-
+                            } else {
+                                dataT.add(it)
                             }
+
+
 
 //                            itemBlackPre2?.also { pre2 ->
 //                                val a = itemBlackPre!!.rangeMax - itemBlackPre!!.rangeMin < 7
@@ -411,43 +411,43 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
         return false
     }
 
-    private fun isFit(month: Int, time: String): Boolean {
+    private fun isFit(month: Int, time: String, year: Int): Boolean {
         when(month) {
             1 -> {
-                return (time.startsWith("2024-1") || time.startsWith("2024-01")) && time.startsWith("2024-10").not()
+                return (time.startsWith("$year-1") || time.startsWith("$year-01")) && time.startsWith("$year-10").not() && time.startsWith("$year-11").not() && time.startsWith("$year-12").not()
             }
             2 -> {
-                return time.startsWith("2024-2") || time.startsWith("2024-02")
+                return time.startsWith("$year-2") || time.startsWith("$year-02")
             }
             3 -> {
-                return time.startsWith("2024-3") || time.startsWith("2024-03")
+                return time.startsWith("$year-3") || time.startsWith("$year-03")
             }
             4 -> {
-                return time.startsWith("2024-4") || time.startsWith("2024-04")
+                return time.startsWith("$year-4") || time.startsWith("$year-04")
             }
             5 -> {
-                return time.startsWith("2024-5") || time.startsWith("2024-05")
+                return time.startsWith("$year-5") || time.startsWith("$year-05")
             }
             6 -> {
-                return time.startsWith("2024-6") || time.startsWith("2024-06")
+                return time.startsWith("$year-6") || time.startsWith("$year-06")
             }
             7 -> {
-                return time.startsWith("2024-7") || time.startsWith("2024-07")
+                return time.startsWith("$year-7") || time.startsWith("$year-07")
             }
             8 -> {
-                return time.startsWith("2024-8") || time.startsWith("2024-08")
+                return time.startsWith("$year-8") || time.startsWith("$year-08")
             }
             9 -> {
-                return time.startsWith("2024-9") || time.startsWith("2024-09")
+                return time.startsWith("$year-9") || time.startsWith("$year-09")
             }
             10 -> {
-                return time.startsWith("2024-10")
+                return time.startsWith("$year-10")
             }
             11 -> {
-                return time.startsWith("2023-11")
+                return time.startsWith("$year-11")
             }
             12 -> {
-                return time.startsWith("2023-12")
+                return time.startsWith("$year-12")
             }
         }
         return false
@@ -565,6 +565,10 @@ class TestViewModel(initial: TestState): MavericksViewModel<TestState>(initial) 
     }
     fun setKuiCheck(checked: Boolean) {
         kuiChecked = checked
+    }
+
+    fun setYear(y: Int) {
+        yearY = y
     }
 
     fun setMaxPriceChecked(checked: Boolean) {

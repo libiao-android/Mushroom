@@ -70,6 +70,8 @@ data class ReportShareInfo(
     var rT: Double = 0.00,
     @Ignore
     var oneR: Double = 0.00,
+    @Ignore
+    var xiaYin: Double = 0.00,
 
     @Ignore
     var candleEntryList: ArrayList<CandleEntry>? = null,
@@ -124,6 +126,9 @@ data class ReportShareInfo(
         info.ext3 = this.ext3
         info.ext4 = this.ext4
         info.ext5 = this.ext5
+        info.count = this.count
+        info.rT = this.rT
+        info.oneR = this.oneR
 
         info.expand = this.expand
         info.moreInfo = this.moreInfo

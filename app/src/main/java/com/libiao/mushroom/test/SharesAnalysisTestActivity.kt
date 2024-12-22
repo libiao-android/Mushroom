@@ -20,6 +20,7 @@ import com.libiao.mushroom.analysis.SharesRealTimeInfoActivity
 import com.libiao.mushroom.kline.KLineActivity
 import com.libiao.mushroom.mode.*
 import com.libiao.mushroom.setting.SettingActivity
+import com.libiao.mushroom.thread.ThreadPoolUtil
 import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil.i
 import java.io.BufferedReader
@@ -130,7 +131,8 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
 
     private fun initData() {
 
-        mModeList.add(TestThreeMode())
+        mModeList.add(TestFiveMode())
+        // mModeList.add(TestThreeMode())
 
         val tempList = ArrayList<BaseMode>()
         mModeList.forEach {
@@ -156,7 +158,14 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
                 //Log.i("libiao", "str: $str, $count")
                 //queryInfo(str.split(",")[0])
 
-                codeList.add(str.split(",")[0])
+                val code = str.split(",")[0]
+//                if (code.startsWith("sz3") || code.startsWith("sh")) {
+//
+//                } else {
+//
+//                }
+
+                codeList.add(code)
 
                 str = reader.readLine()
             }
@@ -290,6 +299,7 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
         }
     }
 
+    val handler = Handler(Looper.getMainLooper())
     fun beforeOneDay(v: View) {
         if(allData.size == 0) return
         Constant.PRE++
@@ -298,6 +308,7 @@ class SharesAnalysisTestActivity : AppCompatActivity() {
         }
         mAdapter?.notifyDataSetChanged()
         findOutFitMode()
+        //handler.postDelayed({beforeOneDay(View(this))}, 100)
     }
 
     fun afterOneDay(v: View) {

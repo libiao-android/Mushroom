@@ -17,9 +17,11 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.libiao.mushroom.room.Up50ShareInfo
 import com.libiao.mushroom.utils.dip
 import com.libiao.mushroom.utils.huanSuanYi
+import kotlinx.android.synthetic.main.report_item_view.view.*
 import kotlinx.android.synthetic.main.up50_item_view.view.*
 
 @ModelView
@@ -29,8 +31,33 @@ class Up50ItemView @JvmOverloads constructor(
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-        initCandleChart()
+        //initCandleChart()
+        initCombinedChart()
         intBarChart()
+    }
+
+    var xAxis: XAxis? = null
+    private fun initCombinedChart() {
+        up50_combined_chart?.also {
+            it.setTouchEnabled(false)
+            it.description.isEnabled = false
+            it.setDrawGridBackground(false) // 是否显示表格颜色
+            //it.setBackgroundColor(Color.WHITE) // 设置背景
+            it.setPinchZoom(false) // if disabled, scaling can be done on x- and y-axis separately
+            it.isLogEnabled = true
+            it.isSelected = false
+            xAxis = it.xAxis
+            xAxis?.isEnabled = false
+
+            val leftAxis: YAxis = it.axisLeft
+            leftAxis.isEnabled = false
+
+            val rightAxis: YAxis = it.axisRight
+            rightAxis.isEnabled = false
+
+            val l: Legend = it.legend // 设置比例图标示
+            l.isEnabled = false //决定显不显示标签
+        }
     }
 
     private fun intBarChart() {
@@ -98,14 +125,36 @@ class Up50ItemView @JvmOverloads constructor(
         }
 
         info.candleEntryList?.also {
-            val candleData = CandleData(getCanleDataSet(it))
+//            val candleData = CandleData(getCanleDataSet(it))
+//
+//            val candleParams = up50_item_candler_chart?.layoutParams
+//            candleParams?.width = getWidth(it.size)
+//            up50_item_candler_chart.layoutParams = candleParams
+//
+//            up50_item_candler_chart.data = candleData
+//            up50_item_candler_chart.invalidate()
 
-            val candleParams = up50_item_candler_chart?.layoutParams
-            candleParams?.width = getWidth(it.size)
-            up50_item_candler_chart.layoutParams = candleParams
 
-            up50_item_candler_chart.data = candleData
-            up50_item_candler_chart.invalidate()
+            val data = CombinedData()
+
+            val dataSets = ArrayList<ILineDataSet>()
+            dataSets.add(getLineDataSet(info.values_5!!, Color.BLUE, "line 5"))
+            dataSets.add(getLineDataSet(info.values_10!!, Color.RED, "line 10"))
+            dataSets.add(getLineDataSet(info.values_20!!, Color.GREEN, "line 20"))
+            data.setData(LineData(dataSets))
+
+            data.setData(CandleData(getCanleDataSet(it)))
+
+            xAxis?.axisMaximum = data.xMax + 1f
+            xAxis?.axisMinimum = data.xMin - 1f
+
+            val params = up50_combined_chart?.layoutParams
+            params?.width = getWidth(it.size)
+            params?.height = getHeight(it.size)
+            up50_combined_chart?.layoutParams = params
+
+            up50_combined_chart?.data = data
+            up50_combined_chart?.invalidate()
 
 
             val barData = BarData(getBarDataSet(info.barEntryList, info.colorsList))
@@ -158,6 +207,23 @@ class Up50ItemView @JvmOverloads constructor(
         }
     }
 
+    private fun getLineDataSet(values: ArrayList<Entry>, color: Int, lable: String): ILineDataSet {
+        // create a dataset and give it a type
+        val set1 = LineDataSet(values, lable)
+        set1.isHighlightEnabled = false
+        set1.setDrawIcons(false)
+        set1.setDrawCircles(false)
+        set1.color = color
+        set1.lineWidth = 0.5f
+//        set1.formLineDashEffect = DashPathEffect(floatArrayOf(10f, 5f), 0f)
+        set1.formSize = 10f
+        //set1.valueTextSize = 9f
+        set1.setDrawFilled(false)
+        set1.setDrawValues(false)
+
+        return set1
+    }
+
     private fun getBarDataSet(barData: List<BarEntry>?, colorData: List<Int>?): MutableList<IBarDataSet>? {
         val set = BarDataSet(barData, "liang neng")
         set.setDrawIcons(false)
@@ -186,6 +252,12 @@ class Up50ItemView @JvmOverloads constructor(
         set1.neutralColor = Color.RED
         //set1.highLightColor = Color.BLACK
         return set1
+    }
+
+    private fun getHeight(size: Int): Int {
+        if(size < 10) return 240
+        if(size > 100) return 600
+        return 240 + (size - 10) * 4
     }
 
     private fun getWidth(size: Int): Int {

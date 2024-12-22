@@ -35,19 +35,25 @@ class MyReportActivity: BaseActivity(), MavericksView {
     private val controller = ReportController()
     private val reportViewModel: ReportViewModel by viewModel()
 
+    private var yearTotalR = 0.00
+
     private fun initView() {
         reportViewModel.setYear(2024)
         cb_21.setOnCheckedChangeListener { buttonView, isChecked ->
+            yearTotalR = 0.00
             reportViewModel.setYear(2021)
         }
         cb_22.setOnCheckedChangeListener { buttonView, isChecked ->
             reportViewModel.setYear(2022)
+            yearTotalR = 0.00
         }
         cb_23.setOnCheckedChangeListener { buttonView, isChecked ->
             reportViewModel.setYear(2023)
+            yearTotalR = 0.00
         }
         cb_24.setOnCheckedChangeListener { buttonView, isChecked ->
             reportViewModel.setYear(2024)
+            yearTotalR = 0.00
         }
         cb_all.setOnCheckedChangeListener { buttonView, isChecked ->
             reportViewModel.setLeiXing("all")
@@ -72,6 +78,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(7) {
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "7"
@@ -80,6 +88,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(8) {
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "8"
@@ -89,6 +99,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(9){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "9"
@@ -97,6 +109,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(10){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "10"
@@ -105,6 +119,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(11){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "11"
@@ -113,6 +129,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(12){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "12"
@@ -122,6 +140,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(1){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "1"
@@ -131,6 +151,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(2){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "2"
@@ -139,6 +161,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(3){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "3"
@@ -147,6 +171,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(4){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "4"
@@ -155,6 +181,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(5){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "5"
@@ -163,6 +191,8 @@ class MyReportActivity: BaseActivity(), MavericksView {
             reportViewModel.fetchInfo(6){
                 ThreadPoolUtil.executeUI {
                     tv_total_range.text = it
+                    yearTotalR += it.split(",")[1].trim().toDouble()
+                    year_total_range.text = baoLiuXiaoShu(yearTotalR)
                 }
             }
             tv_month.text = "6"

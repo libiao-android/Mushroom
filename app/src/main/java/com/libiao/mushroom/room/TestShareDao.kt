@@ -42,6 +42,6 @@ interface TestShareDao {
     @Query("SELECT * FROM TestShareInfo WHERE ext5 = 111")
     fun getDaZhangShares3(): MutableList<TestShareInfo>
 
-    @Query("SELECT * FROM TestShareInfo WHERE ext5 = 777")
+    @Query("SELECT * FROM TestShareInfo WHERE ext5 = 8888")
     fun getZhenDang(): MutableList<TestShareInfo>
 }

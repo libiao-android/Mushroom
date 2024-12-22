@@ -135,6 +135,7 @@ class Up50Fragment: BaseFragment(R.layout.fang_liang_fragment), MavericksView, I
                                     val intent = Intent(context, KLineActivity::class.java)
                                     intent.putExtra("code", it.code)
                                     intent.putExtra("info", it.toString())
+                                    intent.putExtra("time", it.time)
                                     context?.startActivity(intent)
                                 }
                             }

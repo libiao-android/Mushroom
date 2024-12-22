@@ -41,14 +41,14 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
     fun fetchInfo(month: Int, back: (range: String) -> Unit) {
         if(month == 6) {
-            //ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteByExt("3")
+           // ReportShareDatabase.getInstance()?.getReportShareDao()?.deleteByExt("6666")
         }
         withState {
 
             //val data = XinGaoShareDatabase.getInstance()?.getReportShareDao()?.getShares()
 
 
-            val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("222")
+            val data = ReportShareDatabase.getInstance()?.getReportShareDao()?.getSharesTest("6666")
             LogUtil.i(TAG, "fetchInfo: ${data?.size}")
             val dataT = ArrayList<ReportShareInfo>()
             val dataTime = ArrayList<ReportShareInfo>()
@@ -193,6 +193,9 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
                                     it.moreInfo3 = "${item.rangeBegin}, ${item.rangeMin}, ${item.rangeMax}, ${item.range}"
                                 }
                             }
+
+                            //if (pre3!!.totalPrice > pre2!!.totalPrice) return@forEach
+
                             it.candleEntryList = candleEntrys
                             it.barEntryList = barEntrys
                             it.colorsList = colorEntrys
@@ -202,9 +205,23 @@ class ReportViewModel(initial: ReportState): MavericksViewModel<ReportState>(ini
 
                             val liangBi = baoLiuXiaoShu(current!!.totalPrice / pre3!!.totalPrice)
 
+                            //val p = pre3!!.range - (pre3!!.rangeBegin - pre3!!.rangeMin) - current!!.range - (current!!.range - current!!.rangeMin)
+                            val p = (pre3!!.rangeBegin - pre3!!.rangeMin)
 
-                            it.moreInfo = "${post1?.rangeBegin}, ${post1?.range}, ${post2?.range}"
+//                            if(post1 != null) {
+//                                val a = current!!.range + post1!!.rangeBegin <= -10
+//                                if (a.not()) return@forEach
+//                            }
 
+
+                            it.moreInfo = "${baoLiuXiaoShu(p)}, ${post1?.rangeBegin}, ${post1?.range}, ${post2?.range}"
+
+//                            val z = p <= 1
+//                            if (z.not()) return@forEach
+
+                     //       if (ShareParseUtil.zhangTing(pre3!!).not()) return@forEach
+
+                            it.xiaYin = p
                             when(leiXingY) {
                                 "all" -> {
                                     if (post1 != null && post2 != null) {

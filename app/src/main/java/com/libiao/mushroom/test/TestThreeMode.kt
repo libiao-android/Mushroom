@@ -36,22 +36,14 @@ class TestThreeMode : BaseMode {
             if (isKeChuang(one.code) || one.name!!.contains("ST")) return
             val two = shares[mDeviationValue + 2]
 
-            val a = one.rangeMin < -4 && one.range < 0
-            val b = (two.rangeMax > 7 || (two.nowPrice > two.beginPrice && two.rangeMax - two.rangeBegin > 7))
-            val c = zero.rangeMax > 7 && zero.range > 0 && zero.nowPrice > zero.beginPrice
+            val a = zero.totalPrice < 5000000000
+            val b = one.totalPrice < 5000000000
+            val c = two.totalPrice > 5000000000 && two.huanShouLv > 10
 
             if (a && b && c) {
                 LogUtil.i(TAG, "${two.brieflyInfo()}")
                 mFitModeList.add(Pair(two.range, two))
 
-                val info = TestShareInfo()
-                info.time = two.time
-                info.code = two.code
-                info.name = two.name
-                info.dayCount = 20
-                info.updateTime = two.time
-                info.ext5 = "777"
-                TestShareDatabase.getInstance()?.getTestShareDao()?.insert(info)
 
             }
         }

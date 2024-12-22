@@ -13,7 +13,7 @@ import com.libiao.mushroom.utils.Constant
 import com.libiao.mushroom.utils.LogUtil
 import java.lang.Double.max
 
-class TestFourMode : BaseMode {
+class TestFiveMode : BaseMode {
 
     constructor(): super() {
     }
@@ -27,12 +27,7 @@ class TestFourMode : BaseMode {
     private val poolMap = HashMap<String, TestOneShareInfo>()
 
     init {
-        val mineShares = TestOneShareDatabase.getInstance()?.getMineShareDao()?.getMineShares()
-        mineShares?.forEach {
-            //LogUtil.i(TAG, "getMineShares: ${it.code}")
-            poolMap[it.code!!] = it
-        }
-        LogUtil.i(TAG, "init: ${poolMap.size}")
+
     }
 
 
@@ -48,9 +43,11 @@ class TestFourMode : BaseMode {
 
             val a = zhangTing(one).not()
             val b = zhangTing(two)
-            val c = three.range > 0 && three.nowPrice >= three.beginPrice && three.rangeBegin > 0
-            val d = four.maxPrice <= three.maxPrice
-            if (a && b && c && d) {
+            val c = three.range > 0 && three.nowPrice >= three.beginPrice && three.rangeBegin >= 0.0
+            //val c = zhangTing(three) && three.rangeBegin >= 0.0
+            //val d = four.maxPrice > three.maxPrice && four.rangeBegin <= 2 && four.range < 0 && four.rangeMax < 4
+            val d = four.rangeBegin <= 2 && four.maxPrice < three.maxPrice * 1.04 && four.nowPrice < three.maxPrice
+            if (a && b && c && d.not() && four.range < -3 && four.range - four.rangeMin < 3) {
                 if (mDeviationValue + 5 < size) {
                     val five = shares[mDeviationValue + 4]
                     val six = shares[mDeviationValue + 5]
@@ -59,7 +56,6 @@ class TestFourMode : BaseMode {
                 }
                 LogUtil.i(TAG, "${four.brieflyInfo()}")
                 mFitModeList.add(Pair(four.range, four))
-                record(four)
             }
         }
     }
@@ -70,10 +66,9 @@ class TestFourMode : BaseMode {
         info.time = one.time
         info.name = one.name
         info.updateTime = one.time
-        info.ext5 = "222"
+        info.ext5 = "6666"
         ReportShareDatabase.getInstance()?.getReportShareDao()?.insert(info)
     }
-
     private fun fanBao(
         one: SharesRecordActivity.ShareInfo,
         two: SharesRecordActivity.ShareInfo
@@ -100,7 +95,7 @@ class TestFourMode : BaseMode {
     }
 
     override fun des(): String {
-        return "test4"
+        return "test"
     }
 
 }

@@ -107,70 +107,70 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
 
         one_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(1) {
+            testViewModel.fetchInfo(1, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "1"
         }
         two_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(2) {
+            testViewModel.fetchInfo(2, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "2"
         }
         three_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(3) {
+            testViewModel.fetchInfo(3, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "3"
         }
         four_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(4) {
+            testViewModel.fetchInfo(4, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "4"
         }
         five_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(5) {
+            testViewModel.fetchInfo(5, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "5"
         }
         six_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(6) {
+            testViewModel.fetchInfo(6, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "6"
         }
         seven_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(7) {
+            testViewModel.fetchInfo(7, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "7"
         }
         eight_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(8) {
+            testViewModel.fetchInfo(8, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "8"
         }
         nine_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(9) {
+            testViewModel.fetchInfo(9, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "9"
         }
         ten_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(10) {
+            testViewModel.fetchInfo(10, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "10"
@@ -178,14 +178,14 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
 
         eleven_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(11) {
+            testViewModel.fetchInfo(11, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "11"
         }
         twelve_test.setOnClickListener {
             loadingStatus = 1
-            testViewModel.fetchInfo(12) {
+            testViewModel.fetchInfo(12, dixi.text.toString().toDouble()) {
                 more_info.text = it
             }
             tv_month.text = "12"
@@ -197,24 +197,19 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
         cb_less_price.setOnCheckedChangeListener { buttonView, isChecked ->
             testViewModel.setLessPricechecked(isChecked)
         }
-        cb_xin_gao_test.setOnCheckedChangeListener { buttonView, isChecked ->
-//            if(isChecked) {
-//                needTime = true
-//                cb_fang_liang_test.isChecked = false
-//                cb_xin_gao_2.isChecked = false
-//                month1.visibility = View.VISIBLE
-//                month2.visibility = View.VISIBLE
-//                xin_gao2_sub_view.visibility = View.GONE
-//            }
-            testViewModel.setAllChecked(isChecked)
-          //  xin_gao_sub_view.visibility = if(isChecked) View.VISIBLE else View.GONE
+        cb_2021.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setYear(2021)
         }
-        cb_zhuan.setOnCheckedChangeListener { buttonView, isChecked ->
-            testViewModel.setZhuanCheck(isChecked)
+        cb_2022.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setYear(2022)
         }
 
-        cb_kui.setOnCheckedChangeListener { buttonView, isChecked ->
-            testViewModel.setKuiCheck(isChecked)
+        cb_2023.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setYear(2023)
+        }
+
+        cb_2024.setOnCheckedChangeListener { buttonView, isChecked ->
+            testViewModel.setYear(2024)
         }
 
         cb_max_price.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -228,19 +223,8 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
             testViewModel.set120Checked(isChecked)
         }
 
-        cb_xin_gao_2.setOnCheckedChangeListener { buttonView, isChecked ->
-            testViewModel.setXinGao2Checked(isChecked)
-            if(isChecked) {
-                cb_xin_gao_test.isChecked = false
-                cb_zhuan.isChecked = false
-                month1.visibility = View.GONE
-                month2.visibility = View.GONE
-                xin_gao2_sub_view.visibility = View.VISIBLE
-            }
-        }
-        cb_xin_di.setOnCheckedChangeListener { buttonView, isChecked ->
-            testViewModel.setXindi(isChecked)
-        }
+
+
         cb_da_zhang.setOnCheckedChangeListener { buttonView, isChecked ->
             testViewModel.setDaZhang(isChecked)
         }
@@ -272,7 +256,7 @@ class TestFragment: BaseFragment(R.layout.test_fragment), MavericksView, IComman
 
         }
         load.setOnClickListener {
-            testViewModel.fetchInfo(1){
+            testViewModel.fetchInfo(1, dixi.text.toString().toDouble()){
 
             }
         }
